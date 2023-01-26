@@ -4,7 +4,7 @@ This project uses ruby Sinatra as backend and AngularJS as frontend to build a d
 
 https://cdn.intra.42.fr/pdf/pdf/60925/en.subject.pdf
 
-This project I initially made with pvanderl in this [repository](https://github.com/pvanderl/19_matcha), I re-uploaded it on my profile.
+This project I initially made with [pvanderl](https://github.com/pvanderl) in this [repository](https://github.com/pvanderl/19_matcha), I re-uploaded it on my profile.
 
 ## Run
 
