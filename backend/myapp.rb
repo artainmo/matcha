@@ -560,7 +560,7 @@ helpers do
         :address => 'ssl0.ovh.net',
         :port => '587',
         :user_name => 'matcha@vanderlynden.eu',
-        :password => 'matchamatcha',
+        :password => '???', #Ask the actual password to pvanderl, we won't leave it publicly here
         :authentication => :plain
       })
       return true
