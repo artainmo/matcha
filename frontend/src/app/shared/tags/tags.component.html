@@ -1,0 +1,33 @@
+<form class="example-form">
+    <mat-form-field class="example-chip-list" appearance="fill">
+        <mat-label>Tags</mat-label>
+        <mat-chip-list #chipList aria-label="Tag selection">
+            <mat-chip *ngFor="let tag of _tags" (removed)="remove(tag)">
+                #{{tag}}
+                <button matChipRemove>
+                    <mat-icon>cancel</mat-icon>
+                </button>
+            </mat-chip>
+            <input placeholder="New tag..."
+									 #tags
+                   [matChipInputFor]="chipList"
+                   [matChipInputSeparatorKeyCodes]="alreadyInList ? separatorKeysCodes : []"
+                   [matChipInputAddOnBlur]="addOnBlur"
+                   (matChipInputTokenEnd)="add($event)"
+                   [formControl]="control"
+                   [matAutocomplete]="auto">
+            <button *ngIf="control.getRawValue().length > 0" matSuffix mat-icon-button aria-label="Add"
+										[disabled]="alreadyInList"
+                    (click)="add(null)">
+                <mat-icon>add</mat-icon>
+            </button>
+            <mat-autocomplete #auto="matAutocomplete">
+                <mat-option *ngFor="let option of availableTags | async" [value]="option">
+                    {{option}}
+                </mat-option>
+            </mat-autocomplete>
+        </mat-chip-list>
+        <mat-error *ngIf="_tags.length < 1">At least one tag is required</mat-error>
+        <mat-error *ngIf="alreadyInList">Element already in list</mat-error>
+    </mat-form-field>
+</form>

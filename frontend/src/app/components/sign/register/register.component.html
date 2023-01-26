@@ -1,0 +1,46 @@
+<form *ngIf="!loading && !success" [formGroup]="form">
+	<mat-form-field appearance="fill">
+			<mat-label>Enter your username</mat-label>
+			<input formControlName="username" matInput autocomplete="on" name="username" type="text">
+	</mat-form-field>
+	<br>
+	<mat-form-field appearance="fill">
+			<mat-label>Enter your first name</mat-label>
+			<input formControlName="firstname" matInput autocomplete="on" name="first_name" type="text">
+	</mat-form-field>
+	<br>
+	<mat-form-field appearance="fill">
+		<mat-label>Enter your last name</mat-label>
+		<input formControlName="lastname" matInput autocomplete="on" name="last_name" type="text">
+	</mat-form-field>
+	<br>
+	<mat-form-field appearance="fill">
+			<mat-label>Enter your email</mat-label>
+			<input formControlName="email" matInput autocomplete="on" name="email" type="email">
+	</mat-form-field>
+	<br>
+	<mat-form-field appearance="fill">
+		<mat-label>Enter your password</mat-label>
+		<input formControlName="password" matInput autocomplete="on" name="password" type="password">
+	</mat-form-field>
+	<p *ngIf="form.controls['password'].invalid">Password must contain at least:
+		<br>- 6 characters
+		<br>- One uppercase letter
+		<br>- One lowercase letter
+		<br>- One number
+		<br>- One special character
+	</p>
+	<br>
+	<div *ngIf="error" style="color: red">
+		{{ errorMessage }}
+	</div>
+	<button mat-raised-button [disabled]="form.invalid" (click)="submit()">Register !</button>
+</form>
+<div *ngIf="loading">
+    <h3>Register in progress</h3>
+</div>
+<div *ngIf="success">
+    <h3>An email has been sent to verify your account.
+        <br>You will not be able to login without verifying your account.
+    </h3>
+</div>

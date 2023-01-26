@@ -1,0 +1,14 @@
+<p *ngIf="!(messages$ | async) || (messages$ | async)?.length == 0">
+  No messages.
+</p>
+<mat-list>
+    <mat-list-item *ngFor="let message of (messages$ | async | getLatests)">
+			<button mat-stroked-button [color]="route.includes(message.sender_id === activeUsername ? message.receiver_id : message.sender_id) ? 'primary' : undefined" [routerLink]="message.sender_id === activeUsername ? message.receiver_id : message.sender_id">
+				<span>
+					{{ message.sender_id === activeUsername ? message.receiver_id : message.sender_id }}
+				</span>
+				<mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="arrow_forward"></mat-icon>
+			</button>
+    </mat-list-item>
+</mat-list>
+<button mat-raised-button (click)="openNewMessageDialog()">Write a new message</button>

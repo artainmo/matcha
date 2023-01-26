@@ -1,0 +1,86 @@
+<mat-form-field appearance="fill">
+	<mat-label>Sort by</mat-label>
+	<mat-select [formControl]="sortBy">
+		<mat-option value="Relevant" *ngIf="showRelevant">Relevant</mat-option>
+		<mat-option value="Default" *ngIf="!showRelevant">Default</mat-option>
+		<mat-option value="Age">Age</mat-option>
+		<mat-option value="Location">Location</mat-option>
+		<mat-option value="Fame">Fame</mat-option>
+		<mat-option value="Tags">Tags</mat-option>
+	</mat-select>
+</mat-form-field>
+<mat-accordion>
+	<mat-expansion-panel hideToggle>
+	</mat-expansion-panel>
+	<mat-expansion-panel>
+		<mat-expansion-panel-header>
+			<mat-panel-title>
+				See the filters bellow
+			</mat-panel-title>
+		</mat-expansion-panel-header>
+		<table>
+			<tr>
+				<td>
+					<span>Filter by fame rating</span><br>
+					<ul style="list-style-type: none;">
+						<li
+							*ngFor="let filter of (availableFilters$ | async)?.fame"
+						>
+							<mat-checkbox
+								[ngModel]="_appliedFilter.fame.includes(filter)"
+								(ngModelChange)="updateFameList(filter)"
+							>
+								{{ filter }}
+							</mat-checkbox>
+						</li>
+					</ul>
+				</td>
+				<td>
+					<span>Filter by distance from you</span><br>
+					<ul style="list-style-type: none;">
+						<li
+							*ngFor="let filter of (availableFilters$ | async)?.distance"
+						>
+							<mat-checkbox
+								[ngModel]="_appliedFilter.distance.includes(filter)"
+								(ngModelChange)="updateDistanceList(filter)"
+							>
+								{{ filter }}
+							</mat-checkbox>
+						</li>
+					</ul>
+				</td>
+				<td>
+					<span>Filter by number of common tags with you</span><br>
+					<ul style="list-style-type: none;">
+						<li
+							*ngFor="let filter of (availableFilters$ | async)?.commonTags"
+						>
+							<mat-checkbox
+								[ngModel]="_appliedFilter.commonTags.includes(filter)"
+								(ngModelChange)="updateCommonTagsList(filter)"
+							>
+								{{ filter }}
+							</mat-checkbox>
+						</li>
+					</ul>
+				</td>
+				<td>
+					<span>Filter by age</span><br>
+					<ul style="list-style-type: none;">
+						<li
+							*ngFor="let filter of (availableFilters$ | async)?.birthday"
+						>
+							<mat-checkbox
+								[ngModel]="_appliedFilter.birthday.includes(filter)"
+								(ngModelChange)="updateBirthdayList(filter)"
+							>
+								{{ filter }}
+							</mat-checkbox>
+						</li>
+					</ul>
+				</td>
+			</tr>
+		</table>
+	</mat-expansion-panel>
+</mat-accordion>

@@ -1,0 +1,50 @@
+<form [hidden]="loading || success" [formGroup]="form">
+    <mat-form-field appearance="fill">
+        <mat-label>Gender</mat-label>
+        <mat-select formControlName="gender">
+            <mat-option value="FEMALE">Female</mat-option>
+            <mat-option value="MALE">Male</mat-option>
+            <mat-option value="OTHER">Other</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <br>
+    <mat-form-field appearance="fill">
+        <mat-label>Birthday</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="birthday">
+        <mat-hint>DD/MM/YYYY</mat-hint>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+    <br>
+    <mat-form-field appearance="fill">
+        <mat-label>Sexual preferences</mat-label>
+        <mat-select formControlName="preferences">
+            <mat-option value="FEMALE">Female</mat-option>
+            <mat-option value="MALE">Male</mat-option>
+            <mat-option value="BI">Bi</mat-option>
+            <mat-option value="OTHER">Other</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <br>
+    <mat-form-field appearance="fill">
+        <mat-label>Biography</mat-label>
+        <input formControlName="biography" matInput autocomplete="on" name="biography" type="text">
+    </mat-form-field>
+    <br>
+    <!--		INTERESTS TAGS -->
+    <app-tags [tags]="_tags"></app-tags>
+    <!--		pictures -->
+    <app-picture-selection
+            (favorite)="favorite = $event"></app-picture-selection>
+    <br>
+    <button mat-raised-button [disabled]="form.invalid || _tags.length < 1 || favorite == ''" (click)="submit()">Register !</button>
+</form>
+<div *ngIf="loading">
+    <h3>Register in progress</h3>
+</div>
+<div *ngIf="success">
+    <h3>An email has been sent to verify your account.
+        <br>You will not be able to login without verifying your account.
+    </h3>
+</div>
+{{ error }}

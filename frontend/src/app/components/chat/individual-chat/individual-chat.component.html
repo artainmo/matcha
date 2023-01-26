@@ -1,0 +1,8 @@
+<table style="width: 100%">
+	<tr *ngFor="let message of (messages$ | async | filterUsername: username)" [style]="(message.sender_id === username) ? 'text-align: right' : 'text-align: left'">
+		<div class="message" style="text-align: right" *ngIf="!(message.sender_id === username)"><div class="sent"><span style="font-size: 12px;">{{message.time | date: 'MM/dd/YYY HH:mm'}} </span> {{ message.content }}</div></div>
+
+		<div class="message" style="text-align: left" *ngIf="message.sender_id === username"><div class="received">{{ message.content }} <span style="font-size: 12px;"> {{message.time | date: 'MM/dd/YYY HH:mm'}}</span></div></div>
+
+	</tr>
+</table>

@@ -1,0 +1,27 @@
+<div *ngIf="!loading">
+	<h4>Visits</h4>
+	<mat-chip-list *ngIf="moreInfos?.visits?.length != 0">
+		<mat-chip *ngFor="let visit of moreInfos?.visits"
+							(removed)="open(visit)">
+			{{ visit }}
+			<button matChipRemove>
+				<mat-icon>arrow_forward</mat-icon>
+			</button>
+		</mat-chip>
+	</mat-chip-list>
+	<p *ngIf="moreInfos?.visits?.length == 0">No visits currently</p>
+	<h4>Likes</h4>
+	<mat-chip-list *ngIf="moreInfos?.likes?.length != 0">
+		<mat-chip *ngFor="let like of moreInfos?.likes"
+							(removed)="open(like)">
+			{{ like }}
+			<button matChipRemove>
+				<mat-icon>arrow_forward</mat-icon>
+			</button>
+		</mat-chip>
+	</mat-chip-list>
+	<p *ngIf="moreInfos?.likes?.length == 0">No likes currently</p>
+	<h4>Fame rating</h4>
+	<p>{{ moreInfos?.fameRating }}</p>
+</div>
+<mat-spinner *ngIf="loading"></mat-spinner>

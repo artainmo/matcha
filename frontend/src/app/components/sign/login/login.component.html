@@ -1,0 +1,21 @@
+<form>
+	<mat-form-field appearance="fill">
+			<mat-label>Enter your user</mat-label>
+			<input [(ngModel)]="user" matInput autocomplete="on" name="username">
+			<mat-error *ngIf="badLogin$ | async">{{ message$ | async }}</mat-error>
+	</mat-form-field>
+	<br>
+	<mat-form-field appearance="fill">
+			<mat-label>Enter your password</mat-label>
+			<input [(ngModel)]="password" matInput [type]="hide ? 'password' : 'text'" autocomplete="on" name="password">
+			<mat-error *ngIf="wrongPassword$ | async">{{ message$ | async }}</mat-error>
+			<button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'"
+							[attr.aria-pressed]="hide">
+					<mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+			</button>
+	</mat-form-field>
+	<p *ngIf="(badLogin$ | async) || (wrongPassword$ | async)">{{ message$ | async }}</p>
+	<br>
+	<button mat-raised-button color="primary" [disabled]="!user || !password" (click)="login()" type="submit">Login</button>
+	<button mat-button routerLink="/profile/password/request">Reset password!</button>
+</form>

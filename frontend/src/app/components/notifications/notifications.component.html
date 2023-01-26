@@ -1,0 +1,17 @@
+<mat-list>
+    <mat-list-item *ngIf="(notifications$ | async)?.length == 0">
+			<p matLine>
+				No notifications yet
+			</p>
+		</mat-list-item>
+    <mat-list-item *ngFor="let notification of (notifications$ | async)">
+        <h3 matLine>{{notification.title}}</h3>
+        <p matLine>
+					{{notification.content}}
+            <button *ngIf="!notification.opened" mat-mini-fab (click)="markRead(notification.id)">
+                <mat-icon>done</mat-icon>
+            </button>
+        </p>
+    </mat-list-item>
+	<mat-divider></mat-divider>
+</mat-list>

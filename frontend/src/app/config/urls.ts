@@ -1,0 +1,22 @@
+import { environment } from '../../environments/environment';
+
+export const URL_REGISTER = environment.server + '/account/register';
+export const URL_VERIFY_ACCOUNT = environment.server + '/account/verify';
+export const URL_COMPLETE_ACCOUNT = environment.server + '/account/fill';
+export const URL_ACCOUNT = environment.server + '/account';
+export const URL_ACCOUNT_FIND = (username: string) => environment.server + '/account/find/' + username;
+export const URL_LOGIN = (username: string, password: string) => environment.server + `/account/${encodeURI(username)}/password/${encodeURI(password)}`;
+export const URL_MORE_INFOS = environment.server + '/account/more-infos';
+export const URL_FAME = (username: string) => environment.server + '/account/fame/' + username;
+export const URL_SEARCH = environment.server + '/account/search';
+export const URL_ACCOUNT_SUGGESTIONS= environment.server + '/account/suggestions';
+export const URL_REQUEST_PASSWORD = (username: string) => environment.server + '/token/resetPassword/' + encodeURI(username);
+export const URL_RESET_PASSWORD = (token: string, password: string) => environment.server + '/token/' + token + '/resetPassword/' + encodeURI(password);
+export const URL_LIKE = environment.server + '/liked/';
+export const URL_FAKE = environment.server + '/account/fake';
+export const URL_BLOCK = environment.server + '/blocked/';
+export const URL_LIKE_CONNECTIONS = environment.server + '/liked/connections';
+export const URL_MESSAGES = environment.server + '/message';
+export const URL_NOTIFICATIONS = environment.server + '/notification';
+export const URL_TAGS_SEARCH = (search: string) => environment.server + '/tag/' + search + '/similar';
+export const URL_PICTURES = environment.server + '/picture';

@@ -1,0 +1,6 @@
+{
+  "/rest": {
+    "target": "https://localhost:4567",
+    "secure": false
+  }
+}

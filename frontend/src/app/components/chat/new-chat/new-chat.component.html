@@ -1,0 +1,32 @@
+<div  *ngIf="(availableUsernames$ | async)!.length == 0">
+  No contacts found. You need to both like each other in order to contact someone.
+</div>
+<form *ngIf="(availableUsernames$ | async)!.length > 0" [formGroup]="form">
+    <mat-form-field appearance="fill">
+        <mat-label>Username</mat-label>
+        <input placeholder="Username"
+               matInput
+               formControlName="username"
+               [matAutocomplete]="auto">
+        <mat-autocomplete #auto="matAutocomplete">
+            <mat-option *ngFor="let username of availableUsernames$ | async" [value]="username">
+                {{username}}
+            </mat-option>
+        </mat-autocomplete>
+        <mat-error *ngIf="form.controls['username'].invalid">At least one tag is required</mat-error>
+        <mat-error *ngIf="!(availableUsernames$ | async)?.includes(form.controls['username'].value)">Enter a valid username.
+            <br> Don't see who you are looking for? Then you are not a match anymore.
+        </mat-error>
+    </mat-form-field>
+    <br>
+    <mat-form-field appearance="fill">
+        <mat-label>Message</mat-label>
+        <textarea
+                matInput
+                formControlName="content"
+                placeholder="Message"
+        ></textarea>
+    </mat-form-field>
+</form>
+<a mat-button (click)="close()">Cancel</a>
+<button mat-button (click)="submit()" *ngIf="(availableUsernames$ | async)!.length > 0">Send</button>

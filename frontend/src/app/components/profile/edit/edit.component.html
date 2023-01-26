@@ -1,0 +1,55 @@
+<mat-spinner *ngIf="loading"></mat-spinner>
+<form *ngIf="!loading" [formGroup]="form">
+  <mat-form-field appearance="fill">
+    <mat-label>Enter your first name</mat-label>
+    <input formControlName="firstname" matInput autocomplete="on" name="first_name" type="text">
+  </mat-form-field>
+  <br>
+	<mat-form-field appearance="fill">
+		<mat-label>Enter your last name</mat-label>
+		<input formControlName="lastname" matInput autocomplete="on" name="last_name" type="text">
+	</mat-form-field>
+	<br>
+  <mat-form-field appearance="fill">
+    <mat-label>Enter your email</mat-label>
+    <input formControlName="email" matInput autocomplete="on" name="email" type="email">
+		<mat-hint style="color: red" *ngIf="form.controls['email'].value == mailErrorValue">Invalid email</mat-hint>
+  </mat-form-field>
+  <br>
+  <mat-form-field appearance="fill">
+    <mat-label>Gender</mat-label>
+    <mat-select formControlName="gender">
+      <mat-option value="FEMALE">Female</mat-option>
+      <mat-option value="MALE">Male</mat-option>
+      <mat-option value="OTHER">Other</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <br>
+  <mat-form-field appearance="fill">
+    <mat-label>Sexual preferences</mat-label>
+    <mat-select formControlName="preferences">
+      <mat-option value="FEMALE">Female</mat-option>
+      <mat-option value="MALE">Male</mat-option>
+      <mat-option value="BI">Bi</mat-option>
+      <mat-option value="OTHER">Other</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <br>
+  <mat-form-field appearance="fill">
+    <mat-label>Biography</mat-label>
+    <input formControlName="biography" matInput autocomplete="on" name="biography" type="text">
+  </mat-form-field>
+	<br>
+	<mat-form-field appearance="fill">
+		<mat-label>Geolocation (fill to replace your device's location)</mat-label>
+		<input formControlName="geolocation" matInput name="geolocation" type="text">
+		<mat-hint style="color: red" *ngIf="form.controls['geolocation'].value == locationErrorValue">Invalid location</mat-hint>
+	</mat-form-field>
+  <app-tags [tags]="_tags"></app-tags>
+  <app-picture-selection
+		[preset_favorite]="profile_picture"
+		(favorite)="profile_picture = $event"></app-picture-selection>
+  <br>
+	<mat-error *ngIf="profile_picture == ''">At least one profile picture is required</mat-error>
+  <button mat-raised-button (click)="save()" [disabled]="_tags.length == 0 || profile_picture == ''">SAVE</button>
+</form>

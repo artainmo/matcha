@@ -1,0 +1,44 @@
+<form [hidden]="(loading$ | async)" [formGroup]="form">
+	<mat-card>
+		<mat-card-title>
+			Age gap
+		</mat-card-title>
+		<mat-card-content>
+			<mat-form-field class="example-margin example-width" appearance="fill">
+				<mat-label>Min value</mat-label>
+				<input matInput type="number" min="0" formControlName="ageGapMin">
+			</mat-form-field>
+			<mat-form-field class="example-margin example-width" appearance="fill">
+				<mat-label>Max value</mat-label>
+				<input matInput type="number" min="0" formControlName="ageGapMax">
+			</mat-form-field>
+		</mat-card-content>
+	</mat-card>
+	<mat-card>
+		<mat-card-title>
+			Fame gap
+		</mat-card-title>
+		<mat-card-content>
+			<mat-form-field class="example-margin example-width" appearance="fill">
+				<mat-label>Min value</mat-label>
+				<input matInput type="number" min="0" formControlName="fameGapMin">
+			</mat-form-field>
+			<mat-form-field class="example-margin example-width" appearance="fill">
+				<mat-label>Max value</mat-label>
+				<input matInput type="number" min="0" formControlName="fameGapMax">
+			</mat-form-field>
+		</mat-card-content>
+	</mat-card>
+	<mat-card>
+		<mat-card-title>
+			Location
+		</mat-card-title>
+		<mat-form-field appearance="fill">
+			<mat-label>Enter a location name</mat-label>
+			<input formControlName="location" matInput autocomplete="on" name="last_name" type="text">
+		</mat-form-field>
+	</mat-card>
+	<app-tags [tags]="_tags"></app-tags>
+	<button mat-raised-button (click)="search()">Search</button>
+</form>
+<br>

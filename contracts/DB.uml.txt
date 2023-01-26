@@ -1,0 +1,102 @@
+@startuml
+
+entity "User" as user {
+  Id: number <<generated>>
+  --
+  Username: string
+  Verified: boolean - False
+  --
+  Password: string <<hashed>>
+  Email: string
+  Fisrtname: string
+  Lastname: string
+  Gender: string
+  Interests: string
+  Biography: string
+  Tags: List<id>
+  Pictures: List<String(urls)>
+  Birthday: date
+  --
+  FakeAccount: boolean - False
+  Geo_lat: float
+  Geo_long: float
+}
+
+enum "Gender" as gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+user::Gender -[dashed]-> gender
+user::Interests -[dashed]-> gender
+
+entity "Tag" as tag {
+  Id: number <<generated>>
+  --
+  Value: string
+}
+
+entity "Visit" as visit {
+  id: number <<generated>>
+  --
+  visiter: number
+  visited: number
+  time: timestamp
+}
+
+entity "Blocked" as blocked {
+  id: number <<generated>>
+  --
+  Blocker: number
+  Blocked: number
+}
+
+entity "Like" as like {
+  id: number <<generated>>
+  --
+  liker: number
+  liked: number
+  time: timestamp
+}
+
+entity "Message" as msg {
+  id: number <<generated>>
+  --
+  from: number
+  to: number
+  time: timestamp
+  content: string
+}
+
+entity "Notification" as notification {
+  Id: number <<generated>>
+  --
+  UserId: number
+  Opened: boolean - False
+  Time: timestamp
+  Title: string
+  Content: string
+  Type: String
+  LinkId: number
+}
+
+enum "Notification Type" as notType {
+  LIKE
+  LIKED_BACK
+  UNLIKED
+  VIEWED
+  MESSAGE
+}
+
+notification::Type -[dashed]-> notType
+
+
+user::Tags -[dashed]-> tag
+visit -[dashed]-> user::Id
+blocked -[dashed]-> user::Id
+like -[dashed]-> user::Id
+msg -[dashed]-> user::Id
+notification -[dashed]-> user::Id
+
+@enduml

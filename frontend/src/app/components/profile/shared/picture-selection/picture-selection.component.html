@@ -1,0 +1,31 @@
+<mat-list role="list">
+	<mat-list-item role="listItem" *ngIf="_files.length === 0">
+		At least one picture is mandatory.
+		<br *ngIf="_favorite === ''">
+		{{ _favorite !== '' ? '' : 'At least one favorite is required.'}}
+	</mat-list-item>
+	<mat-list-item role="listItem" *ngFor="let file of _files; let i = index">
+		<button mat-icon-button aria-label="Example icon button with a home icon" style="margin-right:1em"
+						[disabled]="_loadingFileIndexes.includes(i)"
+						(click)="setFavorite(file)">
+			<mat-icon [ngClass]="{'red-icon': file == _favorite, 'grey-icon': !(file == _favorite)}">favorite</mat-icon>
+		</button>
+		{{ file | getLast: '/' }}
+
+		<button mat-icon-button aria-label="Example icon button with a home icon" (click)="removeFile(i)"
+						[disabled]="_loadingFileIndexes.includes(i)">
+			<mat-icon>delete</mat-icon>
+			<mat-spinner *ngIf="_loadingFileIndexes.includes(i)"></mat-spinner>
+		</button>
+	</mat-list-item>
+</mat-list>
+<br>
+
+<input #fileInput hidden="true" type="file" onclick="this.value=null" (change)="uploadFile($event)" accept="image/*"/>
+<br>
+<button mat-flat-button color="primary"
+        [disabled]="fileUploadLoading || _files?.length === 5"
+        (click)="fileInput.click()">
+    {{ _files?.length === 5 ? 'Maximum 5 pictures' : 'Add Picture' }}
+    <mat-spinner *ngIf="fileUploadLoading"></mat-spinner>
+</button>

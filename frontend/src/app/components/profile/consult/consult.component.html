@@ -1,0 +1,63 @@
+<mat-spinner *ngIf="loading"></mat-spinner>
+<div *ngIf="!loading">
+  <button *ngIf="isMyProfile" routerLink="/profile/edit" mat-raised-button>Edit My profile</button>
+	<div *ngIf="!isMyProfile">
+		<h4>{{ (profile.last_connected | isOnline) ? 'Online' : ('Last Connected: ' + (profile.last_connected | date: 'dd/MM/YYYY HH:mm')) }}</h4>
+	</div>
+	<h4>{{ profile.firstname }} {{ profile.lastname }} ({{ profile.username }})</h4>
+	<mat-grid-list cols="4" rowHeight="200px" *ngIf="profile.pictures == undefined || profile.pictures.length > 0">
+		<mat-grid-tile
+			*ngFor="let picture of profile.pictures"
+		><img [src]="picture" [alt]="picture" style="max-width: 100%; max-height: 100%;"></mat-grid-tile>
+	</mat-grid-list>
+	<div>
+    <h4>Biography</h4>
+    {{ profile.biography }}
+  </div>
+  <div>
+    <h4>Birthday</h4>
+    {{ profile.birthday | date: 'dd/MM/YYYY' }}
+  </div>
+  <div>
+    <h4>Gender</h4>
+    {{ profile.gender }}
+  </div>
+  <div>
+    <h4>Profile picture</h4>
+		<img [src]="profile.profile_picture" [alt]="profile.profile_picture" style="max-height: 1000px; max-width: 500px;">
+  </div>
+  <div>
+    <h4>{{ profile.custom_geolocation ? 'Custom location' : 'Calculated geolocation' }}</h4>
+		{{ profile.geolocation }}
+  </div>
+  <div>
+    <h4>sexual orientation</h4>
+    {{ profile.sexual_orientation }}
+  </div>
+  <div *ngIf="profile.custom_geolocation">
+    <h4>Profile's location has been manually set up</h4>
+  </div>
+  <div>
+    <h4>Tags</h4>
+    <mat-chip-list aria-label="Tags selection">
+      <mat-chip *ngFor="let tag of profile.tags">#{{ tag }}</mat-chip>
+    </mat-chip-list>
+  </div>
+  <app-more-profile-infos *ngIf="isMyProfile"></app-more-profile-infos>
+  <app-fame-rating *ngIf="!isMyProfile" [username]="profile.username"></app-fame-rating>
+
+	<div *ngIf="!isMyProfile && profile.blocked">
+		You blocked this profile
+	</div>
+	<div *ngIf="!isMyProfile && !profile.blocked">
+		<p *ngIf="profile.fake_account" style="color: red">This account seems to be a fake account</p>
+		<br>
+		<button *ngIf="!profile.fake_account" mat-raised-button (click)="reportAsFake()">Report as fake</button>
+		<button mat-raised-button (click)="profile.liked ? dislikeProfile() : likeProfile()">{{ profile.liked ? 'Dislike' : 'like' }}</button>
+		<button mat-raised-button (click)="blockProfile()">Block</button>
+		<br>
+		<p *ngIf="profile.liked && profile.likes_back">It's a match!
+		<button mat-raised-button [routerLink]="'/chat/'+profile.username">Message!</button>
+		</p>
+	</div>
+</div>

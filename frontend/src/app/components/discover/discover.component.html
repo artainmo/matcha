@@ -1,0 +1,14 @@
+<app-sort-and-filter *ngIf="(results$ | async)!.length !== 0" (appliedFilters)="log($event)"></app-sort-and-filter>
+<mat-list>
+	<h3 mat-subheader>Suggestions</h3>
+	<h4 *ngIf="(results$ | async)!.length === 0">No suggestions found</h4>
+	<mat-list-item *ngFor="let suggestion of (results$ | async)! | filter: filterArg | sort: (sortArg$ | async); last as last">
+		<button mat-raised-button [routerLink]="'/profile/' + suggestion.username">See profile <mat-icon>arrow_right</mat-icon></button>
+		<h4 mat-line>{{suggestion.username}}</h4>
+		<p mat-line> {{suggestion.firstname}} {{ suggestion.lastname }} </p>
+		<mat-divider [inset]="true" *ngIf="!last"></mat-divider>
+	</mat-list-item>
+	<mat-list-item *ngIf="isLoading$ | async">
+		<mat-spinner></mat-spinner>
+	</mat-list-item>
+</mat-list>
