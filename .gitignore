@@ -1,0 +1,8 @@
+/dist
+/frontend/node_modules
+**/.DS_Store
+**/*.swp
+**/.vscode
+backend/Gemfile.lock
+public/images/*
+!public/images/.gitkeep
