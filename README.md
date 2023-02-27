@@ -1,8 +1,8 @@
 # Welcome to Matcha!
 
-This project uses ruby Sinatra as backend and AngularJS as frontend to build a dating app.
+42 school [subject](https://cdn.intra.42.fr/pdf/pdf/60925/en.subject.pdf).
 
-https://cdn.intra.42.fr/pdf/pdf/60925/en.subject.pdf
+This project uses ruby Sinatra as backend and AngularJS as frontend to build a dating app.
 
 This project I initially made with [pvanderl](https://github.com/pvanderl) in this [repository](https://github.com/pvanderl/19_matcha), I re-uploaded it on my profile.
 
