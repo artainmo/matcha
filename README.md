@@ -1,6 +1,6 @@
 # Welcome to Matcha!
 
-42 school [subject](https://cdn.intra.42.fr/pdf/pdf/60925/en.subject.pdf)
+42 school [subject](https://cdn.intra.42.fr/pdf/pdf/60925/en.subject.pdf).
 
 This project uses ruby Sinatra as backend and AngularJS as frontend to build a dating app.
 
