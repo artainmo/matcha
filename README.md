@@ -41,6 +41,9 @@ To run test frontend server with hot reload of frontend, do:
 ### Frontend
 [Angular](https://angular.io)
 
-### Interfaces tools
+### Design tools
 [Swagger editor (microservice contract editor tool)](https://editor.swagger.io/)<br>
-[UML editor (DB schema editor tool)](https://planttext.com/)
+A Swagger Editor is used to design, edit, and validate REST APIs. It lets you write API definitions in YAML or JSON. A Swagger Editor checks whether your syntax is valid and generates API documentation automatically. The result can be considered a "contract", which means an agreement that defines how clients and servers communicate.
+
+[UML editor (DB schema editor tool)](https://planttext.com/)<br>
+A UML (Unified Modeling Language) Editor is used to create diagrams that model the structure and behavior of software systems. Here we used class diagrams to design the database.
