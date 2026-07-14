@@ -1,6 +1,9 @@
 source "https://rubygems.org"
 
-gem 'sinatra'
+ruby '3.3.5'
+
+gem 'sinatra', '~> 3.0'
+gem 'pg'
 gem 'sinatra-contrib'
 gem 'sinatra-reloader'
 gem 'json'
@@ -20,3 +23,4 @@ gem 'puma'
 gem 'reel'
 gem 'http'
 gem 'webrick'
+gem 'ostruct'

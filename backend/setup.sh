@@ -1,5 +1,5 @@
 if ! [[ $(gem list | grep 'pg') ]]; then
-	pgPath=$(sudo find / -name "pg_config" 2>/dev/null | head -n 1)
+	pgPath=$(find /opt/homebrew /usr/local /usr /Library/PostgreSQL /Applications/Postgres.app -name "pg_config" 2>/dev/null | head -n 1)
 	gem install pg -- --with-pg-config=$pgPath --user-install
 fi
 if ! [[ $(gem list | grep 'bundler (2.3.18') ]]; then
@@ -14,7 +14,7 @@ fi
 if ! [[ $(gem list | grep 'bcrypt') ]]; then
 	gem install bcrypt:3.1.18 --user-install
 fi
-if ! [[ $(gem list | grep 'geocoder') ]]; then
-	bundle install
-fi
-# If this error occurs 'You don't have write permissions for the /Library/Ruby/Gems/2.6.0 directory.' -> export GEM_HOME="$HOME/.gem"
+
+bundle install
+
+# If this error occurs 'You don't have write permissions for the /Library/Ruby/Gems/2.6.0 directory.' then add in ~/.zshrc 'export PATH="/opt/homebrew/opt/ruby/bin:$PATH" so the ruby from homebrew gets used.
