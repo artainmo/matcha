@@ -12,6 +12,13 @@ require 'digest'
 require 'geocoder'
 require 'fileutils'
 
+# Nominatim (the default, keyless geocoding lookup) now rejects requests whose
+# User-Agent doesn't identify the application, per its usage policy:
+# https://operations.osmfoundation.org/policies/nominatim/.
+# This wasn't a problem when the project got created begin 2023, but it became
+# a problem when the jury wanted to verify the project in 2026.
+Geocoder.configure(http_headers: { 'User-Agent' => 'matcha-app/1.0' })
+
 count = 0
 
 class DatabaseManager
