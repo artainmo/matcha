@@ -11,7 +11,6 @@ This project I initially made with [pvanderl](https://github.com/pvanderl) in th
 This project was created on macos.
 
 For the frontend we used: Angular Cli 14.2.13; Node 18.20.8; and npm 10.8.2. Discrepancies can make the frontend hang. Verify you have the correct versions with: `npx ng version`. You can download the right versions in your terminal with: `brew install node@18`; `npm install -g @angular/cli@14`.
-```
 
 For the database we run a postgres server using 'https://postgresapp.com' on macos. After downloading the postgres app, within the app you can click on 'initialize' to start the server.<br>
 Now access the psql command line by double clicking a default database such as the one named 'template1'. Within the psql command line you can use the following commands to create a matcha database:
