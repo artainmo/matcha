@@ -17,6 +17,7 @@ CREATE USER postgres;
 ALTER USER postgres WITH PASSWORD 'admin';
 CREATE DATABASE matcha OWNER postgres;
 ```
+Make sure the postgres server runs while launching the app, generating users, or cleaning the database.<br>
 
 For the backend you should `brew install ruby@3.3`, afterwards you can add the following lines to your "~/.zshrc": 
 ```
