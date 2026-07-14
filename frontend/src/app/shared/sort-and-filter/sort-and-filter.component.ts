@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { SortAndFilterService } from "./sort-and-filter.service";
 import { IFilter } from "./filter.interface";
@@ -14,6 +14,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
     selector: 'app-sort-and-filter',
     templateUrl: './sort-and-filter.component.html',
     styleUrls: ['./sort-and-filter.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MatFormField, MatLabel, MatSelect, FormsModule, ReactiveFormsModule, MatOption, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatCheckbox, AsyncPipe]
 })
 export class SortAndFilterComponent implements OnInit {

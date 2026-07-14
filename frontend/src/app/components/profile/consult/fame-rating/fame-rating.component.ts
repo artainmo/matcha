@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { URL_FAME } from "../../../../config/urls";
 
@@ -7,6 +7,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 @Component({
     selector: 'app-fame-rating',
     templateUrl: './fame-rating.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MatProgressSpinner]
 })
 export class FameRatingComponent implements OnInit {

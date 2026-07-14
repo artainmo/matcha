@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { SearchService } from "../search.service";
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { Observable } from 'rxjs';
@@ -13,6 +13,7 @@ import { AsyncPipe } from '@angular/common';
 @Component({
     selector: 'app-search-bar',
     templateUrl: './search-bar.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [FormsModule, ReactiveFormsModule, MatCard, MatCardTitle, MatCardContent, MatFormField, MatLabel, MatInput, TagsComponent, MatButton, AsyncPipe]
 })
 export class SearchBarComponent implements OnInit {

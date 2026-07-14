@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { IMessage } from '../../../models/message.model';
@@ -15,6 +15,7 @@ import { GetLatestsPipe } from '../pipes/chat.pipes';
 @Component({
     selector: 'app-chat-list',
     templateUrl: './chat-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MatList, MatListItem, MatButton, RouterLink, MatIcon, AsyncPipe, GetLatestsPipe]
 })
 export class ChatListComponent implements OnInit {

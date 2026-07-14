@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DiscoverService } from './discover.service';
 import { IUserResult } from "../../shared/search.interface";
@@ -19,6 +19,7 @@ import { FilterPipe } from '../../shared/sort-and-filter/filter.pipe';
 @Component({
     selector: 'app-discover',
     templateUrl: './discover.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [SortAndFilterComponent, MatList, MatListSubheaderCssMatStyler, MatListItem, MatButton, RouterLink, MatIcon, MatLine, MatDivider, MatProgressSpinner, AsyncPipe, SortPipe, FilterPipe]
 })
 export class DiscoverComponent implements OnInit {

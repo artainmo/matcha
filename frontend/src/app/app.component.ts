@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { AccountService } from './services/account.service';
 import { NotificationsService } from './services/notifications.service';
@@ -13,6 +13,7 @@ import { MatIcon } from '@angular/material/icon';
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MatButton, RouterLink, MatBadge, MatIconButton, MatIcon, RouterOutlet, AsyncPipe]
 })
 export class AppComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
 import { PictureService } from './picture.service';
 import { AccountService } from "../../../../services/account.service";
 import { MatList, MatListItem } from '@angular/material/list';
@@ -12,6 +12,7 @@ import { SplitPipe } from '../../../../pipes/split.pipe';
     selector: 'app-picture-selection',
     templateUrl: './picture-selection.component.html',
     styleUrls: ['./picture-selection.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MatList, MatListItem, MatIconButton, MatIcon, NgClass, MatProgressSpinner, MatButton, SplitPipe]
 })
 export class PictureSelectionComponent implements OnInit {

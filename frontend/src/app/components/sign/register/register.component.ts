@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IProfile } from '../../../models/user.model';
 import { AccountService } from '../../../services/account.service';
@@ -19,6 +19,7 @@ export interface IRegisterStep1 {
 @Component({
     selector: 'app-register',
     templateUrl: './register.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatButton]
 })
 export class RegisterComponent {

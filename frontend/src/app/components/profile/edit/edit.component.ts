@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IProfile } from "../../../models/user.model";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AccountService } from "../../../services/account.service";
@@ -18,6 +18,7 @@ import { MatButton } from '@angular/material/button';
 @Component({
     selector: 'app-edit',
     templateUrl: './edit.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MatProgressSpinner, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatHint, MatSelect, MatOption, TagsComponent, PictureSelectionComponent, MatError, MatButton]
 })
 export class EditComponent implements OnInit {

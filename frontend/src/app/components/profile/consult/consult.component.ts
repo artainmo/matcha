@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import {AccountService} from "../../../services/account.service";
 import {IProfile} from "../../../models/user.model";
@@ -14,6 +14,7 @@ import { IsOnlinePipe } from './pipes/is-online.pipe';
 @Component({
     selector: 'app-consult',
     templateUrl: './consult.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MatProgressSpinner, MatButton, RouterLink, MatGridList, MatGridTile, MatChipSet, MatChip, MoreProfileInfosComponent, FameRatingComponent, DatePipe, IsOnlinePipe]
 })
 export class ConsultComponent implements OnInit {

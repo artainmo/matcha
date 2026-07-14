@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AccountService } from '../../../services/account.service';
 import { FormsModule } from '@angular/forms';
@@ -11,6 +11,7 @@ import { MatIcon } from '@angular/material/icon';
 @Component({
     selector: 'app-login',
     templateUrl: './login.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [FormsModule, MatFormField, MatLabel, MatInput, MatError, MatIconButton, MatSuffix, MatIcon, MatButton, RouterLink, AsyncPipe]
 })
 export class LoginComponent implements OnInit {

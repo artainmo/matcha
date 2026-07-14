@@ -2,7 +2,7 @@ import { enableProdMode, importProvidersFrom, provideZoneChangeDetection } from 
 import { environment } from './environments/environment';
 import { AccountService } from './app/services/account.service';
 import { MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -37,7 +37,7 @@ bootstrapApplication(AppComponent, {
         provideZoneChangeDetection(),importProvidersFrom(BrowserModule, FormsModule, MatFormFieldModule, MatButtonModule, ReactiveFormsModule, MatIconModule, MatInputModule, MatSelectModule, MatChipsModule, MatAutocompleteModule, MatListModule, MatBadgeModule, MatDialogModule, MatProgressSpinnerModule, MatDatepickerModule, MatNativeDateModule, MatExpansionModule, MatCardModule, MatRadioModule, MatCheckboxModule, MatGridListModule, MatSnackBarModule),
         AccountService,
         { provide: MAT_DATE_LOCALE, useValue: 'fr-FR' },
-        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClient(withXhr(), withInterceptorsFromDi()),
         provideAnimations(),
         provideRouter(routes, withRouterConfig({ onSameUrlNavigation: 'reload' }))
     ]

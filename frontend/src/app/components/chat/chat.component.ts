@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { MessageService } from '../../services/message.service';
 import { ChatListComponent } from './chat-list/chat-list.component';
 import { RouterOutlet } from '@angular/router';
@@ -6,6 +6,7 @@ import { RouterOutlet } from '@angular/router';
 @Component({
     selector: 'app-chat',
     templateUrl: './chat.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ChatListComponent, RouterOutlet]
 })
 export class ChatComponent implements OnInit, OnDestroy {

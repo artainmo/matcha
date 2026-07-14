@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Observable } from 'rxjs';
 import { IMessage } from '../../../models/message.model';
@@ -9,6 +9,7 @@ import { FilterUsernamePipe } from '../pipes/chat.pipes';
 @Component({
     selector: 'app-individual-chat',
     templateUrl: './individual-chat.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [AsyncPipe, DatePipe, FilterUsernamePipe]
 })
 export class IndividualChatComponent implements OnInit {

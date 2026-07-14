@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { SearchService } from "./search.service";
 import { Observable } from 'rxjs';
 import { IUserResult } from "../../shared/search.interface";
@@ -20,6 +20,7 @@ import { FilterPipe } from '../../shared/sort-and-filter/filter.pipe';
 @Component({
     selector: 'app-search',
     templateUrl: './search.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [SearchBarComponent, SortAndFilterComponent, MatList, MatListSubheaderCssMatStyler, MatListItem, MatButton, RouterLink, MatIcon, MatLine, MatDivider, MatProgressSpinner, AsyncPipe, SortPipe, FilterPipe]
 })
 export class SearchComponent {

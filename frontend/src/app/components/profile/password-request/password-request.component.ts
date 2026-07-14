@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AccountService } from '../../../services/account.service';
 import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
@@ -10,6 +10,7 @@ import { MatButton } from '@angular/material/button';
 @Component({
     selector: 'app-password-request',
     templateUrl: './password-request.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MatFormField, MatLabel, MatInput, FormsModule, MatError, MatButton, AsyncPipe]
 })
 export class PasswordRequestComponent implements OnInit {

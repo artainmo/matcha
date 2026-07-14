@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AccountService } from '../../../services/account.service';
 import {Router} from "@angular/router";
@@ -16,6 +16,7 @@ import { MatButton } from '@angular/material/button';
 @Component({
     selector: 'app-complete-profile',
     templateUrl: './complete-profile.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatInput, MatDatepickerInput, MatHint, MatDatepickerToggle, MatSuffix, MatDatepicker, TagsComponent, PictureSelectionComponent, MatButton]
 })
 export class CompleteProfileComponent {

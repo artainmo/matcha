@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AccountService } from '../../../services/account.service';
 import { FormControl, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -10,6 +10,7 @@ import { MatIcon } from '@angular/material/icon';
 @Component({
     selector: 'app-password-reset',
     templateUrl: './password-reset.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MatFormField, MatLabel, MatInput, FormsModule, ReactiveFormsModule, MatIconButton, MatSuffix, MatIcon, MatButton]
 })
 export class PasswordResetComponent {

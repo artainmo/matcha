@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IMoreInfos } from "./more-info.interface";
 import { HttpClient } from "@angular/common/http";
 import { URL_MORE_INFOS } from "../../../../config/urls";
@@ -11,6 +11,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 @Component({
     selector: 'app-more-profile-infos',
     templateUrl: './more-profile-infos.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MatChipSet, MatChip, MatChipRemove, MatIcon, MatProgressSpinner]
 })
 export class MoreProfileInfosComponent implements OnInit {

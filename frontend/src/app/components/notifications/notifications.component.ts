@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { INotification } from '../../models/notification.model';
 import { NotificationsService } from '../../services/notifications.service';
@@ -12,6 +12,7 @@ import { MatDivider } from '@angular/material/divider';
 @Component({
     selector: 'app-notifications',
     templateUrl: './notifications.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MatList, MatListItem, MatLine, MatMiniFabButton, MatIcon, MatDivider, AsyncPipe]
 })
 export class NotificationsComponent implements OnInit {
