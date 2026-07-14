@@ -4,8 +4,7 @@ import { AccountService } from '../../../services/account.service';
 
 @Component({
     selector: 'app-verify',
-    templateUrl: './verify.component.html',
-    standalone: false
+    templateUrl: './verify.component.html'
 })
 export class VerifyComponent implements OnInit {
 

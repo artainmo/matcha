@@ -1,10 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MessageService } from '../../services/message.service';
+import { ChatListComponent } from './chat-list/chat-list.component';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
     selector: 'app-chat',
     templateUrl: './chat.component.html',
-    standalone: false
+    imports: [ChatListComponent, RouterOutlet]
 })
 export class ChatComponent implements OnInit, OnDestroy {
 

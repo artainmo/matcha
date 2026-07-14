@@ -1,8 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IProfile } from '../../../models/user.model';
 import { AccountService } from '../../../services/account.service';
+import { NgIf } from '@angular/common';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatButton } from '@angular/material/button';
 
 export interface IRegisterStep1 {
 	email: string;
@@ -15,7 +19,7 @@ export interface IRegisterStep1 {
 @Component({
     selector: 'app-register',
     templateUrl: './register.component.html',
-    standalone: false
+    imports: [NgIf, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatButton]
 })
 export class RegisterComponent {
 

@@ -1,11 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AccountService } from '../../../services/account.service';
+import { FormsModule } from '@angular/forms';
+import { MatFormField, MatLabel, MatError, MatSuffix } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { NgIf, AsyncPipe } from '@angular/common';
+import { MatIconButton, MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
     selector: 'app-login',
     templateUrl: './login.component.html',
-    standalone: false
+    imports: [FormsModule, MatFormField, MatLabel, MatInput, NgIf, MatError, MatIconButton, MatSuffix, MatIcon, MatButton, RouterLink, AsyncPipe]
 })
 export class LoginComponent implements OnInit {
 	hide = true;

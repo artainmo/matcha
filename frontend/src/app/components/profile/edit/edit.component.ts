@@ -2,14 +2,23 @@ import { Component, OnInit } from '@angular/core';
 import { IProfile } from "../../../models/user.model";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AccountService } from "../../../services/account.service";
-import { FormControl, FormGroup, ValidationErrors, Validators } from "@angular/forms";
+import { FormControl, FormGroup, ValidationErrors, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { HttpErrorResponse } from "@angular/common/http";
 import { tap } from 'rxjs';
+import { NgIf } from '@angular/common';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatFormField, MatLabel, MatHint, MatError } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { TagsComponent } from '../../../shared/tags/tags.component';
+import { PictureSelectionComponent } from '../shared/picture-selection/picture-selection.component';
+import { MatButton } from '@angular/material/button';
 
 @Component({
     selector: 'app-edit',
     templateUrl: './edit.component.html',
-    standalone: false
+    imports: [NgIf, MatProgressSpinner, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatHint, MatSelect, MatOption, TagsComponent, PictureSelectionComponent, MatError, MatButton]
 })
 export class EditComponent implements OnInit {
   profile!: IProfile;

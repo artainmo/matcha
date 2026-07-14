@@ -5,12 +5,17 @@ import { IMessage } from '../../../models/message.model';
 import { AccountService } from '../../../services/account.service';
 import { MessageService } from '../../../services/message.service';
 import { NewChatComponent } from '../new-chat/new-chat.component';
-import { Location } from "@angular/common";
+import { Location, NgIf, NgFor, AsyncPipe } from "@angular/common";
+import { MatList, MatListItem } from '@angular/material/list';
+import { MatButton } from '@angular/material/button';
+import { RouterLink } from '@angular/router';
+import { MatIcon } from '@angular/material/icon';
+import { GetLatestsPipe } from '../pipes/chat.pipes';
 
 @Component({
     selector: 'app-chat-list',
     templateUrl: './chat-list.component.html',
-    standalone: false
+    imports: [NgIf, MatList, NgFor, MatListItem, MatButton, RouterLink, MatIcon, AsyncPipe, GetLatestsPipe]
 })
 export class ChatListComponent implements OnInit {
 

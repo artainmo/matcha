@@ -1,11 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { URL_FAME } from "../../../../config/urls";
+import { NgIf } from '@angular/common';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
     selector: 'app-fame-rating',
     templateUrl: './fame-rating.component.html',
-    standalone: false
+    imports: [NgIf, MatProgressSpinner]
 })
 export class FameRatingComponent implements OnInit {
 

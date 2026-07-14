@@ -2,15 +2,18 @@ import { Component, OnInit } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { AccountService } from './services/account.service';
 import { NotificationsService } from './services/notifications.service';
-import { Location } from '@angular/common';
-import { Router } from "@angular/router";
+import { Location, NgIf, AsyncPipe } from '@angular/common';
+import { Router, RouterLink, RouterOutlet } from "@angular/router";
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatBadge } from '@angular/material/badge';
+import { MatIcon } from '@angular/material/icon';
 
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css'],
-    standalone: false
+    imports: [NgIf, MatButton, RouterLink, MatBadge, MatIconButton, MatIcon, RouterOutlet, AsyncPipe]
 })
 export class AppComponent implements OnInit {
 	title = 'Matcha';

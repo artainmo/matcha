@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
     selector: 'app-profile',
     templateUrl: './profile.component.html',
-    standalone: false
+    imports: [RouterOutlet]
 })
 export class ProfileComponent implements OnInit {
 

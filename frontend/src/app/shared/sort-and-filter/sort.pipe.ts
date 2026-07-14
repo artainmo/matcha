@@ -1,10 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { IUserResult } from "../search.interface";
 
-@Pipe({
-    name: 'sort',
-    standalone: false
-})
+@Pipe({ name: 'sort' })
 export class SortPipe implements PipeTransform {
 
   transform(value: IUserResult[], sortArg: string | null): IUserResult[] {

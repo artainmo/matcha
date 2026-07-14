@@ -3,11 +3,15 @@ import { IMoreInfos } from "./more-info.interface";
 import { HttpClient } from "@angular/common/http";
 import { URL_MORE_INFOS } from "../../../../config/urls";
 import { Router } from "@angular/router";
+import { NgIf, NgFor } from '@angular/common';
+import { MatChipSet, MatChip, MatChipRemove } from '@angular/material/chips';
+import { MatIcon } from '@angular/material/icon';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
     selector: 'app-more-profile-infos',
     templateUrl: './more-profile-infos.component.html',
-    standalone: false
+    imports: [NgIf, MatChipSet, NgFor, MatChip, MatChipRemove, MatIcon, MatProgressSpinner]
 })
 export class MoreProfileInfosComponent implements OnInit {
 

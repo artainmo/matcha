@@ -2,10 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { IUserResult } from "../search.interface";
 import { IFilter } from "./filter.interface";
 
-@Pipe({
-    name: 'filter',
-    standalone: false
-})
+@Pipe({ name: 'filter' })
 export class FilterPipe implements PipeTransform {
 
   transform(value: IUserResult[], filterArg: IFilter | null): IUserResult[] {

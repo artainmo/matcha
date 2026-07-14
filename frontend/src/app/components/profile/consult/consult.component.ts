@@ -1,12 +1,20 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import {AccountService} from "../../../services/account.service";
 import {IProfile} from "../../../models/user.model";
+import { NgIf, NgFor, DatePipe } from '@angular/common';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatButton } from '@angular/material/button';
+import { MatGridList, MatGridTile } from '@angular/material/grid-list';
+import { MatChipSet, MatChip } from '@angular/material/chips';
+import { MoreProfileInfosComponent } from './more-profile-infos/more-profile-infos.component';
+import { FameRatingComponent } from './fame-rating/fame-rating.component';
+import { IsOnlinePipe } from './pipes/is-online.pipe';
 
 @Component({
     selector: 'app-consult',
     templateUrl: './consult.component.html',
-    standalone: false
+    imports: [NgIf, MatProgressSpinner, MatButton, RouterLink, MatGridList, NgFor, MatGridTile, MatChipSet, MatChip, MoreProfileInfosComponent, FameRatingComponent, DatePipe, IsOnlinePipe]
 })
 export class ConsultComponent implements OnInit {
 

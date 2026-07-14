@@ -6,3 +6,4 @@
 backend/Gemfile.lock
 public/images/*
 !public/images/.gitkeep
+.idea
