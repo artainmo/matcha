@@ -7,7 +7,7 @@ import { IFilter } from "../../shared/sort-and-filter/filter.interface";
 import { SearchBarComponent } from './search-bar/search-bar.component';
 import { SortAndFilterComponent } from '../../shared/sort-and-filter/sort-and-filter.component';
 import { MatList, MatListSubheaderCssMatStyler, MatListItem } from '@angular/material/list';
-import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { MatButton } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
@@ -20,7 +20,7 @@ import { FilterPipe } from '../../shared/sort-and-filter/filter.pipe';
 @Component({
     selector: 'app-search',
     templateUrl: './search.component.html',
-    imports: [SearchBarComponent, SortAndFilterComponent, MatList, MatListSubheaderCssMatStyler, NgIf, NgFor, MatListItem, MatButton, RouterLink, MatIcon, MatLine, MatDivider, MatProgressSpinner, AsyncPipe, SortPipe, FilterPipe]
+    imports: [SearchBarComponent, SortAndFilterComponent, MatList, MatListSubheaderCssMatStyler, MatListItem, MatButton, RouterLink, MatIcon, MatLine, MatDivider, MatProgressSpinner, AsyncPipe, SortPipe, FilterPipe]
 })
 export class SearchComponent {
 

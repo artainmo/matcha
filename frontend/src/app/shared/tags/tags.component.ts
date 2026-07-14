@@ -5,7 +5,7 @@ import { MatChipInputEvent, MatChipGrid, MatChipRow, MatChipRemove, MatChipInput
 import { map, Observable, Subscription } from 'rxjs';
 import { TagsService } from './tags.service';
 import { MatFormField, MatLabel, MatSuffix, MatError } from '@angular/material/form-field';
-import { NgFor, NgIf, AsyncPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { MatAutocompleteTrigger, MatAutocomplete } from '@angular/material/autocomplete';
 import { MatIconButton } from '@angular/material/button';
@@ -14,7 +14,7 @@ import { MatOption } from '@angular/material/core';
 @Component({
     selector: 'app-tags',
     templateUrl: './tags.component.html',
-    imports: [FormsModule, MatFormField, MatLabel, MatChipGrid, NgFor, MatChipRow, MatChipRemove, MatIcon, MatChipInput, MatAutocompleteTrigger, ReactiveFormsModule, NgIf, MatIconButton, MatSuffix, MatAutocomplete, MatOption, MatError, AsyncPipe]
+    imports: [FormsModule, MatFormField, MatLabel, MatChipGrid, MatChipRow, MatChipRemove, MatIcon, MatChipInput, MatAutocompleteTrigger, ReactiveFormsModule, MatIconButton, MatSuffix, MatAutocomplete, MatOption, MatError, AsyncPipe]
 })
 export class TagsComponent implements OnInit, OnDestroy {
 	@ViewChild('tags') inputTag!: ElementRef;

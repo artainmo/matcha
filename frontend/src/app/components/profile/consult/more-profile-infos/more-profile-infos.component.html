@@ -1,27 +1,43 @@
-<div *ngIf="!loading">
-	<h4>Visits</h4>
-	<mat-chip-set *ngIf="moreInfos?.visits?.length != 0">
-		<mat-chip *ngFor="let visit of moreInfos?.visits"
-							(removed)="open(visit)">
-			{{ visit }}
-			<button matChipRemove>
-				<mat-icon>arrow_forward</mat-icon>
-			</button>
-		</mat-chip>
-	</mat-chip-set>
-	<p *ngIf="moreInfos?.visits?.length == 0">No visits currently</p>
-	<h4>Likes</h4>
-	<mat-chip-set *ngIf="moreInfos?.likes?.length != 0">
-		<mat-chip *ngFor="let like of moreInfos?.likes"
-							(removed)="open(like)">
-			{{ like }}
-			<button matChipRemove>
-				<mat-icon>arrow_forward</mat-icon>
-			</button>
-		</mat-chip>
-	</mat-chip-set>
-	<p *ngIf="moreInfos?.likes?.length == 0">No likes currently</p>
-	<h4>Fame rating</h4>
-	<p>{{ moreInfos?.fameRating }}</p>
-</div>
-<mat-spinner *ngIf="loading"></mat-spinner>
+@if (!loading) {
+  <div>
+    <h4>Visits</h4>
+    @if (moreInfos?.visits?.length != 0) {
+      <mat-chip-set>
+        @for (visit of moreInfos?.visits; track visit) {
+          <mat-chip
+            (removed)="open(visit)">
+            {{ visit }}
+            <button matChipRemove>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </mat-chip>
+        }
+      </mat-chip-set>
+    }
+    @if (moreInfos?.visits?.length == 0) {
+      <p>No visits currently</p>
+    }
+    <h4>Likes</h4>
+    @if (moreInfos?.likes?.length != 0) {
+      <mat-chip-set>
+        @for (like of moreInfos?.likes; track like) {
+          <mat-chip
+            (removed)="open(like)">
+            {{ like }}
+            <button matChipRemove>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </mat-chip>
+        }
+      </mat-chip-set>
+    }
+    @if (moreInfos?.likes?.length == 0) {
+      <p>No likes currently</p>
+    }
+    <h4>Fame rating</h4>
+    <p>{{ moreInfos?.fameRating }}</p>
+  </div>
+}
+@if (loading) {
+  <mat-spinner></mat-spinner>
+}

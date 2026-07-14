@@ -4,7 +4,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { IMessage } from '../../../models/message.model';
 import { MessageService } from '../../../services/message.service';
-import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatAutocompleteTrigger, MatAutocomplete } from '@angular/material/autocomplete';
@@ -14,7 +14,7 @@ import { MatAnchor, MatButton } from '@angular/material/button';
 @Component({
     selector: 'app-new-chat',
     templateUrl: './new-chat.component.html',
-    imports: [NgIf, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatAutocompleteTrigger, MatAutocomplete, NgFor, MatOption, MatError, MatAnchor, MatButton, AsyncPipe]
+    imports: [FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatAutocompleteTrigger, MatAutocomplete, MatOption, MatError, MatAnchor, MatButton, AsyncPipe]
 })
 export class NewChatComponent implements OnInit {
 

@@ -11,12 +11,12 @@ import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular
 import { TagsComponent } from '../../../shared/tags/tags.component';
 import { PictureSelectionComponent } from '../shared/picture-selection/picture-selection.component';
 import { MatButton } from '@angular/material/button';
-import { NgIf } from '@angular/common';
+
 
 @Component({
     selector: 'app-complete-profile',
     templateUrl: './complete-profile.component.html',
-    imports: [FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatInput, MatDatepickerInput, MatHint, MatDatepickerToggle, MatSuffix, MatDatepicker, TagsComponent, PictureSelectionComponent, MatButton, NgIf]
+    imports: [FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatInput, MatDatepickerInput, MatHint, MatDatepickerToggle, MatSuffix, MatDatepicker, TagsComponent, PictureSelectionComponent, MatButton]
 })
 export class CompleteProfileComponent {
 

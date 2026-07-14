@@ -4,13 +4,13 @@ import { AccountService } from '../../../services/account.service';
 import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
-import { NgIf, AsyncPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { MatButton } from '@angular/material/button';
 
 @Component({
     selector: 'app-password-request',
     templateUrl: './password-request.component.html',
-    imports: [MatFormField, MatLabel, MatInput, FormsModule, NgIf, MatError, MatButton, AsyncPipe]
+    imports: [MatFormField, MatLabel, MatInput, FormsModule, MatError, MatButton, AsyncPipe]
 })
 export class PasswordRequestComponent implements OnInit {
 	unknownUsername$ = this.accountService.badUsername.asObservable();

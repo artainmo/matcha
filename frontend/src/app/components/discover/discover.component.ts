@@ -4,7 +4,7 @@ import { DiscoverService } from './discover.service';
 import { IUserResult } from "../../shared/search.interface";
 import { IFilter } from "../../shared/sort-and-filter/filter.interface";
 import { SortAndFilterService } from "../../shared/sort-and-filter/sort-and-filter.service";
-import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { SortAndFilterComponent } from '../../shared/sort-and-filter/sort-and-filter.component';
 import { MatList, MatListSubheaderCssMatStyler, MatListItem } from '@angular/material/list';
 import { MatButton } from '@angular/material/button';
@@ -19,7 +19,7 @@ import { FilterPipe } from '../../shared/sort-and-filter/filter.pipe';
 @Component({
     selector: 'app-discover',
     templateUrl: './discover.component.html',
-    imports: [NgIf, SortAndFilterComponent, MatList, MatListSubheaderCssMatStyler, NgFor, MatListItem, MatButton, RouterLink, MatIcon, MatLine, MatDivider, MatProgressSpinner, AsyncPipe, SortPipe, FilterPipe]
+    imports: [SortAndFilterComponent, MatList, MatListSubheaderCssMatStyler, MatListItem, MatButton, RouterLink, MatIcon, MatLine, MatDivider, MatProgressSpinner, AsyncPipe, SortPipe, FilterPipe]
 })
 export class DiscoverComponent implements OnInit {
 

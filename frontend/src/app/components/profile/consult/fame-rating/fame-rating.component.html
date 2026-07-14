@@ -1,3 +1,5 @@
 <h4>Fame rating</h4>
 <p>{{ fame }}</p>
-<mat-spinner *ngIf="loading"></mat-spinner>
+@if (loading) {
+  <mat-spinner></mat-spinner>
+}

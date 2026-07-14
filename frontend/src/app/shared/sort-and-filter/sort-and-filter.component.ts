@@ -5,7 +5,7 @@ import { IFilter } from "./filter.interface";
 import { Observable, tap } from 'rxjs';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatSelect } from '@angular/material/select';
-import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { MatOption } from '@angular/material/core';
 import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
 import { MatCheckbox } from '@angular/material/checkbox';
@@ -14,7 +14,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
     selector: 'app-sort-and-filter',
     templateUrl: './sort-and-filter.component.html',
     styleUrls: ['./sort-and-filter.component.css'],
-    imports: [MatFormField, MatLabel, MatSelect, FormsModule, ReactiveFormsModule, NgIf, MatOption, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, NgFor, MatCheckbox, AsyncPipe]
+    imports: [MatFormField, MatLabel, MatSelect, FormsModule, ReactiveFormsModule, MatOption, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatCheckbox, AsyncPipe]
 })
 export class SortAndFilterComponent implements OnInit {
 

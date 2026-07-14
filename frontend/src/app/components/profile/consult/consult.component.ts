@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import {AccountService} from "../../../services/account.service";
 import {IProfile} from "../../../models/user.model";
-import { NgIf, NgFor, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatButton } from '@angular/material/button';
 import { MatGridList, MatGridTile } from '@angular/material/grid-list';
@@ -14,7 +14,7 @@ import { IsOnlinePipe } from './pipes/is-online.pipe';
 @Component({
     selector: 'app-consult',
     templateUrl: './consult.component.html',
-    imports: [NgIf, MatProgressSpinner, MatButton, RouterLink, MatGridList, NgFor, MatGridTile, MatChipSet, MatChip, MoreProfileInfosComponent, FameRatingComponent, DatePipe, IsOnlinePipe]
+    imports: [MatProgressSpinner, MatButton, RouterLink, MatGridList, MatGridTile, MatChipSet, MatChip, MoreProfileInfosComponent, FameRatingComponent, DatePipe, IsOnlinePipe]
 })
 export class ConsultComponent implements OnInit {
 

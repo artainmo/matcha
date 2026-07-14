@@ -1,33 +1,43 @@
 <form class="example-form">
-    <mat-form-field class="example-chip-list" appearance="fill">
-        <mat-label>Tags</mat-label>
-        <mat-chip-grid #chipGrid aria-label="Tag selection">
-            <mat-chip-row *ngFor="let tag of _tags" (removed)="remove(tag)">
-                #{{tag}}
-                <button matChipRemove>
-                    <mat-icon>cancel</mat-icon>
-                </button>
-            </mat-chip-row>
-            <input placeholder="New tag..."
-									 #tags
-                   [matChipInputFor]="chipGrid"
-                   [matChipInputSeparatorKeyCodes]="alreadyInList ? separatorKeysCodes : []"
-                   [matChipInputAddOnBlur]="addOnBlur"
-                   (matChipInputTokenEnd)="add($event)"
-                   [formControl]="control"
-                   [matAutocomplete]="auto">
-            <button *ngIf="control.getRawValue().length > 0" matSuffix mat-icon-button aria-label="Add"
-										[disabled]="alreadyInList"
-                    (click)="add(null)">
-                <mat-icon>add</mat-icon>
-            </button>
-            <mat-autocomplete #auto="matAutocomplete">
-                <mat-option *ngFor="let option of availableTags | async" [value]="option">
-                    {{option}}
-                </mat-option>
-            </mat-autocomplete>
-        </mat-chip-grid>
-        <mat-error *ngIf="_tags.length < 1">At least one tag is required</mat-error>
-        <mat-error *ngIf="alreadyInList">Element already in list</mat-error>
-    </mat-form-field>
+  <mat-form-field class="example-chip-list" appearance="fill">
+    <mat-label>Tags</mat-label>
+    <mat-chip-grid #chipGrid aria-label="Tag selection">
+      @for (tag of _tags; track tag) {
+        <mat-chip-row (removed)="remove(tag)">
+          #{{tag}}
+          <button matChipRemove>
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip-row>
+      }
+      <input placeholder="New tag..."
+        #tags
+        [matChipInputFor]="chipGrid"
+        [matChipInputSeparatorKeyCodes]="alreadyInList ? separatorKeysCodes : []"
+        [matChipInputAddOnBlur]="addOnBlur"
+        (matChipInputTokenEnd)="add($event)"
+        [formControl]="control"
+        [matAutocomplete]="auto">
+      @if (control.getRawValue().length > 0) {
+        <button matSuffix mat-icon-button aria-label="Add"
+          [disabled]="alreadyInList"
+          (click)="add(null)">
+          <mat-icon>add</mat-icon>
+        </button>
+      }
+      <mat-autocomplete #auto="matAutocomplete">
+        @for (option of availableTags | async; track option) {
+          <mat-option [value]="option">
+            {{option}}
+          </mat-option>
+        }
+      </mat-autocomplete>
+    </mat-chip-grid>
+    @if (_tags.length < 1) {
+      <mat-error>At least one tag is required</mat-error>
+    }
+    @if (alreadyInList) {
+      <mat-error>Element already in list</mat-error>
+    }
+  </mat-form-field>
 </form>

@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { PictureService } from './picture.service';
 import { AccountService } from "../../../../services/account.service";
 import { MatList, MatListItem } from '@angular/material/list';
-import { NgIf, NgFor, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { MatIconButton, MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
@@ -12,7 +12,7 @@ import { SplitPipe } from '../../../../pipes/split.pipe';
     selector: 'app-picture-selection',
     templateUrl: './picture-selection.component.html',
     styleUrls: ['./picture-selection.component.css'],
-    imports: [MatList, NgIf, MatListItem, NgFor, MatIconButton, MatIcon, NgClass, MatProgressSpinner, MatButton, SplitPipe]
+    imports: [MatList, MatListItem, MatIconButton, MatIcon, NgClass, MatProgressSpinner, MatButton, SplitPipe]
 })
 export class PictureSelectionComponent implements OnInit {
 

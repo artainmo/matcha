@@ -5,7 +5,7 @@ import { AccountService } from "../../../services/account.service";
 import { FormControl, FormGroup, ValidationErrors, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { HttpErrorResponse } from "@angular/common/http";
 import { tap } from 'rxjs';
-import { NgIf } from '@angular/common';
+
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatFormField, MatLabel, MatHint, MatError } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -18,7 +18,7 @@ import { MatButton } from '@angular/material/button';
 @Component({
     selector: 'app-edit',
     templateUrl: './edit.component.html',
-    imports: [NgIf, MatProgressSpinner, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatHint, MatSelect, MatOption, TagsComponent, PictureSelectionComponent, MatError, MatButton]
+    imports: [MatProgressSpinner, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatHint, MatSelect, MatOption, TagsComponent, PictureSelectionComponent, MatError, MatButton]
 })
 export class EditComponent implements OnInit {
   profile!: IProfile;

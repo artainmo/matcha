@@ -3,13 +3,13 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Observable } from 'rxjs';
 import { IMessage } from '../../../models/message.model';
 import { MessageService } from '../../../services/message.service';
-import { NgFor, NgIf, AsyncPipe, DatePipe } from '@angular/common';
+import { AsyncPipe, DatePipe } from '@angular/common';
 import { FilterUsernamePipe } from '../pipes/chat.pipes';
 
 @Component({
     selector: 'app-individual-chat',
     templateUrl: './individual-chat.component.html',
-    imports: [NgFor, NgIf, AsyncPipe, DatePipe, FilterUsernamePipe]
+    imports: [AsyncPipe, DatePipe, FilterUsernamePipe]
 })
 export class IndividualChatComponent implements OnInit {
 
