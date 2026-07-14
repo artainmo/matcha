@@ -1,6 +1,6 @@
 <div *ngIf="!loading">
 	<h4>Visits</h4>
-	<mat-chip-list *ngIf="moreInfos?.visits?.length != 0">
+	<mat-chip-set *ngIf="moreInfos?.visits?.length != 0">
 		<mat-chip *ngFor="let visit of moreInfos?.visits"
 							(removed)="open(visit)">
 			{{ visit }}
@@ -8,10 +8,10 @@
 				<mat-icon>arrow_forward</mat-icon>
 			</button>
 		</mat-chip>
-	</mat-chip-list>
+	</mat-chip-set>
 	<p *ngIf="moreInfos?.visits?.length == 0">No visits currently</p>
 	<h4>Likes</h4>
-	<mat-chip-list *ngIf="moreInfos?.likes?.length != 0">
+	<mat-chip-set *ngIf="moreInfos?.likes?.length != 0">
 		<mat-chip *ngFor="let like of moreInfos?.likes"
 							(removed)="open(like)">
 			{{ like }}
@@ -19,7 +19,7 @@
 				<mat-icon>arrow_forward</mat-icon>
 			</button>
 		</mat-chip>
-	</mat-chip-list>
+	</mat-chip-set>
 	<p *ngIf="moreInfos?.likes?.length == 0">No likes currently</p>
 	<h4>Fame rating</h4>
 	<p>{{ moreInfos?.fameRating }}</p>

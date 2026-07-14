@@ -1,10 +1,10 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { Observable, of } from 'rxjs';
 import { URL_PICTURES } from '../../../../config/urls';
 import { catchError } from "rxjs/operators";
 import { throwError } from "rxjs/internal/observable/throwError";
-import { MatLegacySnackBar as MatSnackBar } from "@angular/material/legacy-snack-bar";
 
 @Injectable({
   providedIn: 'root'

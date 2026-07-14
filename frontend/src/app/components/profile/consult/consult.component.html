@@ -39,9 +39,9 @@
   </div>
   <div>
     <h4>Tags</h4>
-    <mat-chip-list aria-label="Tags selection">
+    <mat-chip-set aria-label="Tags selection">
       <mat-chip *ngFor="let tag of profile.tags">#{{ tag }}</mat-chip>
-    </mat-chip-list>
+    </mat-chip-set>
   </div>
   <app-more-profile-infos *ngIf="isMyProfile"></app-more-profile-infos>
   <app-fame-rating *ngIf="!isMyProfile" [username]="profile.username"></app-fame-rating>
