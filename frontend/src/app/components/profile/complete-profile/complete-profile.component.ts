@@ -5,8 +5,9 @@ import { AccountService } from '../../../services/account.service';
 import {Router} from "@angular/router";
 
 @Component({
-	selector: 'app-complete-profile',
-	templateUrl: './complete-profile.component.html',
+    selector: 'app-complete-profile',
+    templateUrl: './complete-profile.component.html',
+    standalone: false
 })
 export class CompleteProfileComponent {
 

@@ -5,8 +5,9 @@ import { Observable } from 'rxjs';
 import { SortAndFilterService } from "../../../shared/sort-and-filter/sort-and-filter.service";
 
 @Component({
-  selector: 'app-search-bar',
-  templateUrl: './search-bar.component.html',
+    selector: 'app-search-bar',
+    templateUrl: './search-bar.component.html',
+    standalone: false
 })
 export class SearchBarComponent implements OnInit {
 

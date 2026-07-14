@@ -3,8 +3,9 @@ import { Router } from '@angular/router';
 import { AccountService } from '../../../services/account.service';
 
 @Component({
-	selector: 'app-login',
-	templateUrl: './login.component.html',
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    standalone: false
 })
 export class LoginComponent implements OnInit {
 	hide = true;

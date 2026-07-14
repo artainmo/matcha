@@ -2,8 +2,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MessageService } from '../../services/message.service';
 
 @Component({
-	selector: 'app-chat',
-	templateUrl: './chat.component.html',
+    selector: 'app-chat',
+    templateUrl: './chat.component.html',
+    standalone: false
 })
 export class ChatComponent implements OnInit, OnDestroy {
 

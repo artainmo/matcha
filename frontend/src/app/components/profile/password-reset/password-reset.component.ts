@@ -4,8 +4,9 @@ import { AccountService } from '../../../services/account.service';
 import { FormControl, Validators } from "@angular/forms";
 
 @Component({
-	selector: 'app-password-reset',
-	templateUrl: './password-reset.component.html',
+    selector: 'app-password-reset',
+    templateUrl: './password-reset.component.html',
+    standalone: false
 })
 export class PasswordResetComponent {
 	password: string = '';

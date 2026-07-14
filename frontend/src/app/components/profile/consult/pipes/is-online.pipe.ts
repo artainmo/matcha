@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from "@angular/core";
 
 @Pipe({
-	name: 'isOnline',
+    name: 'isOnline',
+    standalone: false
 })
 export class IsOnlinePipe implements PipeTransform {
 	transform(input: Date): boolean {

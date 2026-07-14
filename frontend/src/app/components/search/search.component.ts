@@ -6,8 +6,9 @@ import { SortAndFilterService } from "../../shared/sort-and-filter/sort-and-filt
 import { IFilter } from "../../shared/sort-and-filter/filter.interface";
 
 @Component({
-  selector: 'app-search',
-  templateUrl: './search.component.html',
+    selector: 'app-search',
+    templateUrl: './search.component.html',
+    standalone: false
 })
 export class SearchComponent {
 

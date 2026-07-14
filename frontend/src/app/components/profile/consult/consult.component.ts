@@ -4,8 +4,9 @@ import {AccountService} from "../../../services/account.service";
 import {IProfile} from "../../../models/user.model";
 
 @Component({
-	selector: 'app-consult',
-	templateUrl: './consult.component.html',
+    selector: 'app-consult',
+    templateUrl: './consult.component.html',
+    standalone: false
 })
 export class ConsultComponent implements OnInit {
 

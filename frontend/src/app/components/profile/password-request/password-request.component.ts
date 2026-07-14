@@ -3,8 +3,9 @@ import { Router } from '@angular/router';
 import { AccountService } from '../../../services/account.service';
 
 @Component({
-	selector: 'app-password-request',
-	templateUrl: './password-request.component.html',
+    selector: 'app-password-request',
+    templateUrl: './password-request.component.html',
+    standalone: false
 })
 export class PasswordRequestComponent implements OnInit {
 	unknownUsername$ = this.accountService.badUsername.asObservable();

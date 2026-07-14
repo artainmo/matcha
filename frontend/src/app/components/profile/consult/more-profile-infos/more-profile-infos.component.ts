@@ -5,8 +5,9 @@ import { URL_MORE_INFOS } from "../../../../config/urls";
 import { Router } from "@angular/router";
 
 @Component({
-  selector: 'app-more-profile-infos',
-  templateUrl: './more-profile-infos.component.html',
+    selector: 'app-more-profile-infos',
+    templateUrl: './more-profile-infos.component.html',
+    standalone: false
 })
 export class MoreProfileInfosComponent implements OnInit {
 

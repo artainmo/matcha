@@ -4,8 +4,9 @@ import { INotification } from '../../models/notification.model';
 import { NotificationsService } from '../../services/notifications.service';
 
 @Component({
-	selector: 'app-notifications',
-	templateUrl: './notifications.component.html'
+    selector: 'app-notifications',
+    templateUrl: './notifications.component.html',
+    standalone: false
 })
 export class NotificationsComponent implements OnInit {
 

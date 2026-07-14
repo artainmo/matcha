@@ -6,8 +6,9 @@ import { map, Observable, Subscription } from 'rxjs';
 import { TagsService } from './tags.service';
 
 @Component({
-	selector: 'app-tags',
-	templateUrl: './tags.component.html'
+    selector: 'app-tags',
+    templateUrl: './tags.component.html',
+    standalone: false
 })
 export class TagsComponent implements OnInit, OnDestroy {
 	@ViewChild('tags') inputTag!: ElementRef;

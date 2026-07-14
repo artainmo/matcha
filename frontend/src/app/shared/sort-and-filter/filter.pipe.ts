@@ -3,7 +3,8 @@ import { IUserResult } from "../search.interface";
 import { IFilter } from "./filter.interface";
 
 @Pipe({
-  name: 'filter'
+    name: 'filter',
+    standalone: false
 })
 export class FilterPipe implements PipeTransform {
 

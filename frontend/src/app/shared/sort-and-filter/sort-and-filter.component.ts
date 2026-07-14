@@ -5,9 +5,10 @@ import { IFilter } from "./filter.interface";
 import { Observable, tap } from 'rxjs';
 
 @Component({
-  selector: 'app-sort-and-filter',
-  templateUrl: './sort-and-filter.component.html',
-	styleUrls: ['./sort-and-filter.component.css']
+    selector: 'app-sort-and-filter',
+    templateUrl: './sort-and-filter.component.html',
+    styleUrls: ['./sort-and-filter.component.css'],
+    standalone: false
 })
 export class SortAndFilterComponent implements OnInit {
 

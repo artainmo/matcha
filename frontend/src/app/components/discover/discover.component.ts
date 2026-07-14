@@ -6,8 +6,9 @@ import { IFilter } from "../../shared/sort-and-filter/filter.interface";
 import { SortAndFilterService } from "../../shared/sort-and-filter/sort-and-filter.service";
 
 @Component({
-	selector: 'app-discover',
-	templateUrl: './discover.component.html',
+    selector: 'app-discover',
+    templateUrl: './discover.component.html',
+    standalone: false
 })
 export class DiscoverComponent implements OnInit {
 

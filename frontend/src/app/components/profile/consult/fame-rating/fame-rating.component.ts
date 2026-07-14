@@ -3,8 +3,9 @@ import { HttpClient } from "@angular/common/http";
 import { URL_FAME } from "../../../../config/urls";
 
 @Component({
-  selector: 'app-fame-rating',
-  templateUrl: './fame-rating.component.html'
+    selector: 'app-fame-rating',
+    templateUrl: './fame-rating.component.html',
+    standalone: false
 })
 export class FameRatingComponent implements OnInit {
 

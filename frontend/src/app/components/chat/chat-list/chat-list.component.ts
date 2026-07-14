@@ -8,8 +8,9 @@ import { NewChatComponent } from '../new-chat/new-chat.component';
 import { Location } from "@angular/common";
 
 @Component({
-	selector: 'app-chat-list',
-	templateUrl: './chat-list.component.html',
+    selector: 'app-chat-list',
+    templateUrl: './chat-list.component.html',
+    standalone: false
 })
 export class ChatListComponent implements OnInit {
 

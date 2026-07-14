@@ -7,8 +7,9 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { tap } from 'rxjs';
 
 @Component({
-	selector: 'app-edit',
-	templateUrl: './edit.component.html',
+    selector: 'app-edit',
+    templateUrl: './edit.component.html',
+    standalone: false
 })
 export class EditComponent implements OnInit {
   profile!: IProfile;

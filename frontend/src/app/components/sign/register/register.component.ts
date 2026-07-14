@@ -13,8 +13,9 @@ export interface IRegisterStep1 {
 }
 
 @Component({
-	selector: 'app-register',
-	templateUrl: './register.component.html',
+    selector: 'app-register',
+    templateUrl: './register.component.html',
+    standalone: false
 })
 export class RegisterComponent {
 

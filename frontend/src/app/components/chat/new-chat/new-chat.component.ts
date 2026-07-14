@@ -6,8 +6,9 @@ import { IMessage } from '../../../models/message.model';
 import { MessageService } from '../../../services/message.service';
 
 @Component({
-  selector: 'app-new-chat',
-  templateUrl: './new-chat.component.html',
+    selector: 'app-new-chat',
+    templateUrl: './new-chat.component.html',
+    standalone: false
 })
 export class NewChatComponent implements OnInit {
 

@@ -3,9 +3,10 @@ import { PictureService } from './picture.service';
 import { AccountService } from "../../../../services/account.service";
 
 @Component({
-	selector: 'app-picture-selection',
-	templateUrl: './picture-selection.component.html',
-	styleUrls: ['./picture-selection.component.css']
+    selector: 'app-picture-selection',
+    templateUrl: './picture-selection.component.html',
+    styleUrls: ['./picture-selection.component.css'],
+    standalone: false
 })
 export class PictureSelectionComponent implements OnInit {
 
