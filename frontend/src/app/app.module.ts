@@ -1,17 +1,17 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatLegacyAutocompleteModule as MatAutocompleteModule } from '@angular/material/legacy-autocomplete';
 import { MatBadgeModule } from '@angular/material/badge';
-import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
+import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy-chips';
+import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
+import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatListModule } from '@angular/material/list';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSelectModule } from '@angular/material/select';
+import { MatLegacyInputModule as MatInputModule } from '@angular/material/legacy-input';
+import { MatLegacyListModule as MatListModule } from '@angular/material/legacy-list';
+import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -46,14 +46,14 @@ import { SearchComponent } from './components/search/search.component';
 import { SearchBarComponent } from './components/search/search-bar/search-bar.component';
 import { SortAndFilterComponent } from './shared/sort-and-filter/sort-and-filter.component';
 import { MatExpansionModule } from "@angular/material/expansion";
-import { MatCardModule } from "@angular/material/card";
+import { MatLegacyCardModule as MatCardModule } from "@angular/material/legacy-card";
 import { SortPipe } from './shared/sort-and-filter/sort.pipe';
 import { FilterPipe } from './shared/sort-and-filter/filter.pipe';
-import { MatRadioModule } from "@angular/material/radio";
-import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MatLegacyRadioModule as MatRadioModule } from "@angular/material/legacy-radio";
+import { MatLegacyCheckboxModule as MatCheckboxModule } from "@angular/material/legacy-checkbox";
 import { IsOnlinePipe } from "./components/profile/consult/pipes/is-online.pipe";
 import { MatGridListModule } from "@angular/material/grid-list";
-import { MatSnackBarModule } from "@angular/material/snack-bar";
+import { MatLegacySnackBarModule as MatSnackBarModule } from "@angular/material/legacy-snack-bar";
 
 @NgModule({
 	declarations: [

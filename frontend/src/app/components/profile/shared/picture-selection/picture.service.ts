@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { URL_PICTURES } from '../../../../config/urls';
 import { catchError } from "rxjs/operators";
 import { throwError } from "rxjs/internal/observable/throwError";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatLegacySnackBar as MatSnackBar } from "@angular/material/legacy-snack-bar";
 
 @Injectable({
   providedIn: 'root'
