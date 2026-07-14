@@ -4,8 +4,6 @@
 
 This project uses ruby Sinatra as backend and AngularJS as frontend to build a dating app.
 
-This project I initially made with [pvanderl](https://github.com/pvanderl) in this [repository](https://github.com/pvanderl/19_matcha), I re-uploaded it on my profile.
-
 ## Run
 
 This project was created on macos.
