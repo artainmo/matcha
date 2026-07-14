@@ -1,4 +1,4 @@
-import { enableProdMode, importProvidersFrom } from '@angular/core';
+import { enableProdMode, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
 import { environment } from './environments/environment';
 import { AccountService } from './app/services/account.service';
 import { MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
@@ -34,7 +34,7 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
     providers: [
-        importProvidersFrom(BrowserModule, FormsModule, MatFormFieldModule, MatButtonModule, ReactiveFormsModule, MatIconModule, MatInputModule, MatSelectModule, MatChipsModule, MatAutocompleteModule, MatListModule, MatBadgeModule, MatDialogModule, MatProgressSpinnerModule, MatDatepickerModule, MatNativeDateModule, MatExpansionModule, MatCardModule, MatRadioModule, MatCheckboxModule, MatGridListModule, MatSnackBarModule),
+        provideZoneChangeDetection(),importProvidersFrom(BrowserModule, FormsModule, MatFormFieldModule, MatButtonModule, ReactiveFormsModule, MatIconModule, MatInputModule, MatSelectModule, MatChipsModule, MatAutocompleteModule, MatListModule, MatBadgeModule, MatDialogModule, MatProgressSpinnerModule, MatDatepickerModule, MatNativeDateModule, MatExpansionModule, MatCardModule, MatRadioModule, MatCheckboxModule, MatGridListModule, MatSnackBarModule),
         AccountService,
         { provide: MAT_DATE_LOCALE, useValue: 'fr-FR' },
         provideHttpClient(withInterceptorsFromDi()),
