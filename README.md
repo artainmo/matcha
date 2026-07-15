@@ -8,16 +8,24 @@ This project uses ruby Sinatra as backend and AngularJS as frontend to build a d
 
 This project was created on macos.
 
-For the frontend we used: Angular Cli 14.2.13; Node 18.20.8; and npm 10.8.2. Discrepancies can make the frontend hang. Verify you have the correct versions with: `npx ng version`. You can download the right versions in your terminal with: `brew install node@18`; `npm install -g @angular/cli@14`.
+For the frontend we used: Angular Cli 22.0.6; Node 24.15.0; and npm 11.11.0. Discrepancies can make the frontend hang. Verify you have the correct versions with: `npx ng version`. You can download the right versions in your terminal with: `brew install node@24`; `npm install`.
 
-For the database we run a postgres server using 'https://postgresapp.com' on macos. After downloading the postgres app, within the app you can click on 'initialize' to start the server.<br>
-Now access the psql command line by double clicking a default database such as the one named 'template1'. Within the psql command line you can use the following commands to create a matcha database:
+For the database we now run PostgreSQL in Docker instead of relying on Postgres.app.<br>
+Install Docker Desktop (or another Docker engine with Compose support), then start the database with:
 ```
-CREATE USER postgres;
-ALTER USER postgres WITH PASSWORD 'admin';
-CREATE DATABASE matcha OWNER postgres;
+docker compose up -d postgres
 ```
-Make sure the postgres server runs while launching the app, generating users, or cleaning the database.<br>
+The container creates the `matcha` database automatically and stores its data in a persistent Docker volume.<br>
+By default the app connects with the following settings:
+```
+PGHOST=localhost
+PGPORT=5433
+PGDATABASE=matcha
+PGUSER=postgres
+PGPASSWORD=admin
+```
+You can copy `.env.example` to `.env` to customize the Docker container values. If you change them, export the same `PG*` variables before launching the Ruby backend so both sides stay aligned.<br>
+Make sure the PostgreSQL container is running while launching the app, generating users, or cleaning the database.<br>
 
 For the backend you should `brew install ruby@3.3`, afterwards you can add the following lines to your "~/.zshrc": 
 ```
@@ -29,6 +37,16 @@ export PATH="$HOME/.gem/ruby/3.3.0/bin:$PATH" #Shows where the gem executables a
 Finally, to launch the whole app in one command:
 ```
 make
+```
+
+To stop the database container:
+```
+docker compose down
+```
+
+To stop it and remove all PostgreSQL data for a clean database:
+```
+docker compose down -v
 ```
 
 To generate users on dating site:

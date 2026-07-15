@@ -19,34 +19,46 @@ require 'fileutils'
 # a problem when the jury wanted to verify the project in 2026.
 Geocoder.configure(http_headers: { 'User-Agent' => 'matcha-app/1.0' })
 
-count = 0
-
 class DatabaseManager
+  MAX_CONNECTION_RETRIES = 10
+  CONNECTION_RETRY_DELAY = 0.5
+
   def initialize
+    retries = 0
+
     begin
       puts 'Connecting to database...'
-      #Run a postgres server and matcha database with https://postgresapp.com on macos
-      @conn = PG.connect({
-        host: 'localhost',
-        port: '5432',
-        dbname: 'matcha',
-        user: 'postgres',
-        password: 'admin'
-      })
+      @conn = PG.connect(connection_config)
     rescue PG::ConnectionBad => error
-      if error.message[48,39] == "FATAL:  sorry, too many clients already"
-        sleep(0.5)
-        count += 1
-        if count >= 10
+      if error.message.include?('FATAL:  sorry, too many clients already')
+        retries += 1
+        if retries >= MAX_CONNECTION_RETRIES
+          puts error.message
           exit
         end
-        initialize
+
+        sleep(CONNECTION_RETRY_DELAY)
+        retry
       else
         puts error.message
         exit
       end
     end
   end
+
+  private
+
+  def connection_config
+    {
+      host: ENV.fetch('PGHOST', 'localhost'),
+      port: ENV.fetch('PGPORT', '5432'),
+      dbname: ENV.fetch('PGDATABASE', 'matcha'),
+      user: ENV.fetch('PGUSER', 'postgres'),
+      password: ENV.fetch('PGPASSWORD', 'admin')
+    }
+  end
+
+  public
 
   def createDatabase
     puts 'Creating the database...'
