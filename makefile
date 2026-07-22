@@ -15,6 +15,9 @@ docker-up-db:
 docker-up-backend:
 	docker-compose up ruby
 
+docker-db-clean:
+	docker-compose down postgres -v
+
 frontend:
 	cd frontend && npm install && npm run build
 	rm -rf backend/public/frontend
@@ -23,9 +26,6 @@ frontend:
 
 backend:
 	cd backend && ./setup.sh && bundle exec ruby myapp.rb
-
-generate_users:
-	cd backend && ./setup.sh && cd database/tests_and_scripts && bundle exec ruby generateUsers.rb $(AMOUNT) $(MAIL)
 
 db_clean:
 	cd backend && ./setup.sh && cd database/tests_and_scripts && bundle exec ruby cleanDatabase.rb

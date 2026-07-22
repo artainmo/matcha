@@ -20,6 +20,7 @@ PUBLIC_ASSETS_PATH = File.expand_path('../public', __dir__)
 
 db_start = DatabaseManager.new
 db_start.createDatabase
+db_start.generateUsersIfNeeded
 
 =begin
   CONFIGURATION
@@ -70,11 +71,11 @@ post '/rest/account/register' do
     data: body['username']
   }
   token = JWT.encode payload, jwt_token, 'HS256'
-  return 417, "Mail is not valid" if !send_mail(body['email'],
-        "Verify Matcha Account",
-  		  "Click on the following link to verify your account: " +
-        frontend + "/profile/verify/" +
-        token)
+  return 417, "Mail is not valid" unless send_mail(body['email'],
+   "Verify Matcha Account",
+   "Click on the following link to verify your account: " +
+   frontend + "/profile/verify/" +
+   token)
   return 200
 end
 
@@ -104,12 +105,14 @@ patch '/rest/account/fill' do
   ret = db.updateAccount(username, 'profile_picture', body['profile_picture'])
   return 417, ret if ret != 'UPDATED'
   if body['tags']
+    db.deleteTagsOfUser(username)
     body['tags'].each { |tag|
       ret = db.createTag(username, tag)
       return 417, ret if ret != 'CREATED' && ret[0,54] != 'ERROR:  duplicate key value violates unique constraint'
     }
   end
   geolocation = getGeolocationCoordinates(body['geolocation'], request.ip)
+  puts geolocation
   return 417, "Wrong geolocation" if geolocation == false
   ret = db.updateAccount(username, 'geolocation', geolocation)
   return 417, ret if ret != 'UPDATED'
@@ -160,6 +163,7 @@ patch '/rest/account' do
       return 417 if ret != 'CREATED'
     }
   end
+  puts "body: #{body['geolocation']}"
   if body['geolocation']
     if body['geolocation'] == ''
       ret = db.updateAccount(username, 'custom_geolocation', false)
@@ -490,7 +494,7 @@ post '/rest/picture' do
   end
   FileUtils.mkdir_p("../public/images/#{username}")
   storage_path = "images/#{username}/#{params[:file][:filename]}"
-  if File.exists?("../public/" + storage_path)
+  if File.exist?("../public/" + storage_path)
     return 400, "Filename already exists"
   end
   ret = db.createPicture(username, storage_path)
@@ -536,7 +540,7 @@ helpers do
   def getGeolocationCoordinates(paramGeolocation, requestIp)
     if paramGeolocation
       return geolocationCoordinates(paramGeolocation)
-    elsif requestIp != '127.0.0.1' && requestIp != '::1'
+    elsif requestIp != '127.0.0.1' && requestIp != '::1' && requestIp != 'localhost'
       #Because we are on localhost we cannot deduct our location from it
       return geolocationCoordinates(requestIp)
     else
@@ -558,6 +562,7 @@ helpers do
   
   def send_mail(receiver, subject, content)
     begin
+      puts "emailpass: #{ENV['EMAILPASS']}"
       Pony.mail(
         :to => receiver,
         :from => 'no-reply@vanderlynden.eu',
@@ -572,7 +577,9 @@ helpers do
         :authentication => :plain
       })
       return true
-    rescue
+    rescue StandardError => e
+      warn "[send_mail] Failed to send email to #{receiver.inspect} with subject #{subject.inspect}: #{e.class} - #{e.message}"
+      warn e.backtrace.join("\n") if e.backtrace
       return false
     end
   end

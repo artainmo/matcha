@@ -64,18 +64,27 @@ class DatabaseManager
 
   def createDatabase
     puts 'Creating the database...'
+    if all_tables_exist?
+      puts 'Database exists already'
+      return
+    end
+
     create_db_commands = File.read(__dir__ + '/designDatabase.sql')
     begin
       @conn.exec(create_db_commands)
     rescue PG::Error => error
-      if error.message[0..-2] == 'ERROR:  relation "account" already exists'
-        puts 'Database exists already!'
-      else
-        print error.message
-        exit
-      end
+      print error.message
     else
       puts 'Database created!'
+    end
+  end
+
+  def all_tables_exist?
+    required_tables = %w[account liked blocked visit tag token message notification picture]
+
+    required_tables.all? do |table|
+      result = @conn.exec_params('SELECT to_regclass($1) AS regclass;', ["public.#{table}"])
+      !result[0]['regclass'].nil?
     end
   end
 
@@ -624,4 +633,89 @@ private
       }
       return filtered_suggestions
     end
+
+  def countAccounts
+    begin
+      result = @conn.exec('SELECT COUNT(*) FROM account;')
+      return result[0]['count'].to_i
+    rescue PG::Error => error
+      puts "Error counting accounts: #{error.message}"
+      return 0
+    end
+  end
+
+  def geolocationCoordinates(ipOrAddress)
+    geolocation = Geocoder.search(ipOrAddress)
+    return false if geolocation.first == nil
+    return geolocation.first.coordinates.join(',')
+  end
+
+  public
+  def generateUsersIfNeeded
+    generate_users = ENV.fetch('GENERATE_USERS', 'false').downcase == 'true'
+    unless generate_users
+      puts "\033[1;33mUser generation is disabled. Set the environment variable GENERATE_USERS to 'true' to enable it.\033[0m"
+      return
+    end
+
+    target_amount = ENV.fetch('GENERATED_USERS_AMOUNT', '5').to_i
+    current_count = countAccounts
+    amount_to_generate = target_amount - current_count
+    created_users = 0
+
+    if amount_to_generate <= 0
+      puts "\033[1;33mNo users to generate. Target of #{target_amount} already reached.\033[0m"
+      return
+    end
+
+    puts "\033[1;36mGenerating #{amount_to_generate} test users to reach target of #{target_amount}...\033[0m"
+
+    # Predefined values for user generation
+    locations = ['Brussels', 'Gent', 'Antwerpen', 'Paris', 'Dublin']
+    tags = ['tennis', 'chess', 'school19', 'music', 'travel']
+    password = 'pass123'
+    genders = ['MALE', 'FEMALE', 'OTHER']
+    sexual_orientations = ['MALE', 'FEMALE', 'BI', 'OTHER']
+    bios = ['The last time I was someone''s "type" was when I donated blood.', 'Give me your best pickup line.',
+      'Looking for the pepperoni to my pizza, the peanut butter to my jelly, the cheese to my crackers. Oh dang… now I''m hungry.',
+      'They say love happens when you least expect it, and trust me, my expectations could not be lower right now.',
+      'If we match, that means we have to get married, right?']
+
+    # Require RandomNameGenerator for generating names
+    require 'random_name_generator'
+
+    # Generate test user if it doesn't exist
+    if countAccounts == 0
+      test_geolocation = geolocationCoordinates(locations[0])
+      if createFullAccountForTestPurposes('test', password, ENV.fetch('EMAILPASS', 'test@example.com'), 'Rob', 'Howard',
+        genders[0], sexual_orientations[1], bios[0], '1998-03-04', Time.now(), test_geolocation, tags[0]) == 'CREATED'
+        amount_to_generate -= 1
+        created_users += 1
+      end
+    end
+
+    # Generate random users
+    i = 0
+    while i < amount_to_generate
+      username = RandomNameGenerator.new.compose
+      geolocation = geolocationCoordinates(locations[rand(5)])
+      firstname = RandomNameGenerator.new.compose
+      tag = tags[rand(5)]
+      lastname = RandomNameGenerator.new.compose
+      gender = genders[rand(3)]
+      birthday = Time.at(rand * Time.now.to_i).to_s[0, 10]
+      biography = bios[rand(5)]
+      last_connected = Time.now()
+      sexual_orientation = sexual_orientations[rand(4)]
+
+      ret = createFullAccountForTestPurposes(username, password, ENV.fetch('EMAILPASS', 'test@example.com'), firstname,
+        lastname, gender, sexual_orientation, biography, birthday, last_connected, geolocation, tag)
+      if ret == 'CREATED'
+        i += 1
+        created_users += 1
+      end
+    end
+
+    puts "\033[0;36mUser generation complete! Created #{created_users} user(s).\033[0m"
+  end
 end
