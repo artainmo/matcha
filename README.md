@@ -49,17 +49,27 @@ PostgreSQL 16 runs in Docker for consistency. Start it with:
 docker compose up -d postgres
 ```
 
-The container creates the `matcha` database automatically and stores its data in a persistent Docker volume.<br>
-By default the app connects with the following settings:
-```
-PGHOST=localhost
-PGPORT=5433
+The container creates the `matcha` database automatically and stores its data in a persistent Docker volume.
+
+#### Environment Variables
+By default the app uses these settings (configure in `.env`):
+```bash
+# For Docker networking (use 'postgres' as hostname inside Docker)
+PGHOST=postgres
+PGPORT=5432
 PGDATABASE=matcha
 PGUSER=postgres
 PGPASSWORD=admin
+
+# For Docker container initialization
+POSTGRES_DB=matcha
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=admin
 ```
 
-You can copy `.env.example` to `.env` to customize the Docker container values. If you change them, export the same `PG*` variables before launching the Ruby backend so both sides stay aligned.
+You can create a `.env` file from `.env.example` to customize these values. If you change them when running without Docker, make sure to export the same `PG*` variables before launching the Ruby backend so both sides stay aligned.
+
+**Note for local (non-Docker) development:** Use `PGHOST=localhost` and `PGPORT=5433` to connect to the PostgreSQL container from your host machine.
 
 ### Backend Setup
 Install Ruby 3.3.5:
