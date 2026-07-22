@@ -1,4 +1,5 @@
 /dist
+/backend/public/frontend
 /frontend/node_modules
 **/.DS_Store
 **/*.swp

@@ -1,27 +1,28 @@
 <form>
-  <mat-form-field appearance="fill">
-    <mat-label>Enter your user</mat-label>
-    <input [(ngModel)]="user" matInput autocomplete="on" name="username">
-    @if (badLogin$ | async) {
-      <mat-error>{{ message$ | async }}</mat-error>
-    }
-  </mat-form-field>
-  <br>
     <mat-form-field appearance="fill">
-      <mat-label>Enter your password</mat-label>
-      <input [(ngModel)]="password" matInput [type]="hide ? 'password' : 'text'" autocomplete="on" name="password">
-      @if (wrongPassword$ | async) {
-        <mat-error>{{ message$ | async }}</mat-error>
-      }
-      <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'"
-        [attr.aria-pressed]="hide">
-        <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-      </button>
+        <mat-label>Enter your user</mat-label>
+        <input [(ngModel)]="user" autocomplete="on" matInput name="username">
+        @if (badLogin$ | async) {
+            <mat-error>{{ message$ | async }}</mat-error>
+        }
+    </mat-form-field>
+    <br>
+    <mat-form-field appearance="fill">
+        <mat-label>Enter your password</mat-label>
+        <input [(ngModel)]="password" [type]="hide ? 'password' : 'text'" autocomplete="on" matInput name="password">
+        @if (wrongPassword$ | async) {
+            <mat-error>{{ message$ | async }}</mat-error>
+        }
+        <button (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide" mat-icon-button
+                matSuffix>
+            <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
     </mat-form-field>
     @if ((badLogin$ | async) || (wrongPassword$ | async)) {
-      <p>{{ message$ | async }}</p>
+        <p>{{ message$ | async }}</p>
     }
     <br>
-      <button mat-raised-button color="primary" [disabled]="!user || !password" (click)="login()" type="submit">Login</button>
-      <button mat-button routerLink="/profile/password/request">Reset password!</button>
-    </form>
+    <button (click)="login()" [disabled]="!user || !password" color="primary" mat-raised-button type="submit">Login
+    </button>
+    <button mat-button routerLink="/profile/password/request">Reset password!</button>
+</form>

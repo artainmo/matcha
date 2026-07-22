@@ -1,91 +1,94 @@
 @if (loading) {
-  <mat-spinner></mat-spinner>
+    <mat-spinner></mat-spinner>
 }
 @if (!loading) {
-  <div>
-    @if (isMyProfile) {
-      <button routerLink="/profile/edit" mat-raised-button>Edit My profile</button>
-    }
-    @if (!isMyProfile) {
-      <div>
-        <h4>{{ (profile.last_connected | isOnline) ? 'Online' : ('Last Connected: ' + (profile.last_connected | date: 'dd/MM/YYYY HH:mm')) }}</h4>
-      </div>
-    }
-    <h4>{{ profile.firstname }} {{ profile.lastname }} ({{ profile.username }})</h4>
-    @if (profile.pictures == undefined || profile.pictures.length > 0) {
-      <mat-grid-list cols="4" rowHeight="200px">
-        @for (picture of profile.pictures; track picture) {
-          <mat-grid-tile
-            ><img [src]="picture" [alt]="picture" style="max-width: 100%; max-height: 100%;"></mat-grid-tile>
-          }
-        </mat-grid-list>
-      }
-      <div>
-        <h4>Biography</h4>
-        {{ profile.biography }}
-      </div>
-      <div>
-        <h4>Birthday</h4>
-        {{ profile.birthday | date: 'dd/MM/YYYY' }}
-      </div>
-      <div>
-        <h4>Gender</h4>
-        {{ profile.gender }}
-      </div>
-      <div>
-        <h4>Profile picture</h4>
-        <img [src]="profile.profile_picture" [alt]="profile.profile_picture" style="max-height: 1000px; max-width: 500px;">
-      </div>
-      <div>
-        <h4>{{ profile.custom_geolocation ? 'Custom location' : 'Calculated geolocation' }}</h4>
-        {{ profile.geolocation }}
-      </div>
-      <div>
-        <h4>sexual orientation</h4>
-        {{ profile.sexual_orientation }}
-      </div>
-      @if (profile.custom_geolocation) {
-        <div>
-          <h4>Profile's location has been manually set up</h4>
-        </div>
-      }
-      <div>
-        <h4>Tags</h4>
-        <mat-chip-set aria-label="Tags selection">
-          @for (tag of profile.tags; track tag) {
-            <mat-chip>#{{ tag }}</mat-chip>
-          }
-        </mat-chip-set>
-      </div>
-      @if (isMyProfile) {
-        <app-more-profile-infos></app-more-profile-infos>
-      }
-      @if (!isMyProfile) {
-        <app-fame-rating [username]="profile.username"></app-fame-rating>
-      }
-      @if (!isMyProfile && profile.blocked) {
-        <div>
-          You blocked this profile
-        </div>
-      }
-      @if (!isMyProfile && !profile.blocked) {
-        <div>
-          @if (profile.fake_account) {
-            <p style="color: red">This account seems to be a fake account</p>
-          }
-          <br>
-            @if (!profile.fake_account) {
-              <button mat-raised-button (click)="reportAsFake()">Report as fake</button>
-            }
-            <button mat-raised-button (click)="profile.liked ? dislikeProfile() : likeProfile()">{{ profile.liked ? 'Dislike' : 'like' }}</button>
-            <button mat-raised-button (click)="blockProfile()">Block</button>
-            <br>
-              @if (profile.liked && profile.likes_back) {
-                <p>It's a match!
-                  <button mat-raised-button [routerLink]="'/chat/'+profile.username">Message!</button>
-                </p>
-              }
+    <div>
+        @if (isMyProfile) {
+            <button mat-raised-button routerLink="/profile/edit">Edit My profile</button>
+        }
+        @if (!isMyProfile) {
+            <div>
+                <h4>{{ (profile.last_connected | isOnline) ? 'Online' : ('Last Connected: ' + (profile.last_connected | date: 'dd/MM/YYYY HH:mm')) }}</h4>
             </div>
-          }
+        }
+        <h4>{{ profile.firstname }} {{ profile.lastname }} ({{ profile.username }})</h4>
+        @if (profile.pictures == undefined || profile.pictures.length > 0) {
+            <mat-grid-list cols="4" rowHeight="200px">
+                @for (picture of profile.pictures; track picture) {
+                    <mat-grid-tile
+                    ><img [alt]="picture" [src]="picture" style="max-width: 100%; max-height: 100%;"></mat-grid-tile>
+                }
+            </mat-grid-list>
+        }
+        <div>
+            <h4>Biography</h4>
+            {{ profile.biography }}
         </div>
-      }
+        <div>
+            <h4>Birthday</h4>
+            {{ profile.birthday | date: 'dd/MM/YYYY' }}
+        </div>
+        <div>
+            <h4>Gender</h4>
+            {{ profile.gender }}
+        </div>
+        <div>
+            <h4>Profile picture</h4>
+            <img [alt]="profile.profile_picture" [src]="profile.profile_picture"
+                 style="max-height: 1000px; max-width: 500px;">
+        </div>
+        <div>
+            <h4>{{ profile.custom_geolocation ? 'Custom location' : 'Calculated geolocation' }}</h4>
+            {{ profile.geolocation }}
+        </div>
+        <div>
+            <h4>sexual orientation</h4>
+            {{ profile.sexual_orientation }}
+        </div>
+        @if (profile.custom_geolocation) {
+            <div>
+                <h4>Profile's location has been manually set up</h4>
+            </div>
+        }
+        <div>
+            <h4>Tags</h4>
+            <mat-chip-set aria-label="Tags selection">
+                @for (tag of profile.tags; track tag) {
+                    <mat-chip>#{{ tag }}</mat-chip>
+                }
+            </mat-chip-set>
+        </div>
+        @if (isMyProfile) {
+            <app-more-profile-infos></app-more-profile-infos>
+        }
+        @if (!isMyProfile) {
+            <app-fame-rating [username]="profile.username"></app-fame-rating>
+        }
+        @if (!isMyProfile && profile.blocked) {
+            <div>
+                You blocked this profile
+            </div>
+        }
+        @if (!isMyProfile && !profile.blocked) {
+            <div>
+                @if (profile.fake_account) {
+                    <p style="color: red">This account seems to be a fake account</p>
+                }
+                <br>
+                @if (!profile.fake_account) {
+                    <button (click)="reportAsFake()" mat-raised-button>Report as fake</button>
+                }
+                <button (click)="profile.liked ? dislikeProfile() : likeProfile()"
+                        mat-raised-button>{{ profile.liked ? 'Dislike' : 'like' }}
+                </button>
+                <button (click)="blockProfile()" mat-raised-button>Block</button>
+                <br>
+                @if (profile.liked && profile.likes_back) {
+                    <p>It's a match!
+                        <button [routerLink]="'/chat/'+profile.username" mat-raised-button>Message!</button>
+                    </p>
+                }
+            </div>
+        }
+    </div>
+}

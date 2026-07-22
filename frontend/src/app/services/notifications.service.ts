@@ -32,6 +32,10 @@ export class NotificationsService {
 		this.timerSubscription.unsubscribe();
 	}
 
+	markRead(id: string) {
+		this.http.patch(URL_NOTIFICATIONS + '/' + id + '/opened/true', {}).subscribe();
+	}
+
 	private getNotifications() {
 		this.http.get<INotification[]>(URL_NOTIFICATIONS)
 			.pipe(
@@ -49,10 +53,6 @@ export class NotificationsService {
 					this.hasNewNotificationsBS.next(notifications.filter((notif: INotification) => !notif.opened).length);
 				}
 			)
-	}
-
-	markRead(id: string) {
-		this.http.patch(URL_NOTIFICATIONS + '/' + id + '/opened/true', {}).subscribe();
 	}
 
 }

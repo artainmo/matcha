@@ -2,10 +2,10 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { IMessage } from '../../../models/message.model';
 import { AccountService } from '../../../services/account.service';
 
-@Pipe({ name: 'filterUsername' })
+@Pipe({name: 'filterUsername'})
 export class FilterUsernamePipe implements PipeTransform {
 	transform(messages: IMessage[] | null, username: string | null): IMessage[] {
-		if (messages === null){
+		if (messages === null) {
 			return [];
 		}
 		return messages.filter((message: IMessage) => message.sender_id === username || message.receiver_id === username);
@@ -13,7 +13,7 @@ export class FilterUsernamePipe implements PipeTransform {
 }
 
 
-@Pipe({ name: 'getLatests' })
+@Pipe({name: 'getLatests'})
 export class GetLatestsPipe implements PipeTransform {
 
 	constructor(

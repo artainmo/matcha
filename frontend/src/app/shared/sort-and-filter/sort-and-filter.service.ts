@@ -4,7 +4,7 @@ import { IUserResult } from "../search.interface";
 import { IFilter } from "./filter.interface";
 
 @Injectable({
-  providedIn: 'root'
+	providedIn: 'root'
 })
 export class SortAndFilterService {
 	sortBS: BehaviorSubject<string> = new BehaviorSubject<string>('');
@@ -15,7 +15,8 @@ export class SortAndFilterService {
 		commonTags: []
 	});
 
-  constructor() { }
+	constructor() {
+	}
 
 	initFilters(res: IUserResult[]) {
 		const availableFilters: IFilter = {

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { SearchService } from "./search.service";
 import { Observable } from 'rxjs';
 import { IUserResult } from "../../shared/search.interface";
@@ -6,7 +6,7 @@ import { SortAndFilterService } from "../../shared/sort-and-filter/sort-and-filt
 import { IFilter } from "../../shared/sort-and-filter/filter.interface";
 import { SearchBarComponent } from './search-bar/search-bar.component';
 import { SortAndFilterComponent } from '../../shared/sort-and-filter/sort-and-filter.component';
-import { MatList, MatListSubheaderCssMatStyler, MatListItem } from '@angular/material/list';
+import { MatList, MatListItem, MatListSubheaderCssMatStyler } from '@angular/material/list';
 import { AsyncPipe } from '@angular/common';
 import { MatButton } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
@@ -18,10 +18,10 @@ import { SortPipe } from '../../shared/sort-and-filter/sort.pipe';
 import { FilterPipe } from '../../shared/sort-and-filter/filter.pipe';
 
 @Component({
-    selector: 'app-search',
-    templateUrl: './search.component.html',
-    changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [SearchBarComponent, SortAndFilterComponent, MatList, MatListSubheaderCssMatStyler, MatListItem, MatButton, RouterLink, MatIcon, MatLine, MatDivider, MatProgressSpinner, AsyncPipe, SortPipe, FilterPipe]
+	selector: 'app-search',
+	templateUrl: './search.component.html',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	imports: [SearchBarComponent, SortAndFilterComponent, MatList, MatListSubheaderCssMatStyler, MatListItem, MatButton, RouterLink, MatIcon, MatLine, MatDivider, MatProgressSpinner, AsyncPipe, SortPipe, FilterPipe]
 })
 export class SearchComponent {
 
@@ -32,10 +32,11 @@ export class SearchComponent {
 	};
 	isLoading$: Observable<boolean> = this.searchService.isLoading$;
 
-  constructor(
+	constructor(
 		private readonly searchService: SearchService,
 		private readonly sortAndFilterService: SortAndFilterService,
-  ) { }
+	) {
+	}
 
 	log(filters: IFilter) {
 		this.filterArg = {...filters};

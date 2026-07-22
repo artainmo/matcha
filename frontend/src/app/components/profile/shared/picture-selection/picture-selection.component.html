@@ -1,40 +1,41 @@
 <mat-list role="list">
-  @if (_files.length === 0) {
-    <mat-list-item role="listItem">
-      At least one picture is mandatory.
-      @if (_favorite === '') {
-        <br>
-        }
-        {{ _favorite !== '' ? '' : 'At least one favorite is required.'}}
-      </mat-list-item>
+    @if (_files.length === 0) {
+        <mat-list-item role="listItem">
+            At least one picture is mandatory.
+            @if (_favorite === '') {
+                <br>
+            }
+            {{ _favorite !== '' ? '' : 'At least one favorite is required.' }}
+        </mat-list-item>
     }
     @for (file of _files; track file; let i = $index) {
-      <mat-list-item role="listItem">
-        <button mat-icon-button aria-label="Example icon button with a home icon" style="margin-right:1em"
-          [disabled]="_loadingFileIndexes.includes(i)"
-          (click)="setFavorite(file)">
-          <mat-icon [ngClass]="{'red-icon': file == _favorite, 'grey-icon': !(file == _favorite)}">favorite</mat-icon>
-        </button>
-        {{ file | getLast: '/' }}
-        <button mat-icon-button aria-label="Example icon button with a home icon" (click)="removeFile(i)"
-          [disabled]="_loadingFileIndexes.includes(i)">
-          <mat-icon>delete</mat-icon>
-          @if (_loadingFileIndexes.includes(i)) {
-            <mat-spinner></mat-spinner>
-          }
-        </button>
-      </mat-list-item>
+        <mat-list-item role="listItem">
+            <button (click)="setFavorite(file)" [disabled]="_loadingFileIndexes.includes(i)" aria-label="Example icon button with a home icon"
+                    mat-icon-button
+                    style="margin-right:1em">
+                <mat-icon [ngClass]="{'red-icon': file == _favorite, 'grey-icon': !(file == _favorite)}">favorite
+                </mat-icon>
+            </button>
+            {{ file | getLast: '/' }}
+            <button (click)="removeFile(i)" [disabled]="_loadingFileIndexes.includes(i)" aria-label="Example icon button with a home icon"
+                    mat-icon-button>
+                <mat-icon>delete</mat-icon>
+                @if (_loadingFileIndexes.includes(i)) {
+                    <mat-spinner></mat-spinner>
+                }
+            </button>
+        </mat-list-item>
     }
-  </mat-list>
-  <br>
+</mat-list>
+<br>
 
-    <input #fileInput hidden="true" type="file" onclick="this.value=null" (change)="uploadFile($event)" accept="image/*"/>
-    <br>
-      <button mat-flat-button color="primary"
-        [disabled]="fileUploadLoading || _files.length === 5"
-        (click)="fileInput.click()">
-        {{ _files.length === 5 ? 'Maximum 5 pictures' : 'Add Picture' }}
-        @if (fileUploadLoading) {
-          <mat-spinner></mat-spinner>
-        }
-      </button>
+<input #fileInput (change)="uploadFile($event)" accept="image/*" hidden="true" onclick="this.value=null" type="file"/>
+<br>
+<button (click)="fileInput.click()" [disabled]="fileUploadLoading || _files.length === 5"
+        color="primary"
+        mat-flat-button>
+    {{ _files.length === 5 ? 'Maximum 5 pictures' : 'Add Picture' }}
+    @if (fileUploadLoading) {
+        <mat-spinner></mat-spinner>
+    }
+</button>

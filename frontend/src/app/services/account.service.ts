@@ -6,8 +6,11 @@ import { throwError } from 'rxjs/internal/observable/throwError';
 import { catchError, tap } from 'rxjs/operators';
 import {
 	URL_ACCOUNT,
-	URL_ACCOUNT_FIND, URL_BLOCK,
-	URL_COMPLETE_ACCOUNT, URL_FAKE, URL_LIKE,
+	URL_ACCOUNT_FIND,
+	URL_BLOCK,
+	URL_COMPLETE_ACCOUNT,
+	URL_FAKE,
+	URL_LIKE,
 	URL_LOGIN,
 	URL_REGISTER,
 	URL_REQUEST_PASSWORD,
@@ -23,12 +26,12 @@ import { NotificationsService } from './notifications.service';
 export class AccountService {
 	badLogin: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  wrongPassword: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  message: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  badUsername: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+	wrongPassword: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+	message: BehaviorSubject<string> = new BehaviorSubject<string>('');
+	badUsername: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  isLoggedIn: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  activeUsername: string = '';
+	isLoggedIn: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+	activeUsername: string = '';
 
 	constructor(
 		private readonly http: HttpClient,
@@ -58,19 +61,20 @@ export class AccountService {
 				return throwError(message);
 			})
 		).subscribe({
-			next: (val: { completed: boolean }) => {
-				this.activeUsername = username;
-				this.isLoggedIn.next(true);
-				if (val.completed) {
-					this.router.navigate(['/discover']).then();
-					this.notificationsService.subscribe();
-				} else {
-					this.router.navigate(['/profile/complete']).then();
+				next: (val: { completed: boolean }) => {
+					this.activeUsername = username;
+					this.isLoggedIn.next(true);
+					if (val.completed) {
+						this.router.navigate(['/discover']).then();
+						this.notificationsService.subscribe();
+					} else {
+						this.router.navigate(['/profile/complete']).then();
+					}
+				},
+				error: (error) => {
+					this.message.next(error);
 				}
-			},
-			error: (error) => {
-				this.message.next(error);
-			}}
+			}
 		);
 	}
 
@@ -116,7 +120,7 @@ export class AccountService {
 	logout() {
 		this.notificationsService.unsubscribe();
 		this.isLoggedIn.next(false);
-    this.router.navigate(['/sign/in']).then();
+		this.router.navigate(['/sign/in']).then();
 	}
 
 	validate(token: string) {
@@ -132,66 +136,66 @@ export class AccountService {
 
 	complete(values: any) {
 		return this.http.patch(URL_COMPLETE_ACCOUNT, values).pipe(
-      catchError((error: HttpErrorResponse) => {
-        if (error.status >= 200 && error.status < 300) {
-          return of({});
-        }
-        return throwError(error);
-      }));
+			catchError((error: HttpErrorResponse) => {
+				if (error.status >= 200 && error.status < 300) {
+					return of({});
+				}
+				return throwError(error);
+			}));
 	}
 
 
-  getProfile(username: string = this.activeUsername): Observable<string | IProfile> {
-    return this.http.get<IProfile>(URL_ACCOUNT_FIND(username)).pipe(
-      catchError((error: HttpErrorResponse) => {
-        if (error.status >= 200 && error.status < 300) {
-          return of(error.message);
-        }
-        return throwError(error);
-      }));
-  }
+	getProfile(username: string = this.activeUsername): Observable<string | IProfile> {
+		return this.http.get<IProfile>(URL_ACCOUNT_FIND(username)).pipe(
+			catchError((error: HttpErrorResponse) => {
+				if (error.status >= 200 && error.status < 300) {
+					return of(error.message);
+				}
+				return throwError(error);
+			}));
+	}
 
-  patchUser(data: Object) {
-    return this.http.patch(URL_ACCOUNT, data);
-  }
+	patchUser(data: Object) {
+		return this.http.patch(URL_ACCOUNT, data);
+	}
 
-  likeProfile(otherUsername: string) {
-    return this.http.post(URL_LIKE + otherUsername, {}).pipe(
-	    catchError((error: HttpErrorResponse) => {
-		    if (error.status >= 200 && error.status < 300) {
-			    return of(error.message);
-		    }
-		    return throwError(error);
-	    }));
-  }
+	likeProfile(otherUsername: string) {
+		return this.http.post(URL_LIKE + otherUsername, {}).pipe(
+			catchError((error: HttpErrorResponse) => {
+				if (error.status >= 200 && error.status < 300) {
+					return of(error.message);
+				}
+				return throwError(error);
+			}));
+	}
 
-  dislikeProfile(otherUsername: string) {
-    return this.http.delete(URL_LIKE + otherUsername).pipe(
-	    catchError((error: HttpErrorResponse) => {
-		    if (error.status >= 200 && error.status < 300) {
-			    return of(error.message);
-		    }
-		    return throwError(error);
-	    }));
-  }
+	dislikeProfile(otherUsername: string) {
+		return this.http.delete(URL_LIKE + otherUsername).pipe(
+			catchError((error: HttpErrorResponse) => {
+				if (error.status >= 200 && error.status < 300) {
+					return of(error.message);
+				}
+				return throwError(error);
+			}));
+	}
 
 	blockProfile(otherUsername: string) {
-    return this.http.post(URL_BLOCK + otherUsername, {}).pipe(
-	    catchError((error: HttpErrorResponse) => {
-		    if (error.status >= 200 && error.status < 300) {
-			    return of(error.message);
-		    }
-		    return throwError(error);
-	    }));
-  }
+		return this.http.post(URL_BLOCK + otherUsername, {}).pipe(
+			catchError((error: HttpErrorResponse) => {
+				if (error.status >= 200 && error.status < 300) {
+					return of(error.message);
+				}
+				return throwError(error);
+			}));
+	}
 
 	reportAsFake(otherUsername: string) {
-    return this.http.post(URL_FAKE + '/' + otherUsername, {}).pipe(
-	    catchError((error: HttpErrorResponse) => {
-		    if (error.status >= 200 && error.status < 300) {
-			    return of(error.message);
-		    }
-		    return throwError(error);
-	    }));
-  }
+		return this.http.post(URL_FAKE + '/' + otherUsername, {}).pipe(
+			catchError((error: HttpErrorResponse) => {
+				if (error.status >= 200 && error.status < 300) {
+					return of(error.message);
+				}
+				return throwError(error);
+			}));
+	}
 }

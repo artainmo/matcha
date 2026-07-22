@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { AccountService } from './services/account.service';
 import { NotificationsService } from './services/notifications.service';
-import { Location, AsyncPipe } from '@angular/common';
+import { AsyncPipe, Location } from '@angular/common';
 import { Router, RouterLink, RouterOutlet } from "@angular/router";
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatBadge } from '@angular/material/badge';
@@ -10,17 +10,17 @@ import { MatIcon } from '@angular/material/icon';
 
 
 @Component({
-    selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css'],
-    changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [MatButton, RouterLink, MatBadge, MatIconButton, MatIcon, RouterOutlet, AsyncPipe]
+	selector: 'app-root',
+	templateUrl: './app.component.html',
+	styleUrls: ['./app.component.css'],
+	changeDetection: ChangeDetectionStrategy.Eager,
+	imports: [MatButton, RouterLink, MatBadge, MatIconButton, MatIcon, RouterOutlet, AsyncPipe]
 })
 export class AppComponent implements OnInit {
 	title = 'Matcha';
 	isLoggedIn$: Observable<boolean> = this.accountService.isLoggedIn.asObservable();
 	hasNewNotifications$: Observable<number> = this.notificationsService.hasNewNotifications$;
-  username: string | null = '';
+	username: string | null = '';
 	route: string = '';
 
 	constructor(
@@ -31,16 +31,16 @@ export class AppComponent implements OnInit {
 	) {
 	}
 
-  ngOnInit() {
-    this.isLoggedIn$.pipe(map(() => {
-      this.username = this.accountService.activeUsername;
-    })).subscribe();
+	ngOnInit() {
+		this.isLoggedIn$.pipe(map(() => {
+			this.username = this.accountService.activeUsername;
+		})).subscribe();
 		this.location.onUrlChange((val) => {
 			this.route = val;
 		});
-  }
+	}
 
-  logout() {
+	logout() {
 		this.accountService.logout();
 	}
 

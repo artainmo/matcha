@@ -6,7 +6,7 @@ import { URL_SEARCH } from "../../config/urls";
 import { SortAndFilterService } from "../../shared/sort-and-filter/sort-and-filter.service";
 
 @Injectable({
-  providedIn: 'root'
+	providedIn: 'root'
 })
 export class SearchService {
 
@@ -15,10 +15,11 @@ export class SearchService {
 	isLoadingBS: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 	isLoading$: Observable<boolean> = this.isLoadingBS.asObservable();
 
-  constructor(
-	  private readonly http: HttpClient,
-	  private readonly sortAndFilterService: SortAndFilterService
-  ) { }
+	constructor(
+		private readonly http: HttpClient,
+		private readonly sortAndFilterService: SortAndFilterService
+	) {
+	}
 
 	search(body: any) {
 		this.isLoadingBS.next(true);
@@ -30,7 +31,6 @@ export class SearchService {
 			}
 		)
 	}
-
 
 
 }

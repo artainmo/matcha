@@ -1,44 +1,44 @@
 @if ((availableUsernames$ | async)!.length == 0) {
-  <div >
-    No contacts found. You need to both like each other in order to contact someone.
-  </div>
+    <div>
+        No contacts found. You need to both like each other in order to contact someone.
+    </div>
 }
 @if ((availableUsernames$ | async)!.length > 0) {
-  <form [formGroup]="form">
-    <mat-form-field appearance="fill">
-      <mat-label>Username</mat-label>
-      <input placeholder="Username"
-        matInput
-        formControlName="username"
-        [matAutocomplete]="auto">
-      <mat-autocomplete #auto="matAutocomplete">
-        @for (username of availableUsernames$ | async; track username) {
-          <mat-option [value]="username">
-            {{username}}
-          </mat-option>
-        }
-      </mat-autocomplete>
-      @if (form.controls['username'].invalid) {
-        <mat-error>At least one tag is required</mat-error>
-      }
-      @if (!(availableUsernames$ | async)?.includes(form.controls['username'].value)) {
-        <mat-error>Enter a valid username.
-          <br> Don't see who you are looking for? Then you are not a match anymore.
-          </mat-error>
-        }
-      </mat-form-field>
-      <br>
+    <form [formGroup]="form">
         <mat-form-field appearance="fill">
-          <mat-label>Message</mat-label>
-          <textarea
-            matInput
-            formControlName="content"
-            placeholder="Message"
-          ></textarea>
+            <mat-label>Username</mat-label>
+            <input [matAutocomplete]="auto"
+                   formControlName="username"
+                   matInput
+                   placeholder="Username">
+            <mat-autocomplete #auto="matAutocomplete">
+                @for (username of availableUsernames$ | async; track username) {
+                    <mat-option [value]="username">
+                        {{ username }}
+                    </mat-option>
+                }
+            </mat-autocomplete>
+            @if (form.controls['username'].invalid) {
+                <mat-error>At least one tag is required</mat-error>
+            }
+            @if (!(availableUsernames$ | async)?.includes(form.controls['username'].value)) {
+                <mat-error>Enter a valid username.
+                    <br> Don't see who you are looking for? Then you are not a match anymore.
+                </mat-error>
+            }
         </mat-form-field>
-      </form>
-    }
-    <a mat-button (click)="close()">Cancel</a>
-    @if ((availableUsernames$ | async)!.length > 0) {
-      <button mat-button (click)="submit()">Send</button>
-    }
+        <br>
+        <mat-form-field appearance="fill">
+            <mat-label>Message</mat-label>
+            <textarea
+                    formControlName="content"
+                    matInput
+                    placeholder="Message"
+            ></textarea>
+        </mat-form-field>
+    </form>
+}
+<a (click)="close()" mat-button>Cancel</a>
+@if ((availableUsernames$ | async)!.length > 0) {
+    <button (click)="submit()" mat-button>Send</button>
+}

@@ -1,43 +1,43 @@
 <form class="example-form">
-  <mat-form-field class="example-chip-list" appearance="fill">
-    <mat-label>Tags</mat-label>
-    <mat-chip-grid #chipGrid aria-label="Tag selection">
-      @for (tag of _tags; track tag) {
-        <mat-chip-row (removed)="remove(tag)">
-          #{{tag}}
-          <button matChipRemove>
-            <mat-icon>cancel</mat-icon>
-          </button>
-        </mat-chip-row>
-      }
-      <input placeholder="New tag..."
-        #tags
-        [matChipInputFor]="chipGrid"
-        [matChipInputSeparatorKeyCodes]="alreadyInList ? separatorKeysCodes : []"
-        [matChipInputAddOnBlur]="addOnBlur"
-        (matChipInputTokenEnd)="add($event)"
-        [formControl]="control"
-        [matAutocomplete]="auto">
-      @if (control.getRawValue().length > 0) {
-        <button matSuffix mat-icon-button aria-label="Add"
-          [disabled]="alreadyInList"
-          (click)="add(null)">
-          <mat-icon>add</mat-icon>
-        </button>
-      }
-      <mat-autocomplete #auto="matAutocomplete">
-        @for (option of availableTags | async; track option) {
-          <mat-option [value]="option">
-            {{option}}
-          </mat-option>
+    <mat-form-field appearance="fill" class="example-chip-list">
+        <mat-label>Tags</mat-label>
+        <mat-chip-grid #chipGrid aria-label="Tag selection">
+            @for (tag of _tags; track tag) {
+                <mat-chip-row (removed)="remove(tag)">
+                    #{{ tag }}
+                    <button matChipRemove>
+                        <mat-icon>cancel</mat-icon>
+                    </button>
+                </mat-chip-row>
+            }
+            <input #tags
+                   (matChipInputTokenEnd)="add($event)"
+                   [formControl]="control"
+                   [matAutocomplete]="auto"
+                   [matChipInputAddOnBlur]="addOnBlur"
+                   [matChipInputFor]="chipGrid"
+                   [matChipInputSeparatorKeyCodes]="alreadyInList ? separatorKeysCodes : []"
+                   placeholder="New tag...">
+            @if (control.getRawValue().length > 0) {
+                <button (click)="add(null)" [disabled]="alreadyInList" aria-label="Add"
+                        mat-icon-button
+                        matSuffix>
+                    <mat-icon>add</mat-icon>
+                </button>
+            }
+            <mat-autocomplete #auto="matAutocomplete">
+                @for (option of availableTags | async; track option) {
+                    <mat-option [value]="option">
+                        {{ option }}
+                    </mat-option>
+                }
+            </mat-autocomplete>
+        </mat-chip-grid>
+        @if (_tags.length < 1) {
+            <mat-error>At least one tag is required</mat-error>
         }
-      </mat-autocomplete>
-    </mat-chip-grid>
-    @if (_tags.length < 1) {
-      <mat-error>At least one tag is required</mat-error>
-    }
-    @if (alreadyInList) {
-      <mat-error>Element already in list</mat-error>
-    }
-  </mat-form-field>
+        @if (alreadyInList) {
+            <mat-error>Element already in list</mat-error>
+        }
+    </mat-form-field>
 </form>

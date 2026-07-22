@@ -8,7 +8,7 @@ import { URL_TAGS_SEARCH } from '../../config/urls';
 })
 export class TagsService {
 
-  availableTagsBS: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
+	availableTagsBS: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
 	availableTags$: Observable<string[]> = this.availableTagsBS.asObservable();
 
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DiscoverService } from './discover.service';
 import { IUserResult } from "../../shared/search.interface";
@@ -6,7 +6,7 @@ import { IFilter } from "../../shared/sort-and-filter/filter.interface";
 import { SortAndFilterService } from "../../shared/sort-and-filter/sort-and-filter.service";
 import { AsyncPipe } from '@angular/common';
 import { SortAndFilterComponent } from '../../shared/sort-and-filter/sort-and-filter.component';
-import { MatList, MatListSubheaderCssMatStyler, MatListItem } from '@angular/material/list';
+import { MatList, MatListItem, MatListSubheaderCssMatStyler } from '@angular/material/list';
 import { MatButton } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
@@ -17,10 +17,10 @@ import { SortPipe } from '../../shared/sort-and-filter/sort.pipe';
 import { FilterPipe } from '../../shared/sort-and-filter/filter.pipe';
 
 @Component({
-    selector: 'app-discover',
-    templateUrl: './discover.component.html',
-    changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [SortAndFilterComponent, MatList, MatListSubheaderCssMatStyler, MatListItem, MatButton, RouterLink, MatIcon, MatLine, MatDivider, MatProgressSpinner, AsyncPipe, SortPipe, FilterPipe]
+	selector: 'app-discover',
+	templateUrl: './discover.component.html',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	imports: [SortAndFilterComponent, MatList, MatListSubheaderCssMatStyler, MatListItem, MatButton, RouterLink, MatIcon, MatLine, MatDivider, MatProgressSpinner, AsyncPipe, SortPipe, FilterPipe]
 })
 export class DiscoverComponent implements OnInit {
 

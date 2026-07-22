@@ -1,35 +1,36 @@
-import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { URL_FAME } from "../../../../config/urls";
 
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
-    selector: 'app-fame-rating',
-    templateUrl: './fame-rating.component.html',
-    changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [MatProgressSpinner]
+	selector: 'app-fame-rating',
+	templateUrl: './fame-rating.component.html',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	imports: [MatProgressSpinner]
 })
 export class FameRatingComponent implements OnInit {
 
-  @Input()
-  username: string = '';
+	@Input()
+	username: string = '';
 
-  fame: number | null = null;
+	fame: number | null = null;
 
-  loading = true;
+	loading = true;
 
-  constructor(
-    private readonly http: HttpClient
-  ) { }
+	constructor(
+		private readonly http: HttpClient
+	) {
+	}
 
-  ngOnInit(): void {
-    this.http.get<number>(URL_FAME(this.username)).subscribe(
-      (res: number) => {
-        this.fame = res;
-        this.loading = false;
-      }
-    );
-  }
+	ngOnInit(): void {
+		this.http.get<number>(URL_FAME(this.username)).subscribe(
+			(res: number) => {
+				this.fame = res;
+				this.loading = false;
+			}
+		);
+	}
 
 }

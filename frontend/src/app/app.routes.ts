@@ -55,17 +55,17 @@ export const routes: Routes = [
 			},
 			{
 				path: 'complete',
-		    canActivate: [AuthGuard],
+				canActivate: [AuthGuard],
 				component: CompleteProfileComponent
 			},
 			{
 				path: 'edit',
-		    canActivate: [AuthGuard],
+				canActivate: [AuthGuard],
 				component: EditComponent
 			},
 			{
 				path: ':id',
-		    canActivate: [AuthGuard],
+				canActivate: [AuthGuard],
 				component: ConsultComponent
 			}
 		]

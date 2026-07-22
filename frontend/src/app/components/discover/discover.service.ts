@@ -6,7 +6,7 @@ import { IUserResult } from "../../shared/search.interface";
 import { SortAndFilterService } from "../../shared/sort-and-filter/sort-and-filter.service";
 
 @Injectable({
-  providedIn: 'root'
+	providedIn: 'root'
 })
 export class DiscoverService {
 
@@ -19,7 +19,8 @@ export class DiscoverService {
 	constructor(
 		private readonly http: HttpClient,
 		private readonly sortAndFilterService: SortAndFilterService
-	) { }
+	) {
+	}
 
 	fetchSuggestions() {
 		this.isLoadingBS.next(true);

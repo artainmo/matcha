@@ -28,6 +28,7 @@ class DatabaseManager
 
     begin
       puts 'Connecting to database...'
+      puts connection_config
       @conn = PG.connect(connection_config)
     rescue PG::ConnectionBad => error
       if error.message.include?('FATAL:  sorry, too many clients already')
@@ -40,6 +41,7 @@ class DatabaseManager
         sleep(CONNECTION_RETRY_DELAY)
         retry
       else
+        puts "error"
         puts error.message
         exit
       end
@@ -51,7 +53,7 @@ class DatabaseManager
   def connection_config
     {
       host: ENV.fetch('PGHOST', 'localhost'),
-      port: ENV.fetch('PGPORT', '5432'),
+      port: ENV.fetch('PGPORT'),
       dbname: ENV.fetch('PGDATABASE', 'matcha'),
       user: ENV.fetch('PGUSER', 'postgres'),
       password: ENV.fetch('PGPASSWORD', 'admin')

@@ -1,19 +1,19 @@
-import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { PictureService } from './picture.service';
 import { AccountService } from "../../../../services/account.service";
 import { MatList, MatListItem } from '@angular/material/list';
 import { NgClass } from '@angular/common';
-import { MatIconButton, MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { SplitPipe } from '../../../../pipes/split.pipe';
 
 @Component({
-    selector: 'app-picture-selection',
-    templateUrl: './picture-selection.component.html',
-    styleUrls: ['./picture-selection.component.css'],
-    changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [MatList, MatListItem, MatIconButton, MatIcon, NgClass, MatProgressSpinner, MatButton, SplitPipe]
+	selector: 'app-picture-selection',
+	templateUrl: './picture-selection.component.html',
+	styleUrls: ['./picture-selection.component.css'],
+	changeDetection: ChangeDetectionStrategy.Eager,
+	imports: [MatList, MatListItem, MatIconButton, MatIcon, NgClass, MatProgressSpinner, MatButton, SplitPipe]
 })
 export class PictureSelectionComponent implements OnInit {
 
@@ -31,7 +31,7 @@ export class PictureSelectionComponent implements OnInit {
 
 	constructor(
 		private readonly pictureService: PictureService,
-    private readonly accountService: AccountService
+		private readonly accountService: AccountService
 	) {
 	}
 
@@ -61,12 +61,12 @@ export class PictureSelectionComponent implements OnInit {
 		}
 		this.pictureService.uploadPicture(file).subscribe(
 			() => {
-        this._files?.push('images/' + this.accountService.activeUsername +  '/' + file.name);
-        this.fileUploadLoading = false;
+				this._files?.push('images/' + this.accountService.activeUsername + '/' + file.name);
+				this.fileUploadLoading = false;
 			},
 			(e: any) => {
 				console.log(e);
-        this.fileUploadLoading = false;
+				this.fileUploadLoading = false;
 			}
 		);
 	}

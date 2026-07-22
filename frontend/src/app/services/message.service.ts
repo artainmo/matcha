@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, Subscription, take, timer } from 'rxjs';
-import {URL_LIKE_CONNECTIONS, URL_MESSAGES} from '../config/urls';
+import { URL_LIKE_CONNECTIONS, URL_MESSAGES } from '../config/urls';
 import { IMessage } from '../models/message.model';
 
 @Injectable({
@@ -29,18 +29,6 @@ export class MessageService {
 			.subscribe();
 	}
 
-	private getMessages() {
-		this.http.get<IMessage[]>(URL_MESSAGES)
-			.pipe(
-				take(1)
-			)
-			.subscribe(
-				(messages: IMessage[]) => {
-					this.messagesBS.next(messages);
-				}
-			)
-	}
-
 	closeChat() {
 		this.messagesSubscription.unsubscribe();
 	}
@@ -57,11 +45,23 @@ export class MessageService {
 			.subscribe()
 	}
 
+	private getMessages() {
+		this.http.get<IMessage[]>(URL_MESSAGES)
+			.pipe(
+				take(1)
+			)
+			.subscribe(
+				(messages: IMessage[]) => {
+					this.messagesBS.next(messages);
+				}
+			)
+	}
+
 	private getContacts() {
-    this.http.get<string[]>(URL_LIKE_CONNECTIONS).subscribe(
-      (usernames: string[]) => {
-        this.availableUsernamesBS.next(usernames);
-      }
-    )
+		this.http.get<string[]>(URL_LIKE_CONNECTIONS).subscribe(
+			(usernames: string[]) => {
+				this.availableUsernamesBS.next(usernames);
+			}
+		)
 	}
 }

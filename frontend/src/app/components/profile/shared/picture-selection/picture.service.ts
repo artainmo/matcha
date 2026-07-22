@@ -7,13 +7,14 @@ import { catchError } from "rxjs/operators";
 import { throwError } from "rxjs/internal/observable/throwError";
 
 @Injectable({
-  providedIn: 'root'
+	providedIn: 'root'
 })
 export class PictureService {
 	constructor(
 		private readonly http: HttpClient,
 		private _snackBar: MatSnackBar
-	) { }
+	) {
+	}
 
 	getPictures() {
 		return this.http.get<[path: string, user: string][]>(URL_PICTURES);
@@ -23,13 +24,13 @@ export class PictureService {
 		const data: FormData = new FormData();
 		data.append('file', file);
 		return this.http.post<string[]>(URL_PICTURES, data).pipe(
-      catchError((error: HttpErrorResponse) => {
-        if (error.status >= 200 && error.status < 300) {
-          return of([]);
-        }
+			catchError((error: HttpErrorResponse) => {
+				if (error.status >= 200 && error.status < 300) {
+					return of([]);
+				}
 				this.openSnackBar(error.message);
-        return throwError(error);
-      }));
+				return throwError(error);
+			}));
 	}
 
 	deletePicture(file: string) {

@@ -9,7 +9,7 @@ export const URL_LOGIN = (username: string, password: string) => environment.ser
 export const URL_MORE_INFOS = environment.server + '/account/more-infos';
 export const URL_FAME = (username: string) => environment.server + '/account/fame/' + username;
 export const URL_SEARCH = environment.server + '/account/search';
-export const URL_ACCOUNT_SUGGESTIONS= environment.server + '/account/suggestions';
+export const URL_ACCOUNT_SUGGESTIONS = environment.server + '/account/suggestions';
 export const URL_REQUEST_PASSWORD = (username: string) => environment.server + '/token/resetPassword/' + encodeURI(username);
 export const URL_RESET_PASSWORD = (token: string, password: string) => environment.server + '/token/' + token + '/resetPassword/' + encodeURI(password);
 export const URL_LIKE = environment.server + '/liked/';

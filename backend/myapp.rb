@@ -9,6 +9,11 @@ require 'net/http'
 require 'fileutils'
 require __dir__ + '/database/databaseManager.rb'
 
+FRONTEND_BUILD_PATH = File.expand_path('public/frontend', __dir__)
+FRONTEND_DIST_PATH = File.join(FRONTEND_BUILD_PATH, 'browser')
+FRONTEND_INDEX_PATH = File.join(FRONTEND_DIST_PATH, 'index.html')
+PUBLIC_ASSETS_PATH = File.expand_path('../public', __dir__)
+
 =begin
   LAUNCH DATABASE
 =end
@@ -22,6 +27,7 @@ db_start.createDatabase
 
 username = '' #username will be defined later through cookies if cookies are used. It must be declared as global variable else it would not be accessible throughout the app.
 set :port, 1942
+set :bind, '0.0.0.0'
 frontend = 'http://localhost:1942'
 
 jwt_token = 'Thasé(à~a-é"çwonderful`^$ù^me`s$^rmcesrf)'
@@ -38,16 +44,18 @@ before do
 end
 
 enable :static # Before searching route patterns direct matches with file names
-set :public_folder, '../dist/frontend' # in :public_folder will be searched
+set :public_folder, FRONTEND_DIST_PATH # in :public_folder will be searched
 
 get /\/(?!((rest)|(images))).*/ do
-  send_file '../dist/frontend/index.html'
+  send_file FRONTEND_INDEX_PATH
 end
 
 get /\/images\/.*/ do
-  path = CGI.unescape(request.path_info)
-  puts "Asking for the following image #{path}"
-  send_file '../public/' + path
+  request_path = CGI.unescape(request.path_info)
+  puts "Asking for the following image #{request_path}"
+  image_path = File.expand_path(request_path.sub(%r{\A/}, ''), PUBLIC_ASSETS_PATH)
+  return 404, 'Image not found' unless image_path.start_with?(PUBLIC_ASSETS_PATH + '/')
+  send_file image_path
 end
 
 # ACCOUNT TABLE ROUTES
@@ -547,20 +555,20 @@ helpers do
     return false if geolocation.first == nil
     return geolocation.first.coordinates.join(',')
   end
-
+  
   def send_mail(receiver, subject, content)
     begin
       Pony.mail(
         :to => receiver,
-        :from => 'matcha@vanderlynden.eu',
+        :from => 'no-reply@vanderlynden.eu',
         :subject => subject,
         :body => content,
         :via => :smtp,
         :via_options => {
         :address => 'ssl0.ovh.net',
         :port => '587',
-        :user_name => 'matcha@vanderlynden.eu',
-        :password => '???', #Ask the actual password to pvanderl, we won't leave it publicly here
+        :user_name => 'no-reply@vanderlynden.eu',
+        :password => ENV['EMAILPASS'], #Ask the actual password to pvanderl, we won't leave it publicly here
         :authentication => :plain
       })
       return true
