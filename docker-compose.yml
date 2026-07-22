@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: matcha-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${PGDATABASE:-matcha}
+      POSTGRES_USER: ${PGUSER:-postgres}
+      POSTGRES_PASSWORD: ${PGPASSWORD:-admin}
+    ports:
+      - "${PGPORT:-5432}:5433"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:

@@ -4,17 +4,51 @@
 
 This project uses ruby Sinatra as backend and AngularJS as frontend to build a dating app.
 
-## Run
+## Quick Start with Docker (Recommended)
 
-This project was created on macos.
+The easiest way to run the entire Matcha application is with Docker:
 
-For the frontend we used: Angular Cli 22.0.6; Node 24.15.0; and npm 11.11.0. Discrepancies can make the frontend hang. Verify you have the correct versions with: `npx ng version`. You can download the right versions in your terminal with: `brew install node@24`; `npm install`.
+### Prerequisites
+- **Docker Desktop** (or Docker Engine + Docker Compose)
+- **Node.js 24.15.0** and **npm 11.11.0** (for frontend build)
+- **Ruby 3.3.5** (only needed if running without Docker)
 
-For the database we now run PostgreSQL in Docker instead of relying on Postgres.app.<br>
-Install Docker Desktop (or another Docker engine with Compose support), then start the database with:
+### Run Everything with Docker
+
+Simply run:
+```bash
+make docker-up
 ```
+
+This will:
+1. Build the Angular frontend
+2. Start the PostgreSQL database container
+3. Start the Ruby Sinatra backend container
+4. Serve the app at **http://localhost:1942**
+
+The database is automatically initialized and persists in a Docker volume.
+
+### Stop the Application
+
+```bash
+make docker-down
+```
+
+---
+
+## Manual Setup (Without Docker)
+
+If you prefer to run the application locally without Docker:
+
+### Frontend Setup
+For the frontend we use: Angular CLI 22.0.6; Node 24.15.0; and npm 11.11.0. Discrepancies can make the frontend hang. Verify you have the correct versions with: `npx ng version`. You can download the right versions in your terminal with: `brew install node@24`; `npm install`.
+
+### Database Setup
+PostgreSQL 16 runs in Docker for consistency. Start it with:
+```bash
 docker compose up -d postgres
 ```
+
 The container creates the `matcha` database automatically and stores its data in a persistent Docker volume.<br>
 By default the app connects with the following settings:
 ```
@@ -24,33 +58,66 @@ PGDATABASE=matcha
 PGUSER=postgres
 PGPASSWORD=admin
 ```
-You can copy `.env.example` to `.env` to customize the Docker container values. If you change them, export the same `PG*` variables before launching the Ruby backend so both sides stay aligned.<br>
-Make sure the PostgreSQL container is running while launching the app, generating users, or cleaning the database.<br>
 
-For the backend you should `brew install ruby@3.3`, afterwards you can add the following lines to your "~/.zshrc": 
+You can copy `.env.example` to `.env` to customize the Docker container values. If you change them, export the same `PG*` variables before launching the Ruby backend so both sides stay aligned.
+
+### Backend Setup
+Install Ruby 3.3.5:
+```bash
+brew install ruby@3.3
 ```
+
+Then add these lines to your `~/.zshrc`:
+```bash
 # To launch the matcha ruby project
-export PATH="/opt/homebrew/opt/ruby/bin:$PATH" #This signals the ruby executables to use the ruby version from homebrew and not the macOS' old system Ruby. This by prepending the path with the homebrew version to look at it first.
-export PATH="$HOME/.gem/ruby/3.3.0/bin:$PATH" #Shows where the gem executables are. Gems are ruby dependencies.
+export PATH="/opt/homebrew/opt/ruby@3.3/bin:$PATH"
+export PATH="$HOME/.gem/ruby/3.3.0/bin:$PATH"
 ```
 
-Finally, to launch the whole app in one command:
-```
-make
+### Run the App Locally (Without Docker)
+
+To launch the whole app in one command:
+```bash
+make backend
 ```
 
-To stop the database container:
+Or just run the backend server:
+```bash
+make b
 ```
+
+This starts Sinatra on port 1942, which serves both the API and the built frontend.
+
+---
+
+## Useful Commands
+
+### View Logs
+```bash
+# Ruby app logs
+docker logs matcha-ruby
+
+# PostgreSQL logs
+docker logs matcha-postgres
+
+# Follow logs in real-time
+docker logs -f matcha-ruby
+```
+
+### Database Management
+
+Stop the database container:
+```bash
 docker compose down
 ```
 
-To stop it and remove all PostgreSQL data for a clean database:
-```
+Stop and remove all PostgreSQL data (clean database):
+```bash
 docker compose down -v
 ```
 
-To generate users on dating site:
-```
+Generate test users:
+```bash
 make generate_users AMOUNT=<number>
 # OR SPECIFY YOUR EMAIL ADDRESS
 make generate_users AMOUNT=<number> MAIL=<your-email-address>
@@ -58,14 +125,18 @@ make generate_users AMOUNT=<number> MAIL=<your-email-address>
 # ALL USERS HAVE PASSWORD 'pass123'
 ```
 
-To clean the database and locally stored images:
-```
+Clean the database and locally stored images:
+```bash
 make db_clean
 ```
 
-To run test frontend server with hot reload of frontend, do:
- 1. Run the server part
- 2. then `cd frontend && npm install && npm run serve`
+### Frontend Development
+
+To run test frontend server with hot reload:
+1. Start the backend: `make docker-up` or `make b`
+2. In a new terminal: `cd frontend && npm install && npm run serve`
+
+---
 
 ## Documentation
 ### Backend
