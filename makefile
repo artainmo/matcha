@@ -9,6 +9,12 @@ docker-up: frontend
 docker-down:
 	docker-compose down
 
+docker-up-db:
+	docker-compose up postgres
+
+docker-up-backend:
+	docker-compose up ruby
+
 frontend:
 	cd frontend && npm install && npm run build
 	rm -rf backend/public/frontend
