@@ -17,7 +17,7 @@ AMOUNT = ARGV[0]
 ARGV[1] ? personal_email = ARGV[1] : personal_email = 'tainmontarthur@gmail.com'
 locations = ['Brussels', 'Gent', 'Antwerpen', 'Paris', 'Dublin']
 tags = ['tennis', 'chess', 'school19', 'music', 'travel']
-password = 'pass123'
+password = ENV.fetch('TEST_PASSWORD', 'pass123')
 genders = ['MALE', 'FEMALE', 'OTHER']
 sexual_orientations = ['MALE', 'FEMALE', 'BI', 'OTHER']
 bios = ['The last time I was someone’s “type” was when I donated blood.', 'Give me your best pickup line.',

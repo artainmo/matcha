@@ -3,9 +3,11 @@ const axios = require('axios');
 axios.defaults.baseURL = 'http://localhost:1942';
 axios.defaults.withCredentials = true; //Send cookies with requests
 
+const TEST_PASSWORD = process.env.TEST_PASSWORD || 'pass';
+
 let account1 = {
 	username: 'artainmo',
-	password: 'pass',
+	password: TEST_PASSWORD,
 	email: 'hotmail',
 	firstname: 'art',
 	lastname: 'tai',
@@ -18,7 +20,7 @@ let account1 = {
 
 let account2 =  {
 	username: 'pvanderl',
-	password: 'pass',
+	password: TEST_PASSWORD,
 	email: 'hotmail',
 	firstname: 'p',
 	lastname: 'v',
@@ -36,7 +38,7 @@ let account3 = {
 
 let account4 = {
 	username: 'girl',
-	password: 'pass',
+	password: TEST_PASSWORD,
 	email: 'hotmail',
 	firstname: 'g',
 	lastname: 'i',
@@ -49,7 +51,7 @@ let account4 = {
 
 let account5 = {
 	username: 'girl2',
-	password: 'pass',
+	password: TEST_PASSWORD,
 	email: 'hotmail',
 	firstname: 'g2',
 	lastname: 'i2',
@@ -62,7 +64,7 @@ let account5 = {
 
 let account6 = {
 	username: 'girl3',
-	password: 'pass',
+	password: TEST_PASSWORD,
 	email: 'hotmail',
 	firstname: 'g3',
 	lastname: 'i3',
@@ -75,7 +77,7 @@ let account6 = {
 
 let account7 = {
 	username: 'gay1',
-	password: 'pass',
+	password: TEST_PASSWORD,
 	email: 'hotmail',
 	firstname: 'g',
 	lastname: 'a',
@@ -133,7 +135,7 @@ async function testAccount() {
 	try { view_result(await axios.patch('/rest/account/artainmo/ddeee/ok')); }
 	catch (error) { view_result(error.response); }
 
-	view_result(await axios.get('/rest/account/password/artainmo/pass'));
+	view_result(await axios.get(`/rest/account/password/artainmo/${TEST_PASSWORD}`));
 	view_result(await axios.get('/rest/account/password/artainmo/edewd'));
 	try { view_result(await axios.get('/rest/account/password/unexist/eddd')); }
 	catch (error) { view_result(error.response); }
