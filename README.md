@@ -56,9 +56,6 @@ Stop the application with: `make docker-down`.
 
 For the frontend we use: Angular CLI 22.0.6; Node 24.15.0; and npm 11.11.0. Discrepancies can make the frontend hang. Verify you have the correct versions with: `npx ng version`. You can download the right versions in your terminal with: `brew install node@24`; `npm install -g @angular/cli@22`.
 
-You can launch the database via docker with `docker compose up -d postgres`.<br>
-The container creates the 'matcha' database automatically and stores its data in a persistent Docker volume. But the `.env` file should be adapted: use `PGHOST=localhost` and `PGPORT=5433` to connect to the PostgreSQL container from your host machine.
-
 For the backend, install Ruby 3.3.5 with: `brew install ruby@3.3`.<br>
 Then add these lines to your `~/.zshrc`:
 ```
@@ -67,11 +64,13 @@ export PATH="/opt/homebrew/opt/ruby@3.3/bin:$PATH"
 export PATH="$HOME/.gem/ruby/3.3.0/bin:$PATH"
 ```
 
-To launch the whole app in one command:
+You can launch the database via docker with `docker compose up -d postgres`.<br>
+Afterwards you can launch the backend and frontend with `make`.<br>
+Thus to launch the app you need the following commands:
 ```
-make backend
+docker compose up -d postgres
+make
 ```
-This starts Sinatra on port 1942, which serves both the API and the built frontend.
 
 To run test frontend server with hot reload of frontend, do:
 1. Run the server part
