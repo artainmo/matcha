@@ -30,5 +30,8 @@ backend:
 db_clean:
 	cd backend && ./setup.sh && cd database/tests_and_scripts && bundle exec ruby cleanDatabase.rb
 
+generate_users:
+	cd backend && ./setup.sh && cd database/tests_and_scripts && bundle exec ruby generateUsers.rb $(AMOUNT) $(MAIL)
+
 b:
 	cd backend && bundle exec ruby myapp.rb

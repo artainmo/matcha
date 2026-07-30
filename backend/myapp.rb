@@ -20,7 +20,6 @@ PUBLIC_ASSETS_PATH = File.expand_path('../public', __dir__)
 
 db_start = DatabaseManager.new
 db_start.createDatabase
-db_start.generateUsersIfNeeded
 
 =begin
   CONFIGURATION

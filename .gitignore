@@ -1,9 +1,11 @@
 /dist
 /backend/public/frontend
 /frontend/node_modules
+frontend/package-lock.json
 **/.DS_Store
 **/*.swp
 **/.vscode
+frontend/.editorconfig
 backend/Gemfile.lock
 public/images/*
 !public/images/.gitkeep
