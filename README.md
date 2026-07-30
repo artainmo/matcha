@@ -7,10 +7,10 @@ This project uses ruby Sinatra as backend and AngularJS as frontend to build a d
 ## Table of contents
 
 - [Use](#Use)
-    - [Run with Docker](#Run with Docker)
+    - [Run with Docker](#Run-with-Docker)
         - [Prerequisites](#Prerequisites)
         - [Run the whole app with Docker](#Run-the-whole-app-with-Docker)
-        - [Only use docker for the database (for local development)](#Only-use-docker-for-the-database-(for-local-development))
+        - [Only use docker for the database (for local development)](#only-use-docker-for-the-database-for-local-development)
         - [View Logs](#View-Logs)
     - [Run without using any Docker](#Run-without-using-any-Docker)
     - [Database Management](#Database-Management)
