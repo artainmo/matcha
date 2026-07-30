@@ -22,6 +22,8 @@ Geocoder.configure(http_headers: { 'User-Agent' => 'matcha-app/1.0' })
 class DatabaseManager
   MAX_CONNECTION_RETRIES = 10
   CONNECTION_RETRY_DELAY = 0.5
+  # Host-side port for the postgres container, see docker-compose.yml ("5433:5432")
+  DOCKER_HOST_PGPORT = '5433'
 
   def initialize
     retries = 0
@@ -50,10 +52,38 @@ class DatabaseManager
 
   private
 
+  # .env is only auto-loaded by docker-compose for containers; scripts run
+  # directly on the host (e.g. generateUsers.rb) need it read manually.
+  def load_dotenv
+    env_path = File.join(__dir__, '..', '..', '.env')
+    return unless File.exist?(env_path)
+
+    File.foreach(env_path) do |line|
+      line = line.strip
+      next if line.empty? || line.start_with?('#')
+
+      key, value = line.split('=', 2)
+      ENV[key] ||= value if key && value
+    end
+  end
+
   def connection_config
+    load_dotenv
+
+    host = ENV.fetch('PGHOST', 'localhost')
+    port = ENV.fetch('PGPORT', '5432')
+
+    # PGHOST=postgres only resolves inside the Docker network. When this
+    # process runs on the host instead of inside a container, reach the
+    # database through its published port instead.
+    if host == 'postgres' && !File.exist?('/.dockerenv')
+      host = 'localhost'
+      port = DOCKER_HOST_PGPORT
+    end
+
     {
-      host: ENV.fetch('PGHOST', 'localhost'),
-      port: ENV.fetch('PGPORT', '5432'),
+      host: host,
+      port: port,
       dbname: ENV.fetch('PGDATABASE', 'matcha'),
       user: ENV.fetch('PGUSER', 'postgres'),
       password: ENV.fetch('PGPASSWORD', 'admin')
