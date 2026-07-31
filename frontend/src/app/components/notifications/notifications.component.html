@@ -1,22 +1,22 @@
 <mat-list>
     @if ((notifications$ | async)?.length == 0) {
         <mat-list-item>
-            <p matLine>
+            <p matListItemLine>
                 No notifications yet
             </p>
         </mat-list-item>
     }
     @for (notification of (notifications$ | async); track notification) {
         <mat-list-item>
-            <h3 matLine>{{ notification.title }}</h3>
-            <p matLine>
+            <h3 matListItemTitle>{{ notification.title }}</h3>
+            <p matListItemLine>
                 {{ notification.content }}
-                @if (!notification.opened) {
-                    <button (click)="markRead(notification.id)" mat-mini-fab>
-                        <mat-icon>done</mat-icon>
-                    </button>
-                }
             </p>
+            @if (!notification.opened) {
+                <button matListItemMeta (click)="markRead(notification.id)" mat-mini-fab>
+                    <mat-icon>done</mat-icon>
+                </button>
+            }
         </mat-list-item>
     }
     <mat-divider></mat-divider>

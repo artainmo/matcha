@@ -8,11 +8,11 @@
     }
     @for (suggestion of (results$ | async)! | filter: filterArg | sort: (sortArg$ | async); track suggestion; let last = $last) {
         <mat-list-item>
-            <button [routerLink]="'/profile/' + suggestion.username" mat-raised-button>See profile
+            <h4 matListItemTitle [routerLink]="'/profile/' + suggestion.username">{{ suggestion.username }}</h4>
+            <p matListItemLine> {{ suggestion.firstname }} {{ suggestion.lastname }} </p>
+            <button matListItemMeta [routerLink]="'/profile/' + suggestion.username" mat-raised-button>See profile
                 <mat-icon>arrow_right</mat-icon>
             </button>
-            <h4 mat-line>{{ suggestion.username }}</h4>
-            <p mat-line> {{ suggestion.firstname }} {{ suggestion.lastname }} </p>
             @if (!last) {
                 <mat-divider [inset]="true"></mat-divider>
             }
