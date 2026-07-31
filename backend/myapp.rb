@@ -43,6 +43,13 @@ before do
     end
 end
 
+# Sinatra defaults to Content-Type: text/html. Without this, API responses
+# containing unescaped user input (username, biography, etc.) would be
+# rendered as HTML by a browser on direct navigation, enabling XSS.
+before %r{/rest/.*} do
+  content_type :json
+end
+
 enable :static # Before searching route patterns direct matches with file names
 set :public_folder, FRONTEND_DIST_PATH # in :public_folder will be searched
 
@@ -63,6 +70,9 @@ end
 post '/rest/account/register' do
   db = DatabaseManager.new
   body = JSON.parse request.body.read
+  return 400, "Invalid characters in username, firstname or lastname" if
+    has_forbidden_chars?(body['username']) || has_forbidden_chars?(body['firstname']) ||
+    has_forbidden_chars?(body['lastname'])
   ret = db.createAccount(body['username'], body['password'],
         body['email'], body['firstname'], body['lastname'])
   return 417, ret if ret != 'CREATED'
@@ -91,6 +101,7 @@ end
 patch '/rest/account/fill' do
   db = DatabaseManager.new
   body = JSON.parse request.body.read
+  return 400, "Invalid characters in biography" if has_forbidden_chars?(body['biography'])
   ret = db.updateAccount(username, 'gender', body['gender'])
   return 417, ret if ret != 'UPDATED'
   ret = db.updateAccount(username, 'sexual_orientation', body['sexual_orientation'])
@@ -121,6 +132,9 @@ end
 patch '/rest/account' do
   db = DatabaseManager.new
   body = JSON.parse request.body.read
+  return 400, "Invalid characters in firstname, lastname or biography" if
+    has_forbidden_chars?(body['firstname']) || has_forbidden_chars?(body['lastname']) ||
+    has_forbidden_chars?(body['biography'])
   if body['email']
     return 417, "Mail is not valid" if !send_mail(body['email'], "New Matcha Email Address",
     		  "This is the new email address you setup on your Matcha account #{username}.")
@@ -530,6 +544,13 @@ end
 =end
 
 helpers do
+  # Rejects '<'/'>' so stored fields can't carry an HTML/script payload that
+  # would execute if ever reflected without escaping.
+  def has_forbidden_chars?(str)
+    return false if str.nil?
+    str.match?(/[<>]/)
+  end
+
   # Function takes timestamp string and returns age in year as integer
   def getAgeInYears(dob) #dob stands for date of birth.
     dob = DateTime.parse(dob).to_date
