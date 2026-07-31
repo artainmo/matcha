@@ -2,10 +2,13 @@ require __dir__ + '/../databaseManager.rb'
 require 'random_name_generator'
 
 #Helper functions
+$geolocationCache = {}
 def geolocationCoordinates(ipOrAddress)
+  return $geolocationCache[ipOrAddress] if $geolocationCache.key?(ipOrAddress)
   geolocation = Geocoder.search(ipOrAddress)
-  return false if geolocation.first == nil
-  return geolocation.first.coordinates.join(',')
+  coordinates = geolocation.first.nil? ? nil : geolocation.first.coordinates.join(',')
+  sleep(1) # stay within Nominatim's 1 request/second rate limit
+  $geolocationCache[ipOrAddress] = coordinates
 end
 
 #Predefine values
