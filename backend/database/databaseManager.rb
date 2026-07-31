@@ -231,17 +231,40 @@ class DatabaseManager
     "with sexual orientation #{sexualOrientation}, gender #{gender}, geolocation #{geolocation}, " + \
     "age #{age}, max age difference #{maxAgeDifference}, max distance #{maxDistance}, " + \
     "minimum fame #{minFame}, minimum common tags #{minCommonTags}...."
-    blockedUsernames = getBlockedUsernames(username) + getBlockedByUsernames(username)
-    notCompleteUsernames = getNotCompleteUsernames().join("','")
-    start_sql = "SELECT * FROM account WHERE username NOT IN " + \
-          "('" + username + "','" + blockedUsernames.join("','") + "','" + notCompleteUsernames + "') "
-    sexualOrientation_sql = "AND (sexual_orientation = 'OTHER' OR sexual_orientation = 'BI' OR sexual_orientation = '#{gender}') "
+  
+    # values collects every bind parameter in the order bind.call() is used;
+    # bind.call(v) appends v and returns its placeholder ("$1", "$2", ...),
+    # so start_sql/sexualOrientation_sql/etc never interpolate raw strings
+    # (usernames, gender, sexual_orientation) into the SQL text itself.
+    #
+    # `->(value) { ... }` is Ruby's lambda syntax: it defines a small
+    # anonymous function, stored in the local variable `bind`, that takes one
+    # argument named `value`. `bind.call(v)` runs it with `v` as `value`.
+    # Each time it runs, `values << value` appends `value` onto the end of
+    # the `values` array (this is why the block can be defined once here but
+    # still add to the same `values` array on every later call — a lambda
+    # keeps access to the local variables that were already in scope where it
+    # was created, in this case `values`). The last line of the lambda body,
+    # `"$#{values.length}"`, becomes its return value: since the value was
+    # just appended, `values.length` is its 1-based position in the array
+    # (1st value appended -> length 1 -> "$1", 2nd -> length 2 -> "$2", etc.),
+    # which is exactly the placeholder Postgres expects to find that value's
+    # position in the `values` array passed to exec_params.
+    values = []
+    bind = ->(value) { values << value; "$#{values.length}" }
+
+    excludedUsernames = [username] + getBlockedUsernames(username) +
+                        getBlockedByUsernames(username) + getNotCompleteUsernames()
+    excluded_placeholders = excludedUsernames.map { |u| bind.call(u) }.join(',')
+    start_sql = "SELECT * FROM account WHERE username NOT IN (#{excluded_placeholders}) "
+    sexualOrientation_sql = "AND (sexual_orientation = 'OTHER' OR sexual_orientation = 'BI' " +
+                            "OR sexual_orientation = #{bind.call(gender)}) "
     if sexualOrientation == 'MALE' or sexualOrientation == 'FEMALE'
-      sexualOrientation_sql = "AND gender = '#{sexualOrientation}' " + sexualOrientation_sql
+      sexualOrientation_sql = "AND gender = #{bind.call(sexualOrientation)} " + sexualOrientation_sql
     end
-    location_sql = "AND geolocation<@>'#{geolocation}' <= #{maxDistance.to_s} " #Distance is calculated in miles
-    age_sql = "AND abs(EXTRACT(YEAR FROM AGE(birthday)) - '#{age}') <= #{maxAgeDifference.to_s};"
-    ret = @conn.exec_params(start_sql + sexualOrientation_sql + location_sql + age_sql)
+    location_sql = "AND geolocation<@>'#{geolocation}' <= #{bind.call(maxDistance.to_i)} " #Distance is calculated in miles
+    age_sql = "AND abs(EXTRACT(YEAR FROM AGE(birthday)) - '#{age}') <= #{bind.call(maxAgeDifference.to_i)};"
+    ret = @conn.exec_params(start_sql + sexualOrientation_sql + location_sql + age_sql, values)
     return [] if ret.cmd_tuples == 0
     ret = filterSuggestionsWithTagsAndFame(username, ret, minCommonTags, minFame)
     return ret #Returns double array instead of PG::Result object
@@ -252,12 +275,14 @@ class DatabaseManager
   end
 
   def getAvailableFromTags(tags)
+    return @conn.exec_params("SELECT account_id FROM public.tag WHERE FALSE") if tags.empty?
+    placeholders = (1..tags.length).map { |i| "$#{i}" }.join(',')
     @conn.exec_params("SELECT account_id FROM (
     SELECT account_id, COUNT(tag)
     FROM public.tag
-    where tag IN ('" + tags.join("','") + "')	GROUP BY account_id
+    where tag IN (#{placeholders})	GROUP BY account_id
     ) as res
-    WHERE res.count = $1", [ tags.length])
+    WHERE res.count = $#{tags.length + 1}", tags + [tags.length])
   end
 
 # Queries on token table
@@ -451,7 +476,37 @@ class DatabaseManager
                             ORDER BY time DESC;', [account])
   end
 
+  # %w[opened] is Ruby shorthand for the array of strings ["opened"] (%w[...]
+  # splits the words inside on whitespace and quotes each one automatically).
+  #
+  # Below, $1/$2 are "bind parameters": placeholders sent to Postgres
+  # separately from the SQL text, along with the actual values ([newValue,
+  # id]) to fill them in with. Postgres treats a bind parameter strictly as a
+  # literal value, never as SQL code, which is what normally prevents SQL
+  # injection. But a column name (columnToUpdate) can't be sent as a bind
+  # parameter — SQL only allows identifiers like column names to appear as
+  # literal text in the query — so it has to be interpolated into the string
+  # instead, and interpolated text IS parsed as SQL. Since columnToUpdate
+  # comes straight from the URL (:colomnToUpdate), that would let a caller
+  # inject arbitrary SQL through the column-name slot.
+  #
+  # A whitelist is a fixed list of the only values allowed through a check;
+  # anything not on the list is rejected. Here it's the list of column names
+  # this method is allowed to update. Checking columnToUpdate against it
+  # below closes the injection hole, since only this known-safe literal
+  # ("opened") can ever reach the interpolated SQL.
+  #
+  # "opened" only works as a column reference because it's spelled exactly
+  # like the notification table's real `opened boolean` column (see
+  # designDatabase.sql) — Postgres resolves the interpolated text against
+  # the table's actual columns. It's the only column listed here because
+  # it's the only one the app ever needs to update this way (the frontend
+  # only ever calls PATCH .../notification/:id/opened/true, to mark a
+  # notification as read).
+  NOTIFICATION_UPDATABLE_COLUMNS = %w[opened]
+
   def updateNotification(id, columnToUpdate, newValue)
+    return "Invalid column" unless NOTIFICATION_UPDATABLE_COLUMNS.include?(columnToUpdate)
     puts "Update notification #{id}'s column '#{columnToUpdate}' with '#{newValue}'"
     begin
       ret = @conn.exec_params("UPDATE notification SET #{columnToUpdate} = $1
@@ -492,7 +547,7 @@ class DatabaseManager
 
   def findSimilarTags(tag)
     puts "Find all tags ressembling #{tag}"
-    return @conn.exec("SELECT DISTINCT tag FROM tag WHERE tag LIKE '%#{tag}%'")
+    return @conn.exec_params("SELECT DISTINCT tag FROM tag WHERE tag LIKE '%' || $1 || '%'", [tag])
   end
 
   def numberCommonTags(tags1, tags2)

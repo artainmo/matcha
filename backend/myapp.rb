@@ -25,7 +25,6 @@ db_start.createDatabase
   CONFIGURATION
 =end
 
-username = '' #username will be defined later through cookies if cookies are used. It must be declared as global variable else it would not be accessible throughout the app.
 set :port, 1942
 set :bind, '0.0.0.0'
 frontend = 'http://localhost:1942'
@@ -35,11 +34,18 @@ jwt_token = 'Thasé(à~a-é"çwonderful`^$ù^me`s$^rmcesrf)'
 Geocoder.configure(timeout: 10)
 
 before do
+    # @username (an instance variable) is scoped to this single request: Sinatra
+    # dups a fresh app instance per request, so each dup gets its own instance
+    # variables. A plain local variable here would instead be one variable
+    # shared by every request the process ever handles (captured by this
+    # block's closure), which under a multi-threaded server (Puma, present in
+    # the Gemfile) lets one user's request overwrite another's mid-flight.
+    @username = ''
     if cookies[:username]
-	    username = JWT.decode cookies[:username], nil, false
-      username = username[0]
+	    @username = JWT.decode cookies[:username], nil, false
+      @username = @username[0]
       db = DatabaseManager.new
-      db.updateLastSeen(username)
+      db.updateLastSeen(@username)
     end
 end
 
@@ -102,29 +108,29 @@ patch '/rest/account/fill' do
   db = DatabaseManager.new
   body = JSON.parse request.body.read
   return 400, "Invalid characters in biography" if has_forbidden_chars?(body['biography'])
-  ret = db.updateAccount(username, 'gender', body['gender'])
+  ret = db.updateAccount(@username, 'gender', body['gender'])
   return 417, ret if ret != 'UPDATED'
-  ret = db.updateAccount(username, 'sexual_orientation', body['sexual_orientation'])
+  ret = db.updateAccount(@username, 'sexual_orientation', body['sexual_orientation'])
   return 417, ret if ret != 'UPDATED'
-  ret = db.updateAccount(username, 'biography', body['biography'])
+  ret = db.updateAccount(@username, 'biography', body['biography'])
   return 417, ret if ret != 'UPDATED'
-  ret = db.updateAccount(username, 'birthday', body['birthday'])
+  ret = db.updateAccount(@username, 'birthday', body['birthday'])
   return 417, ret if ret != 'UPDATED'
-  ret = db.updateAccount(username, 'last_connected', Time.now())
+  ret = db.updateAccount(@username, 'last_connected', Time.now())
   return 417, ret if ret != 'UPDATED'
-  ret = db.updateAccount(username, 'profile_picture', body['profile_picture'])
+  ret = db.updateAccount(@username, 'profile_picture', body['profile_picture'])
   return 417, ret if ret != 'UPDATED'
   if body['tags']
-    db.deleteTagsOfUser(username)
+    db.deleteTagsOfUser(@username)
     body['tags'].each { |tag|
-      ret = db.createTag(username, tag)
+      ret = db.createTag(@username, tag)
       return 417, ret if ret != 'CREATED' && ret[0,54] != 'ERROR:  duplicate key value violates unique constraint'
     }
   end
   geolocation = getGeolocationCoordinates(body['geolocation'], request.ip)
   puts geolocation
   return 417, "Wrong geolocation" if geolocation == false
-  ret = db.updateAccount(username, 'geolocation', geolocation)
+  ret = db.updateAccount(@username, 'geolocation', geolocation)
   return 417, ret if ret != 'UPDATED'
   return 200, ret
 end
@@ -137,58 +143,58 @@ patch '/rest/account' do
     has_forbidden_chars?(body['biography'])
   if body['email']
     return 417, "Mail is not valid" if !send_mail(body['email'], "New Matcha Email Address",
-    		  "This is the new email address you setup on your Matcha account #{username}.")
-    ret = db.updateAccount(username, 'email', body['email'])
+    		  "This is the new email address you setup on your Matcha account #{@username}.")
+    ret = db.updateAccount(@username, 'email', body['email'])
     return 417 if ret != 'UPDATED'
   end
   if body['gender']
-    ret = db.updateAccount(username, 'gender', body['gender'])
+    ret = db.updateAccount(@username, 'gender', body['gender'])
     return 417 if ret != 'UPDATED'
   end
   if body['sexual_orientation']
-    ret = db.updateAccount(username, 'sexual_orientation', body['sexual_orientation'])
+    ret = db.updateAccount(@username, 'sexual_orientation', body['sexual_orientation'])
     return 417 if ret != 'UPDATED'
   end
   if body['biography']
-    ret = db.updateAccount(username, 'biography', body['biography'])
+    ret = db.updateAccount(@username, 'biography', body['biography'])
     return 417 if ret != 'UPDATED'
   end
   if body['birthday']
-    ret = db.updateAccount(username, 'birthday', body['birthday'])
+    ret = db.updateAccount(@username, 'birthday', body['birthday'])
     return 417 if ret != 'UPDATED'
   end
   if body['profile_picture']
-    ret = db.updateAccount(username, 'profile_picture', body['profile_picture'])
+    ret = db.updateAccount(@username, 'profile_picture', body['profile_picture'])
     return 417 if ret != 'UPDATED'
   end
   if body['firstname']
-    ret = db.updateAccount(username, 'firstname', body['firstname'])
+    ret = db.updateAccount(@username, 'firstname', body['firstname'])
     return 417 if ret != 'UPDATED'
   end
   if body['lastname']
-    ret = db.updateAccount(username, 'lastname', body['lastname'])
+    ret = db.updateAccount(@username, 'lastname', body['lastname'])
     return 417 if ret != 'UPDATED'
   end
   if body['tags']
-    ret = db.deleteTagsOfUser(username)
+    ret = db.deleteTagsOfUser(@username)
     body['tags'].each { |tag|
-      ret = db.createTag(username, tag)
+      ret = db.createTag(@username, tag)
       return 417 if ret != 'CREATED'
     }
   end
   puts "body: #{body['geolocation']}"
   if body['geolocation']
     if body['geolocation'] == ''
-      ret = db.updateAccount(username, 'custom_geolocation', false)
+      ret = db.updateAccount(@username, 'custom_geolocation', false)
       geolocation = getGeolocationCoordinates(nil, request.ip)
       return 417, "Wrong geolocation" if geolocation == false
-      db.updateGeolocation(username, geolocation)
+      db.updateGeolocation(@username, geolocation)
       return 417, ret if ret != 'UPDATED'
     else
-      ret = db.updateAccount(username, 'custom_geolocation', true)
+      ret = db.updateAccount(@username, 'custom_geolocation', true)
       geolocation = geolocationCoordinates(body['geolocation'])
       return 417, "Wrong geolocation" if geolocation == false
-      ret = db.updateAccount(username, 'geolocation', geolocation)
+      ret = db.updateAccount(@username, 'geolocation', geolocation)
       return 417, ret if ret != 'UPDATED'
     end
   end
@@ -200,11 +206,11 @@ get '/rest/account/find/:_username' do |_username|
   accounts = db.findAccount(_username)
   affected_rows = accounts.cmd_tuples
   return 404, "Username not found" if affected_rows == 0
-  if _username != username && _username != '' && username != ''
-    ret = db.createVisit(username, _username)
+  if _username != @username && _username != '' && @username != ''
+    ret = db.createVisit(@username, _username)
     return 417, ret if ret != 'CREATED'
-    db.createNotification(username, _username, "account view",
-                          "account viewed by #{username}", "VIEWED")
+    db.createNotification(@username, _username, "account view",
+                          "account viewed by #{@username}", "VIEWED")
   end
   ret = db.findTagsOfUser(_username)
   tags = []
@@ -215,11 +221,11 @@ get '/rest/account/find/:_username' do |_username|
   likes_back = false
   connected = false
   blocked = false
-  if _username != username
-    liked = db.findLiked(username, _username).cmd_tuples > 0
-    likes_back = db.findLiked(_username, username).cmd_tuples > 0
-    blocked = db.isBlockedBy(username, _username)
-    connected = db.findLiked(_username, username).cmd_tuples > 0 && liked
+  if _username != @username
+    liked = db.findLiked(@username, _username).cmd_tuples > 0
+    likes_back = db.findLiked(_username, @username).cmd_tuples > 0
+    blocked = db.isBlockedBy(@username, _username)
+    connected = db.findLiked(_username, @username).cmd_tuples > 0 && liked
   end
   pictures = db.findPicturesUser(_username).values.map {|a| a[0]}
   return 200, toAccountObject(accounts.values[0], tags, liked, likes_back, connected, pictures, blocked).to_json
@@ -251,16 +257,16 @@ end
 
 get '/rest/account/more-infos' do
   db = DatabaseManager.new
-  ret = db.findAccount(username)
+  ret = db.findAccount(@username)
   return 417, "Username not found" if ret.cmd_tuples == 0
   # Fame
-  fame_rating = db.getFameRating(username)
+  fame_rating = db.getFameRating(@username)
   # likes
-  ret = db.findLikesTo(username)
+  ret = db.findLikesTo(@username)
   affected_rows = ret.cmd_tuples
   likes = affected_rows == 0 ? [] : ret.values.map {|a| a[0]}
   # Visits
-  ret = db.findVisitsTo(username)
+  ret = db.findVisitsTo(@username)
   affected_rows = ret.cmd_tuples
   visits = affected_rows == 0 ? [] : ret.values.map {|a| a[0]}
   return 200, {
@@ -281,10 +287,10 @@ end
 post '/rest/account/search' do
   db = DatabaseManager.new
   body = JSON.parse request.body.read
-  blockedUsernames = db.getBlockedUsernames(username) + db.getBlockedByUsernames(username)
+  blockedUsernames = db.getBlockedUsernames(@username) + db.getBlockedByUsernames(@username)
   notCompleteUsernames = db.getNotCompleteUsernames().join("','")
   query = 'WHERE username NOT IN ' + \
-        "('" + username + "','" + blockedUsernames.join("','") + "','" + notCompleteUsernames + "')"
+        "('" + @username + "','" + blockedUsernames.join("','") + "','" + notCompleteUsernames + "')"
   variables = []
   today = Date.today
   if body['minAge']
@@ -309,7 +315,7 @@ post '/rest/account/search' do
     query += ' AND username IN ' + "('" + usernames.join("','") + "')"
   end
   search = db.search(query, variables)
-  res = db.getIUserResultsFromArray(username, search)
+  res = db.getIUserResultsFromArray(@username, search)
   if body['minFame'] || body['maxFame']
     res.each {|user|
       if body['minFame'] && user[:fame] < body['minFame'].to_i
@@ -327,7 +333,7 @@ get '/rest/account/suggestions' do
   db = DatabaseManager.new
   geolocation = getGeolocationCoordinates(params[:geolocation], request.ip)
   return 417, "Wrong geolocation" if geolocation == false
-  db.updateGeolocation(username, geolocation)
+  db.updateGeolocation(@username, geolocation)
   maxAgeDifference = params[:age]
   maxDistance = params[:location]
   minFame = params[:fame]
@@ -336,7 +342,7 @@ get '/rest/account/suggestions' do
   maxDistance = 33 if maxDistance == nil
   minFame = -1000 if minFame == nil
   minCommonTags = 0 if minCommonTags == nil
-  ret = db.findAccount(username)
+  ret = db.findAccount(@username)
   return 404, "Username not found" if ret.cmd_tuples == 0
   age = getAgeInYears(ret[0]['birthday'])
   sug = db.findSuggestionsAccount(ret[0]['username'],
@@ -385,7 +391,7 @@ end
 
 post '/rest/blocked/:blocked' do |blocked|
   db = DatabaseManager.new
-  ret = db.createBlocked(username, blocked)
+  ret = db.createBlocked(@username, blocked)
   return 417, ret if ret != 'CREATED'
   return 200, ret
 end
@@ -394,25 +400,25 @@ end
 
 post '/rest/liked/:liked' do |liked|
   db = DatabaseManager.new
-  ret = db.createLiked(username, liked)
+  ret = db.createLiked(@username, liked)
   return 417, ret if ret != 'CREATED'
-  if (db.findLiked(liked, username)).cmd_tuples === 0
-    db.createNotification(username, liked, "account liked",
-                          "account liked by #{username}", "LIKE")
+  if (db.findLiked(liked, @username)).cmd_tuples === 0
+    db.createNotification(@username, liked, "account liked",
+                          "account liked by #{@username}", "LIKE")
   else
-    db.createNotification(username, liked, "account liked back",
-                          "account liked back by #{username}", "LIKED_BACK")
+    db.createNotification(@username, liked, "account liked back",
+                          "account liked back by #{@username}", "LIKED_BACK")
   end
   return 200, ret
 end
 
 delete '/rest/liked/:liked' do |liked|
   db = DatabaseManager.new
-  ret = db.deleteLiked(username, liked)
+  ret = db.deleteLiked(@username, liked)
   affected_rows = ret.cmd_tuples
-  return 417, "Like of #{username} to #{liked} not found" if affected_rows == 0
-  db.createNotification(username, liked, "account unliked",
-                        "account unliked by #{username}", "UNLIKED")
+  return 417, "Like of #{@username} to #{liked} not found" if affected_rows == 0
+  db.createNotification(@username, liked, "account unliked",
+                        "account unliked by #{@username}", "UNLIKED")
   return 200, ret.cmd_tuples.to_s #Returns the number of removed rows
 end
 
@@ -420,11 +426,11 @@ get '/rest/liked/connections' do
   db = DatabaseManager.new
   connections = []
 
-  blockedBy = db.getBlockedByUsernames(username)
-  ret = db.findLikesTo(username)
+  blockedBy = db.getBlockedByUsernames(@username)
+  ret = db.findLikesTo(@username)
   return 200, [] if ret == nil
   ret.each_row { |row|
-    ret2 = db.findLiked(username, row[0])
+    ret2 = db.findLiked(@username, row[0])
     if !blockedBy.include?(row[0]) && ret2.cmd_tuples != 0
       connections.push(row[0])
     end
@@ -437,20 +443,20 @@ end
 post '/rest/message/:receiver' do |receiver|
   db = DatabaseManager.new
   body = JSON.parse request.body.read
-  if db.isBlockedBy(username, receiver) or !itsMatch(username, receiver)
+  if db.isBlockedBy(@username, receiver) or !itsMatch(@username, receiver)
     return 201, 'CREATED'
   end
-  ret = db.createMessage(username, receiver, body['content'])
+  ret = db.createMessage(@username, receiver, body['content'])
   return 417, ret if ret != 'CREATED'
-  db.createNotification(username, receiver, "message received",
-                        "message received from #{username}", "MESSAGE")
+  db.createNotification(@username, receiver, "message received",
+                        "message received from #{@username}", "MESSAGE")
   return 201, ret
 end
 
 get '/rest/message' do
   db = DatabaseManager.new
   list = []
-  ret = db.findMessagesForUser(username)
+  ret = db.findMessagesForUser(@username)
   list = ret.each.map { |message|
     {
       id: message['id'],
@@ -467,7 +473,7 @@ end
 
 get '/rest/notification' do
   db = DatabaseManager.new
-  ret = db.findNotifications(username)
+  ret = db.findNotifications(@username)
   list = ret.each.map { |notification|
     {
       id: notification['id'],
@@ -501,18 +507,18 @@ end
 
 post '/rest/picture' do
   db = DatabaseManager.new
-  if db.numberPicturesUser(username)[0]['count'].to_i >= 5
+  if db.numberPicturesUser(@username)[0]['count'].to_i >= 5
     return 400, "Maximum number of pictures for user attained"
   end
   if !params[:file] or !params[:file][:filename]
     return 400, "No file in request to be uploaded"
   end
-  FileUtils.mkdir_p("../public/images/#{username}")
-  storage_path = "images/#{username}/#{params[:file][:filename]}"
+  FileUtils.mkdir_p("../public/images/#{@username}")
+  storage_path = "images/#{@username}/#{params[:file][:filename]}"
   if File.exist?("../public/" + storage_path)
     return 400, "Filename already exists"
   end
-  ret = db.createPicture(username, storage_path)
+  ret = db.createPicture(@username, storage_path)
   return 417, ret if ret != 'CREATED'
   File.open("../public/" + storage_path, "wb") do |f|
     f.write(params[:file][:tempfile].read)
@@ -534,7 +540,7 @@ end
 
 get '/rest/picture' do
   db = DatabaseManager.new
-  ret = db.findPicturesUser(username)
+  ret = db.findPicturesUser(@username)
   return 200, ret.values.to_json
   #Returns the storage paths towards locally stored images which start from project root
 end
