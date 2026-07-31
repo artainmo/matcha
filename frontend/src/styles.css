@@ -1,1 +1,5 @@
-/*This file must exist else compilation error occurs, despite the fact it is not used.*/
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
