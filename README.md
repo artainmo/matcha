@@ -28,6 +28,8 @@ This project uses ruby Sinatra as backend and AngularJS as frontend to build a d
 
 The app uses these settings that you should configure in a `.env` file:
 ```
+EMAILPASS= #We won't give the password publicly, ask it to pvanderl@student.42belgium.be 
+
 # For Docker networking (use 'postgres' as hostname inside Docker)
 PGHOST=postgres
 PGPORT=5432
@@ -90,7 +92,7 @@ docker logs -f matcha-ruby
 
 ### Run without using any Docker
 
-This project can be run on macos without using docker.
+This project can be run on macos without using docker. In that case you should have no `.env` and remove it if one exists.
 
 For the frontend we use: Angular CLI 22.0.6; Node 24.15.0; and npm 11.11.0. Discrepancies can make the frontend hang. Verify you have the correct versions with: `npx ng version`. You can download the right versions in your terminal with: `brew install node@24`; `npm install -g @angular/cli@22`.
 
@@ -109,6 +111,8 @@ For the backend you should `brew install ruby@3.3`, afterwards you can add the f
 export PATH="/opt/homebrew/opt/ruby/bin:$PATH" #This signals the ruby executables to use the ruby version from homebrew and not the macOS' old system Ruby. This by prepending the path with the homebrew version to look at it first.
 export PATH="$HOME/.gem/ruby/3.3.0/bin:$PATH" #Shows where the gem executables are. Gems are ruby dependencies.
 ```
+
+Subsequently the email password needs to be given. You can do this with `export EMAILPASS="..."` (we won't give the password publicly, ask it to pvanderl@student.42belgium.be).
 
 Finally, to launch the whole app in one command:
 ```

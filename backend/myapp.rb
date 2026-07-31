@@ -561,7 +561,6 @@ helpers do
   
   def send_mail(receiver, subject, content)
     begin
-      puts "emailpass: #{ENV['EMAILPASS']}"
       Pony.mail(
         :to => receiver,
         :from => 'no-reply@vanderlynden.eu',

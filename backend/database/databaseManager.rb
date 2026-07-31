@@ -30,7 +30,7 @@ class DatabaseManager
 
     begin
       puts 'Connecting to database...'
-      puts connection_config
+      #puts connection_config
       @conn = PG.connect(connection_config)
     rescue PG::ConnectionBad => error
       if error.message.include?('FATAL:  sorry, too many clients already')
