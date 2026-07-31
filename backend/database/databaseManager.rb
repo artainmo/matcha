@@ -186,7 +186,7 @@ class DatabaseManager
   end
 
   def verifyPasswordAccount(username, passwordTry)
-    puts "Verify if #{passwordTry} is the correct password of #{username}..."
+    puts "Verify password attempt for #{username}..."
     ret = findAccount(username)
     return 'Username not found' if ret.cmd_tuples == 0
     return 'Username not verified' if ret[0]['verified'] == 'f'

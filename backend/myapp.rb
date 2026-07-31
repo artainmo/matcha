@@ -221,14 +221,15 @@ post '/rest/account/fake/:_username' do |_username|
   return 200
 end
 
-get '/rest/account/:_username/password/:passwordTry' do |_username, passwordTry|
+post '/rest/account/login' do
   db = DatabaseManager.new
-  ret = db.verifyPasswordAccount(_username, passwordTry)
+  body = JSON.parse request.body.read
+  ret = db.verifyPasswordAccount(body['username'], body['password'])
   return 404, ret if ret == 'Username not found'
   return 417, ret if ret == 'Username not verified'
   return 400, ret[0].to_s if ret[0] === false
-  cookie_token = JWT.encode _username, nil, 'none'
-  db.updateLastSeen(_username)
+  cookie_token = JWT.encode body['username'], nil, 'none'
+  db.updateLastSeen(body['username'])
   response.set_cookie("username", :value => cookie_token, :domain => false,
 					  :path => '/', :expires => Date.today + 3)
   return 200, {:message => ret[0].to_s, :completed => ret[1] }.to_json
@@ -353,15 +354,16 @@ get '/rest/token/resetPassword/:_username' do |_username|
   return 200
 end
 
-get '/rest/token/:token/resetPassword/:newPassword' do |token, newPassword|
+post '/rest/token/:token/resetPassword' do |token|
   db = DatabaseManager.new
+  body = JSON.parse request.body.read
   ret = db.findToken(token)
   return 417, "Token not found" if ret.cmd_tuples == 0
   if Date.parse(ret[0]['expiry_time']) < Date.today
     db.deleteToken(ret[0]['account_id'])
     return 417, "Token is expired"
   end
-  db.updateAccount(ret[0]['account_id'], "password", newPassword)
+  db.updateAccount(ret[0]['account_id'], "password", body['newPassword'])
   return 200
 end
 

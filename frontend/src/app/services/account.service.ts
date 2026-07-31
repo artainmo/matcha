@@ -41,7 +41,7 @@ export class AccountService {
 	}
 
 	login(username: string, password: string) {
-		this.http.get<{ completed: boolean }>(URL_LOGIN(username, password)).pipe(
+		this.http.post<{ completed: boolean }>(URL_LOGIN, { username, password }).pipe(
 			tap(() => {
 				this.badLogin.next(false);
 				this.wrongPassword.next(false);
@@ -106,7 +106,7 @@ export class AccountService {
 	}
 
 	resetPassword(token: string, password: string) {
-		this.http.get(URL_RESET_PASSWORD(token, password))
+		this.http.post(URL_RESET_PASSWORD(token), { newPassword: password })
 			.subscribe(
 				() => {
 					this.router.navigate(['/sign/in']).then();
