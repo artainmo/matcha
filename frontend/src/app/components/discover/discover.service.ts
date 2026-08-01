@@ -2,8 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { URL_ACCOUNT_SUGGESTIONS } from '../../config/urls';
-import { IUserResult } from "../../shared/search.interface";
+import { IUserResult, IUserResultResponse } from "../../shared/search.interface";
 import { SortAndFilterService } from "../../shared/sort-and-filter/sort-and-filter.service";
+import { mapUserResultResponse } from "../../shared/user-result.mapper";
 
 @Injectable({
 	providedIn: 'root'
@@ -24,10 +25,11 @@ export class DiscoverService {
 
 	fetchSuggestions() {
 		this.isLoadingBS.next(true);
-		this.http.get<IUserResult[]>(URL_ACCOUNT_SUGGESTIONS).subscribe(
-			(values: IUserResult[]) => {
-				this.suggestionsBS.next(values);
-				this.sortAndFilterService.initFilters(values);
+		this.http.get<IUserResultResponse[]>(URL_ACCOUNT_SUGGESTIONS).subscribe(
+			(values: IUserResultResponse[]) => {
+				const users = values.map(mapUserResultResponse);
+				this.suggestionsBS.next(users);
+				this.sortAndFilterService.initFilters(users);
 				this.isLoadingBS.next(false);
 			}
 		)

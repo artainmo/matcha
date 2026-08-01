@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, Observable } from 'rxjs';
-import { IUserResult } from "../../shared/search.interface";
+import { IUserResult, IUserResultResponse } from "../../shared/search.interface";
 import { URL_SEARCH } from "../../config/urls";
 import { SortAndFilterService } from "../../shared/sort-and-filter/sort-and-filter.service";
+import { mapUserResultResponse } from "../../shared/user-result.mapper";
 
 @Injectable({
 	providedIn: 'root'
@@ -23,10 +24,11 @@ export class SearchService {
 
 	search(body: any) {
 		this.isLoadingBS.next(true);
-		this.http.post<IUserResult[]>(URL_SEARCH, body).subscribe(
-			(res: IUserResult[]) => {
-				this.resultsBS.next(res);
-				this.sortAndFilterService.initFilters(res);
+		this.http.post<IUserResultResponse[]>(URL_SEARCH, body).subscribe(
+			(res: IUserResultResponse[]) => {
+				const users = res.map(mapUserResultResponse);
+				this.resultsBS.next(users);
+				this.sortAndFilterService.initFilters(users);
 				this.isLoadingBS.next(false);
 			}
 		)

@@ -7,5 +7,8 @@ export interface IUserResult {
 	distance: number;
 	order: number;
 	birthday: string;
+	age: number;
 	fake_account: boolean;
 }
+
+export type IUserResultResponse = Omit<IUserResult, 'age'>;

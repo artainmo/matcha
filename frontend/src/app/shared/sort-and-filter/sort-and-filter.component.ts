@@ -30,7 +30,8 @@ export class SortAndFilterComponent implements OnInit {
 	@Output()
 	appliedFilters: EventEmitter<IFilter> = new EventEmitter<IFilter>();
 	_appliedFilter: IFilter = {
-		birthday: [],
+		ageMin: null,
+		ageMax: null,
 		distance: [],
 		fame: [],
 		commonTags: []
@@ -79,12 +80,21 @@ export class SortAndFilterComponent implements OnInit {
 		this.appliedFilters.emit(this._appliedFilter);
 	}
 
-	updateBirthdayList(filter: string) {
-		const index = this._appliedFilter.birthday.indexOf(filter);
-		if (!this._appliedFilter.birthday.includes(filter))
-			this._appliedFilter.birthday.push(filter);
-		else
-			this._appliedFilter.birthday.splice(index, 1);
+	updateAgeMin(ageMin: number | string | null) {
+		this._appliedFilter.ageMin = this.normalizeAgeValue(ageMin);
 		this.appliedFilters.emit(this._appliedFilter);
+	}
+
+	updateAgeMax(ageMax: number | string | null) {
+		this._appliedFilter.ageMax = this.normalizeAgeValue(ageMax);
+		this.appliedFilters.emit(this._appliedFilter);
+	}
+
+	private normalizeAgeValue(value: number | string | null): number | null {
+		if (value === null || value === '') {
+			return null;
+		}
+		const normalized = Number(value);
+		return Number.isNaN(normalized) ? null : normalized;
 	}
 }

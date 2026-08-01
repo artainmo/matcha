@@ -27,7 +27,7 @@ export class DiscoverComponent implements OnInit {
 	results$: Observable<IUserResult[]> = this.discoverService.suggestions$;
 	sortArg$: Observable<string> = this.sortAndFilterService.sortBS.asObservable();
 	filterArg: IFilter = {
-		birthday: [], commonTags: [], distance: [], fame: []
+		ageMin: null, ageMax: null, commonTags: [], distance: [], fame: []
 	};
 	isLoading$: Observable<boolean> = this.discoverService.isLoading$;
 

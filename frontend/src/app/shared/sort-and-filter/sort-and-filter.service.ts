@@ -9,7 +9,8 @@ import { IFilter } from "./filter.interface";
 export class SortAndFilterService {
 	sortBS: BehaviorSubject<string> = new BehaviorSubject<string>('');
 	availableFiltersBS: BehaviorSubject<IFilter> = new BehaviorSubject<IFilter>({
-		birthday: [],
+		ageMin: null,
+		ageMax: null,
 		distance: [],
 		fame: [],
 		commonTags: []
@@ -20,14 +21,13 @@ export class SortAndFilterService {
 
 	initFilters(res: IUserResult[]) {
 		const availableFilters: IFilter = {
-			birthday: [],
+			ageMin: null,
+			ageMax: null,
 			distance: [],
 			fame: [],
 			commonTags: []
 		};
 		for (const item of res) {
-			if (!(availableFilters.birthday.includes(item.birthday)))
-				availableFilters.birthday.push(item.birthday);
 			if (!(availableFilters.distance.includes(item.distance)))
 				availableFilters.distance.push(item.distance);
 			if (!(availableFilters.fame.includes(item.fame)))
@@ -40,7 +40,8 @@ export class SortAndFilterService {
 
 	resetFilters() {
 		this.availableFiltersBS.next({
-			birthday: [],
+			ageMin: null,
+			ageMax: null,
 			distance: [],
 			fame: [],
 			commonTags: []

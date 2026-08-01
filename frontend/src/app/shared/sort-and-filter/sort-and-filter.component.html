@@ -74,19 +74,30 @@
                 </td>
                 <td>
                     <span>Filter by age</span><br>
-                    <ul class="filter-list">
-                        @for (filter of (availableFilters$ | async)?.birthday; track filter) {
-                            <li
+                    <div class="age-range-fields">
+                        <label>
+                            Min
+                            <input
+                                    type="number"
+                                    [min]="(availableFilters$ | async)?.ageMin ?? 0"
+                                    step="1"
+                                    [max]="_appliedFilter.ageMax"
+                                    [ngModel]="_appliedFilter.ageMin"
+                                    (ngModelChange)="updateAgeMin($event)"
                             >
-                                <mat-checkbox
-                                        (ngModelChange)="updateBirthdayList(filter)"
-                                        [ngModel]="_appliedFilter.birthday.includes(filter)"
-                                >
-                                    {{ filter }}
-                                </mat-checkbox>
-                            </li>
-                        }
-                    </ul>
+                        </label>
+                        <label>
+                            Max
+                            <input
+                                    type="number"
+                                    [max]="(availableFilters$ | async)?.ageMax ?? 115"
+                                    step="1"
+                                    [min]="_appliedFilter.ageMax"
+                                    [ngModel]="_appliedFilter.ageMax"
+                                    (ngModelChange)="updateAgeMax($event)"
+                            >
+                        </label>
+                    </div>
                 </td>
             </tr>
         </table>

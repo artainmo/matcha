@@ -13,7 +13,7 @@ export class SortPipe implements PipeTransform {
 				);
 			case 'Age':
 				return value.sort(
-					(a: IUserResult, b: IUserResult) => (new Date(b.birthday)).getTime() - new Date(a.birthday).getTime()
+					(a: IUserResult, b: IUserResult) => a.age - b.age
 				);
 			case 'Location':
 				return value.sort(
