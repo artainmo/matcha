@@ -42,7 +42,7 @@ export class CompleteProfileComponent {
 	constructor(
 		private readonly accountService: AccountService,
 		private readonly router: Router,
-		private readonly notificationsService: NotificationsService,
+		private readonly notificationsService: NotificationsService
 	) {
 	}
 

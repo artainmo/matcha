@@ -8,3 +8,4 @@
                                                                                               matcha-postgres  | 2026-08-01 16:39:09.263 UTC [892] CONTEXT:  unnamed portal parameter $1 = ''
                                                                                               matcha-postgres  | 2026-08-01 16:39:09.263 UTC [892] STATEMENT:  UPDATE account SET geolocation = $1
 8 - Pour les utilisateurs générés, il serait mieux d'avoir une image qui soit la même pour tous. sinon, j'ai des error dans la console en FE.
+9 - ✅ Les notifications doivent être en temps réel maintenant. -> Pierre checke
