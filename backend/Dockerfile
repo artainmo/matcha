@@ -10,8 +10,8 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy Gemfile and Gemfile.lock
-COPY Gemfile Gemfile.lock ./
+# Copy Gemfile
+COPY Gemfile ./
 
 # Install Bundler and gems
 RUN gem install bundler && bundle install
