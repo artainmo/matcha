@@ -31,13 +31,29 @@
         <input autocomplete="on" formControlName="biography" matInput name="biography" type="text">
     </mat-form-field>
     <br>
+    <p>Do you accept us estimating your approximate location from your IP address?</p>
+    <mat-radio-group formControlName="acceptGeolocation">
+        <mat-radio-button [value]="true">Yes, use my IP address</mat-radio-button>
+        <mat-radio-button [value]="false">No, let me enter it manually</mat-radio-button>
+    </mat-radio-group>
+    <br>
+    @if (form.controls['acceptGeolocation'].value === false) {
+        <mat-form-field appearance="fill">
+            <mat-label>Enter your approximate location</mat-label>
+            <input formControlName="geolocation" matInput name="geolocation" type="text">
+            @if (form.controls['geolocation'].value == locationErrorValue) {
+                <mat-hint style="color: red">Invalid location</mat-hint>
+            }
+        </mat-form-field>
+        <br>
+    }
     <!--		INTERESTS TAGS -->
     <app-tags [tags]="_tags"></app-tags>
     <!--		pictures -->
     <app-picture-selection
             (favorite)="favorite = $event"></app-picture-selection>
     <br>
-    <button (click)="submit()" [disabled]="form.invalid || _tags.length < 1 || favorite == ''" mat-raised-button>
+    <button (click)="submit()" [disabled]="form.invalid || _tags.length < 1 || favorite == '' || (form.controls['acceptGeolocation'].value === false && !form.controls['geolocation'].value)" mat-raised-button type="button">
         Register !
     </button>
 </form>

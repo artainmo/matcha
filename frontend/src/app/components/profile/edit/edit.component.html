@@ -60,6 +60,6 @@
         @if (profile_picture == '') {
             <mat-error>At least one profile picture is required</mat-error>
         }
-        <button (click)="save()" [disabled]="_tags.length == 0 || profile_picture == ''" mat-raised-button>SAVE</button>
+        <button (click)="save()" [disabled]="_tags.length == 0 || profile_picture == ''" mat-raised-button type="button">SAVE</button>
     </form>
 }

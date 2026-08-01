@@ -33,6 +33,8 @@ jwt_token = 'Thasé(à~a-é"çwonderful`^$ù^me`s$^rmcesrf)'
 
 Geocoder.configure(timeout: 10)
 
+abort("ERROR: EMAILPASS environment variable is not set: account registration and other emails (password reset, etc.) will fail without it. Look at README for launching the app correctly.") unless ENV['EMAILPASS']
+
 before do
     # @username (an instance variable) is scoped to this single request: Sinatra
     # dups a fresh app instance per request, so each dup gets its own instance
@@ -131,6 +133,8 @@ patch '/rest/account/fill' do
   puts geolocation
   return 417, "Wrong geolocation" if geolocation == false
   ret = db.updateAccount(@username, 'geolocation', geolocation)
+  return 417, ret if ret != 'UPDATED'
+  ret = db.updateAccount(@username, 'custom_geolocation', body['geolocation'] ? true : false)
   return 417, ret if ret != 'UPDATED'
   return 200, ret
 end

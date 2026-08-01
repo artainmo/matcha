@@ -5,7 +5,7 @@
             @for (tag of _tags; track tag) {
                 <mat-chip-row (removed)="remove(tag)">
                     #{{ tag }}
-                    <button matChipRemove>
+                    <button matChipRemove type="button">
                         <mat-icon>cancel</mat-icon>
                     </button>
                 </mat-chip-row>
@@ -21,7 +21,8 @@
             @if (control.getRawValue().length > 0) {
                 <button (click)="add(null)" [disabled]="alreadyInList" aria-label="Add"
                         mat-icon-button
-                        matSuffix>
+                        matSuffix
+                        type="button">
                     <mat-icon>add</mat-icon>
                 </button>
             }
