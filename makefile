@@ -18,6 +18,15 @@ docker-up-backend:
 docker-db-clean:
 	docker-compose down postgres -v
 
+# Same as db_clean/generate_users, but run inside their own one-off 'ruby' container
+# instead of on the host (no local ruby/gems setup needed). --name avoids clashing
+# with the main 'matcha-ruby' container if the app is already running via docker-up.
+docker-db_clean:
+	docker-compose run --rm --name matcha-ruby-db_clean ruby sh -c "bundle install && cd database/tests_and_scripts && bundle exec ruby cleanDatabase.rb"
+
+docker-generate_users:
+	docker-compose run --rm --name matcha-ruby-generate_users ruby sh -c "bundle install && cd database/tests_and_scripts && bundle exec ruby generateUsers.rb $(AMOUNT) $(MAIL)"
+
 frontend:
 	cd frontend && npm install && npm run build
 	rm -rf backend/public/frontend
@@ -32,15 +41,6 @@ db_clean:
 
 generate_users:
 	cd backend && ./setup.sh && cd database/tests_and_scripts && bundle exec ruby generateUsers.rb $(AMOUNT) $(MAIL)
-
-# Same as db_clean/generate_users, but run inside their own one-off 'ruby' container
-# instead of on the host (no local ruby/gems setup needed). --name avoids clashing
-# with the main 'matcha-ruby' container if the app is already running via docker-up.
-docker-db_clean:
-	docker-compose run --rm --name matcha-ruby-db_clean ruby sh -c "bundle install && cd database/tests_and_scripts && bundle exec ruby cleanDatabase.rb"
-
-docker-generate_users:
-	docker-compose run --rm --name matcha-ruby-generate_users ruby sh -c "bundle install && cd database/tests_and_scripts && bundle exec ruby generateUsers.rb $(AMOUNT) $(MAIL)"
 
 b:
 	cd backend && bundle exec ruby myapp.rb

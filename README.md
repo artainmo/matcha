@@ -131,6 +131,10 @@ Generate test users:
 make generate_users AMOUNT=<number>
 # OR SPECIFY YOUR EMAIL ADDRESS
 make generate_users AMOUNT=<number> MAIL=<your-email-address>
+# RUN THE SAME USER GENERATION THROUGH DOCKER
+make docker-generate-users AMOUNT=<number>
+# OR SPECIFY YOUR EMAIL ADDRESS
+make docker-generate-users AMOUNT=<number> MAIL=<your-email-address>
 # ONE OF THE USERS WILL BE NAMED 'test' 
 # ALL USERS HAVE PASSWORD 'pass123'
 make docker-generate_users AMOUNT=<number> MAIL=<your-email-address>

@@ -1,0 +1,5 @@
+1 - ✅ j'ai une erreur quand je fais un docker up avec la copy du locker file
+2 - La génération des users ne fonctionne pas chez moi  -> Faire un docker pour cela
+3 - Quand un utilisateur crée un compte et que l'envoie d'email fail, après on ne sais ni se connecter ni créer un compte. -> Arthur checke
+4 - Si tu essaye de créer deux fois un compte avec le même username, le serveur ecris "ERROR" (pourtant c'est un puts)
+5 - Pour la creation des users, un console log de où on en est dans le count serait bien
