@@ -1,20 +1,23 @@
-@if (!(messages$ | async) || (messages$ | async)?.length == 0) {
-    <p>
-        No messages.
-    </p>
-}
-<mat-list>
-    @for (message of (messages$ | async | getLatests); track message) {
-        <mat-list-item>
-            <button [color]="route.includes(message.sender_id === activeUsername ? message.receiver_id : message.sender_id) ? 'primary' : undefined"
-                    [routerLink]="message.sender_id === activeUsername ? message.receiver_id : message.sender_id"
-                    mat-stroked-button>
-        <span>
-          {{ message.sender_id === activeUsername ? message.receiver_id : message.sender_id }}
-        </span>
-                <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="arrow_forward"></mat-icon>
-            </button>
-        </mat-list-item>
+<section class="chat-list-page page-stack">
+    @if (!(messages$ | async) || (messages$ | async)?.length == 0) {
+        <p class="empty-state panel">
+            No messages.
+        </p>
     }
-</mat-list>
-<button (click)="openNewMessageDialog()" mat-raised-button>Write a new message</button>
+    <mat-list class="panel">
+        @for (message of (messages$ | async | getLatests); track message) {
+            <mat-list-item class="chat-item">
+                <button [color]="route.includes(message.sender_id === activeUsername ? message.receiver_id : message.sender_id) ? 'primary' : undefined"
+                        [routerLink]="message.sender_id === activeUsername ? message.receiver_id : message.sender_id"
+                        class="chat-link"
+                        mat-stroked-button>
+            <span>
+              {{ message.sender_id === activeUsername ? message.receiver_id : message.sender_id }}
+            </span>
+                    <mat-icon aria-hidden="false" aria-label="Go to chat" fontIcon="arrow_forward"></mat-icon>
+                </button>
+            </mat-list-item>
+        }
+    </mat-list>
+    <button (click)="openNewMessageDialog()" class="new-message-btn" mat-raised-button>Write a new message</button>
+</section>

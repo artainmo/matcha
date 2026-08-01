@@ -15,6 +15,7 @@ import { GetLatestsPipe } from '../pipes/chat.pipes';
 @Component({
 	selector: 'app-chat-list',
 	templateUrl: './chat-list.component.html',
+	styleUrls: ['./chat-list.component.css'],
 	changeDetection: ChangeDetectionStrategy.Eager,
 	imports: [MatList, MatListItem, MatButton, RouterLink, MatIcon, AsyncPipe, GetLatestsPipe]
 })

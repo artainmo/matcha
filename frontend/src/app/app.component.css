@@ -7,33 +7,96 @@
 .app-header,
 .app-footer {
     flex-shrink: 0;
-    padding: 8px 0;
+    padding: 12px 0;
     text-align: center;
-    background-color: #f5f5f5;
+    background-color: var(--surface);
+    border-bottom: 1px solid var(--border);
 }
 
 .app-header {
-    font-size: 1.25rem;
-    font-weight: 500;
+    color: #0f172a;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
 }
 
 .app-footer {
-    font-size: 0.75rem;
-    color: rgba(0, 0, 0, 0.6);
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    border-bottom: none;
+    border-top: 1px solid var(--border);
 }
 
 .app-main {
     flex: 1 0 auto;
+    padding: 18px 0 28px;
 }
 
 .menu {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 10px;
     width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-soft);
 }
 
-.message {
-    padding: 15px;
-    border-radius: 15px;
-    border: black;
+.menu-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.menu-group-end {
+    margin-left: auto;
+}
+
+.app-content {
+    display: block;
+}
+
+@media (max-width: 720px) {
+    .menu {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .menu-group {
+        width: 100%;
+    }
+
+    .menu-group button {
+        flex: 1 1 calc(50% - 4px);
+        min-width: 130px;
+    }
+
+    .menu-group-end {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .app-header {
+        font-size: 1.15rem;
+    }
+
+    .app-main {
+        padding: 12px 0 18px;
+    }
+
+    .menu {
+        border-radius: 12px;
+        margin-bottom: 12px;
+    }
+
+    .menu-group button {
+        flex-basis: 100%;
+    }
 }

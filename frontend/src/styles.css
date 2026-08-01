@@ -3,3 +3,72 @@ html, body {
     margin: 0;
 }
 
+:root {
+    --bg: #f3f5f8;
+    --surface: #ffffff;
+    --surface-muted: #eef2f7;
+    --text: #1f2937;
+    --text-muted: #6b7280;
+    --border: #d4dbe5;
+    --accent: #2563eb;
+    --accent-soft: #dbeafe;
+    --shadow-soft: 0 8px 30px rgba(15, 23, 42, 0.08);
+    --radius-lg: 16px;
+    --radius-md: 10px;
+    --space-1: 8px;
+    --space-2: 12px;
+    --space-3: 16px;
+    --space-4: 24px;
+    --space-5: 32px;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", "Segoe UI", "Roboto", sans-serif;
+    line-height: 1.5;
+}
+
+a {
+    color: inherit;
+}
+
+.app-shell {
+    width: min(1100px, 100% - 2rem);
+    margin-inline: auto;
+}
+
+.panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    padding: var(--space-4);
+}
+
+.page-stack {
+    display: grid;
+    gap: var(--space-3);
+}
+
+@media (max-width: 600px) {
+    :root {
+        --space-4: 18px;
+        --space-5: 24px;
+    }
+
+    .app-shell {
+        width: min(1100px, 100% - 1rem);
+    }
+
+    .panel {
+        padding: var(--space-3);
+        border-radius: 14px;
+    }
+}

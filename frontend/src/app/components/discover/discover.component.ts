@@ -18,6 +18,7 @@ import { FilterPipe } from '../../shared/sort-and-filter/filter.pipe';
 @Component({
 	selector: 'app-discover',
 	templateUrl: './discover.component.html',
+	styleUrls: ['./discover.component.css'],
 	changeDetection: ChangeDetectionStrategy.Eager,
 	imports: [SortAndFilterComponent, MatList, MatListSubheaderCssMatStyler, MatListItem, MatButton, RouterLink, MatIcon, MatListItemTitle, MatListItemLine, MatListItemMeta, MatDivider, MatProgressSpinner, AsyncPipe, SortPipe, FilterPipe]
 })

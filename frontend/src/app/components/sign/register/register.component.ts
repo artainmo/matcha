@@ -19,6 +19,7 @@ export interface IRegisterStep1 {
 @Component({
 	selector: 'app-register',
 	templateUrl: './register.component.html',
+	styleUrls: ['./register.component.css'],
 	changeDetection: ChangeDetectionStrategy.Eager,
 	imports: [FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatButton]
 })

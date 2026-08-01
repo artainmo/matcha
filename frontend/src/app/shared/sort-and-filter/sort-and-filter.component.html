@@ -22,11 +22,11 @@
                 See the filters bellow
             </mat-panel-title>
         </mat-expansion-panel-header>
-        <table>
+        <table class="filter-table">
             <tr>
                 <td>
                     <span>Filter by fame rating</span><br>
-                    <ul style="list-style-type: none;">
+                    <ul class="filter-list">
                         @for (filter of (availableFilters$ | async)?.fame; track filter) {
                             <li
                             >
@@ -42,7 +42,7 @@
                 </td>
                 <td>
                     <span>Filter by distance from you</span><br>
-                    <ul style="list-style-type: none;">
+                    <ul class="filter-list">
                         @for (filter of (availableFilters$ | async)?.distance; track filter) {
                             <li
                             >
@@ -58,7 +58,7 @@
                 </td>
                 <td>
                     <span>Filter by number of common tags with you</span><br>
-                    <ul style="list-style-type: none;">
+                    <ul class="filter-list">
                         @for (filter of (availableFilters$ | async)?.commonTags; track filter) {
                             <li
                             >
@@ -74,7 +74,7 @@
                 </td>
                 <td>
                     <span>Filter by age</span><br>
-                    <ul style="list-style-type: none;">
+                    <ul class="filter-list">
                         @for (filter of (availableFilters$ | async)?.birthday; track filter) {
                             <li
                             >

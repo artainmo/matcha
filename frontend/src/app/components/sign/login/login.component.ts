@@ -11,6 +11,7 @@ import { MatIcon } from '@angular/material/icon';
 @Component({
 	selector: 'app-login',
 	templateUrl: './login.component.html',
+	styleUrls: ['./login.component.css'],
 	changeDetection: ChangeDetectionStrategy.Eager,
 	imports: [FormsModule, MatFormField, MatLabel, MatInput, MatError, MatIconButton, MatSuffix, MatIcon, MatButton, RouterLink, AsyncPipe]
 })

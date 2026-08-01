@@ -1,3 +1,31 @@
-td {
-    border: 1px solid black;
+.filter-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.filter-table td {
+    width: 25%;
+    vertical-align: top;
+    border: 1px solid var(--border);
+    padding: 12px;
+}
+
+.filter-list {
+    list-style-type: none;
+    margin: 8px 0 0;
+    padding: 0;
+}
+
+@media (max-width: 700px) {
+    .filter-table,
+    .filter-table tbody,
+    .filter-table tr,
+    .filter-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .filter-table td + td {
+        margin-top: 8px;
+    }
 }

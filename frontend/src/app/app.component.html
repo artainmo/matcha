@@ -1,20 +1,22 @@
-<header class="app-header">Matcha</header>
+<header class="app-header">
+    <div class="app-shell">Matcha</div>
+</header>
 
 <main class="app-main">
 @if (!(isLoggedIn$ | async)) {
-    <div class="menu">
-        <div>
+    <nav class="menu app-shell">
+        <div class="menu-group">
             <button [color]="route === '/sign/in' ? 'primary' : undefined" mat-button routerLink="sign/in">Login
             </button>
             <button [color]="route === '/sign/up' ? 'primary' : undefined" mat-button routerLink="sign/up">Register
             </button>
         </div>
-    </div>
+    </nav>
 }
 @if (isLoggedIn$ | async) {
-    <div class="menu">
+    <nav class="menu app-shell">
         @if (route !== '/profile/complete') {
-            <div>
+            <div class="menu-group">
                 <button (click)="openMyProfile()" [color]="route.includes('/profile/' + username) ? 'primary' : undefined"
                         mat-button>My profile
                 </button>
@@ -29,7 +31,7 @@
                 </button>
             </div>
         }
-        <div>
+        <div class="menu-group menu-group-end">
             @if (route === '/discover') {
                 <button mat-icon-button routerLink="search">
                     <mat-icon>search</mat-icon>
@@ -37,11 +39,15 @@
             }
             <button (click)="logout()" mat-button>Logout</button>
         </div>
-    </div>
+    </nav>
 }
 
 
-<router-outlet></router-outlet>
+<section class="app-shell app-content">
+    <router-outlet></router-outlet>
+</section>
 </main>
 
-<footer class="app-footer">© 2023 artainmo &amp; pvanderl, 42belgium.</footer>
+<footer class="app-footer">
+    <div class="app-shell">© 2023 artainmo &amp; pvanderl, 42belgium.</div>
+</footer>

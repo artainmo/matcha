@@ -1,26 +1,29 @@
-@if ((results$ | async)!.length !== 0) {
-    <app-sort-and-filter (appliedFilters)="log($event)"></app-sort-and-filter>
-}
-<mat-list>
-    <h3 mat-subheader>Suggestions</h3>
-    @if ((results$ | async)!.length === 0) {
-        <h4>No suggestions found</h4>
+<section class="discover-page page-stack">
+    @if ((results$ | async)!.length !== 0) {
+        <app-sort-and-filter (appliedFilters)="log($event)"></app-sort-and-filter>
     }
-    @for (suggestion of (results$ | async)! | filter: filterArg | sort: (sortArg$ | async); track suggestion; let last = $last) {
-        <mat-list-item>
-            <h4 matListItemTitle [routerLink]="'/profile/' + suggestion.username">{{ suggestion.username }}</h4>
-            <p matListItemLine> {{ suggestion.firstname }} {{ suggestion.lastname }} </p>
-            <button matListItemMeta [routerLink]="'/profile/' + suggestion.username" mat-raised-button>See profile
-                <mat-icon>arrow_right</mat-icon>
-            </button>
-            @if (!last) {
-                <mat-divider [inset]="true"></mat-divider>
-            }
-        </mat-list-item>
-    }
-    @if (isLoading$ | async) {
-        <mat-list-item>
-            <mat-spinner></mat-spinner>
-        </mat-list-item>
-    }
-</mat-list>
+    <mat-list class="panel discover-list">
+        <h3 mat-subheader>Suggestions</h3>
+        @if ((results$ | async)!.length === 0) {
+            <h4 class="empty-state">No suggestions found</h4>
+        }
+        @for (suggestion of (results$ | async)! | filter: filterArg | sort: (sortArg$ | async); track suggestion; let last = $last) {
+            <mat-list-item class="suggestion-item">
+                <h4 matListItemTitle [routerLink]="'/profile/' + suggestion.username">{{ suggestion.username }}</h4>
+                <p matListItemLine>{{ suggestion.firstname }} {{ suggestion.lastname }}</p>
+                <button matListItemMeta [routerLink]="'/profile/' + suggestion.username" mat-raised-button>
+                    See profile
+                    <mat-icon>arrow_right</mat-icon>
+                </button>
+                @if (!last) {
+                    <mat-divider [inset]="true"></mat-divider>
+                }
+            </mat-list-item>
+        }
+        @if (isLoading$ | async) {
+            <mat-list-item class="loading-row">
+                <mat-spinner></mat-spinner>
+            </mat-list-item>
+        }
+    </mat-list>
+</section>
