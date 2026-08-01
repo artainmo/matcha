@@ -1,0 +1,36 @@
+.discover-page {
+    padding: var(--space-2) 0 var(--space-4);
+}
+
+.discover-list h3[mat-subheader] {
+    color: var(--text-muted);
+    margin-bottom: var(--space-2);
+}
+
+.suggestion-item {
+    min-height: 74px;
+}
+
+.empty-state {
+    color: var(--text-muted);
+    margin: var(--space-2) 0;
+}
+
+.loading-row {
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 600px) {
+    .discover-page {
+        padding: var(--space-1) 0 var(--space-3);
+    }
+
+    .suggestion-item {
+        min-height: 96px;
+    }
+
+    .suggestion-item button[matListItemMeta] {
+        margin-top: 6px;
+    }
+}
