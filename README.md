@@ -28,7 +28,8 @@ This project uses ruby Sinatra as backend and AngularJS as frontend to build a d
 
 The app uses these settings that you should configure in a `.env` file:
 ```
-EMAILPASS= #We won't give the password publicly, ask it to pvanderl@student.42belgium.be 
+#We won't give the password publicly, ask it to pvanderl@student.42belgium.be
+EMAILPASS=
 
 # For Docker networking (use 'postgres' as hostname inside Docker)
 PGHOST=postgres
@@ -112,7 +113,7 @@ export PATH="/opt/homebrew/opt/ruby/bin:$PATH" #This signals the ruby executable
 export PATH="$HOME/.gem/ruby/3.3.0/bin:$PATH" #Shows where the gem executables are. Gems are ruby dependencies.
 ```
 
-Subsequently the email password needs to be given. You can do this with `export EMAILPASS="..."` (we won't give the password publicly, ask it to pvanderl@student.42belgium.be).
+Subsequently the email password needs to be given. You can do this with `export EMAILPASS=""` (we won't give the password publicly, ask it to pvanderl@student.42belgium.be).
 
 Finally, to launch the whole app in one command:
 ```

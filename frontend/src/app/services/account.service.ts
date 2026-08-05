@@ -88,12 +88,8 @@ export class AccountService {
 				this.badUsername.next(false);
 			}),
 			catchError((error: HttpErrorResponse) => {
-				let message = '';
-				if (error.status === 417) {
-					message = 'Username not found';
-					this.badUsername.next(true);
-				}
-				return throwError(message);
+				this.badUsername.next(error.status === 417 && error.error === 'Username not found');
+				return throwError(error.status === 417 ? error.error : '');
 			})
 		).subscribe(
 			() => {

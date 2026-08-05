@@ -31,9 +31,21 @@ frontend = 'http://localhost:1942'
 
 jwt_token = 'Thasé(à~a-é"çwonderful`^$ù^me`s$^rmcesrf)'
 
+EMAIL_LOGGED_MESSAGE = "No email was sent because EMAILPASS is empty: " \
+  "the email was logged in the terminal instead, for testing purposes."
+
 Geocoder.configure(timeout: 10)
 
-abort("ERROR: EMAILPASS environment variable is not set: account registration and other emails (password reset, etc.) will fail without it. Look at README for launching the app correctly.") unless ENV['EMAILPASS']
+unless ENV['EMAILPASS']
+  abort(
+    "\e[33mERROR: EMAILPASS environment variable is not set: account registration " \
+    "and other emails (password reset, etc.) will fail without it. " \
+    "Look at README for launching the app correctly. " \
+    "Else, The possibility exists to set it empty (export EMAILPASS=\"\") for " \
+    "testing purposes (no mail will be sent but the mail will be logged " \
+    "on console). \e[0m "
+  )
+end
 
 before do
     # @username (an instance variable) is scoped to this single request: Sinatra
@@ -88,11 +100,13 @@ post '/rest/account/register' do
     data: body['username']
   }
   token = JWT.encode payload, jwt_token, 'HS256'
-  return 417, "Mail is not valid" unless send_mail(body['email'],
+  mail_status = send_mail(body['email'],
    "Verify Matcha Account",
    "Click on the following link to verify your account: " +
    frontend + "/profile/verify/" +
    token)
+  return 417, "Mail is not valid" if mail_status == :failed
+  return 417, EMAIL_LOGGED_MESSAGE if mail_status == :logged
   return 200
 end
 
@@ -146,8 +160,10 @@ patch '/rest/account' do
     has_forbidden_chars?(body['firstname']) || has_forbidden_chars?(body['lastname']) ||
     has_forbidden_chars?(body['biography'])
   if body['email']
-    return 417, "Mail is not valid" if !send_mail(body['email'], "New Matcha Email Address",
+    mail_status = send_mail(body['email'], "New Matcha Email Address",
     		  "This is the new email address you setup on your Matcha account #{@username}.")
+    return 417, "Mail is not valid" if mail_status == :failed
+    return 417, EMAIL_LOGGED_MESSAGE if mail_status == :logged
     ret = db.updateAccount(@username, 'email', body['email'])
     return 417 if ret != 'UPDATED'
   end
@@ -371,10 +387,12 @@ get '/rest/token/resetPassword/:_username' do |_username|
   token = ret[1]
   puts(token)
   #send email with token
-  return 417, "Mail is not valid" if !send_mail(email, "reset matcha password",
+  mail_status = send_mail(email, "reset matcha password",
   		  "Click on the following link to reset password: " +
           frontend + "/profile/password/reset/" +
            token)
+  return 417, "Mail is not valid" if mail_status == :failed
+  return 417, EMAIL_LOGGED_MESSAGE if mail_status == :logged
   return 200
 end
 
@@ -592,7 +610,16 @@ helpers do
     return geolocation.first.coordinates.join(',')
   end
   
+  # Returns :sent, :logged (EMAILPASS is empty, testing mode) or :failed.
   def send_mail(receiver, subject, content)
+    if ENV['EMAILPASS'].empty?
+      puts "\e[36m[send_mail] EMAILPASS is empty: no email sent (testing mode). " \
+        "Logging it below instead:\e[0m"
+      puts "To: #{receiver}"
+      puts "Subject: #{subject}"
+      puts "Content: #{content}"
+      return :logged
+    end
     begin
       Pony.mail(
         :to => receiver,
@@ -607,11 +634,11 @@ helpers do
         :password => ENV['EMAILPASS'], #Ask the actual password to pvanderl, we won't leave it publicly here
         :authentication => :plain
       })
-      return true
+      return :sent
     rescue StandardError => e
       warn "[send_mail] Failed to send email to #{receiver.inspect} with subject #{subject.inspect}: #{e.class} - #{e.message}"
       warn e.backtrace.join("\n") if e.backtrace
-      return false
+      return :failed
     end
   end
 

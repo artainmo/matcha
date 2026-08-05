@@ -20,6 +20,9 @@
                 <mat-hint style="color: red">Invalid email</mat-hint>
             }
         </mat-form-field>
+        @if (mailNotSentNotice) {
+            <div style="color: red">{{ mailNotSentNotice }}</div>
+        }
         <br>
         <mat-form-field appearance="fill">
             <mat-label>Gender</mat-label>

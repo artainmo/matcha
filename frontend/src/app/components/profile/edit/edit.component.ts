@@ -27,6 +27,7 @@ export class EditComponent implements OnInit {
 	profile_picture: string = '';
 	locationErrorValue: string = '';
 	mailErrorValue: string = '';
+	mailNotSentNotice: string = '';
 
 	form: FormGroup = new FormGroup({
 		gender: new FormControl('', [Validators.required]),
@@ -88,17 +89,21 @@ export class EditComponent implements OnInit {
 				this.loading = false;
 				this.router.navigate(['/profile', this.profile.username]).then();
 			}, (error: HttpErrorResponse) => {
+				this.mailNotSentNotice = '';
 				if (error.error === 'Wrong geolocation') {
 					this.locationErrorValue = this.form.controls['geolocation'].value;
 					this.form.controls['geolocation'].setErrors({
 						'wrongLocation': true
 					});
-				}
-				if (error.error === 'Mail is not valid') {
+				} else if (error.error === 'Mail is not valid') {
 					this.mailErrorValue = this.form.controls['geolocation'].value;
 					this.form.controls['email'].setErrors({
 						'wrongEmail': true
 					});
+				} else if (typeof error.error === 'string' && error.error.startsWith('No email was sent')) {
+					// EMAILPASS is empty on the backend: the email address itself is fine,
+					// just show why no verification email actually went out.
+					this.mailNotSentNotice = error.error;
 				}
 				this.loading = false;
 			}
