@@ -11,6 +11,7 @@ import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular
 import { TagsComponent } from '../../../shared/tags/tags.component';
 import { PictureSelectionComponent } from '../shared/picture-selection/picture-selection.component';
 import { MatButton } from '@angular/material/button';
+import { NotificationsService } from '../../../services/notifications.service';
 
 
 @Component({
@@ -36,7 +37,8 @@ export class CompleteProfileComponent {
 
 	constructor(
 		private readonly accountService: AccountService,
-		private readonly router: Router
+		private readonly router: Router,
+		private readonly notificationsService: NotificationsService,
 	) {
 	}
 
@@ -56,6 +58,7 @@ export class CompleteProfileComponent {
 				this.success = true;
 				this.loading = false;
 				this.router.navigate(['/discover']).then();
+				this.notificationsService.subscribe();
 			}, (response: HttpErrorResponse) => {
 				this.error = response.status;
 				this.loading = false;
