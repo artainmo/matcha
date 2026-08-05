@@ -55,4 +55,5 @@ while i < AMOUNT
                   lastname, gender, sexual_orientation, biography, birthday,
                   last_connected, geolocation, tag)
   i += 1 if ret == 'CREATED'
+  puts "User created number: #{i}."
 end
