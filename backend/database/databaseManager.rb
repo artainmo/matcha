@@ -135,7 +135,7 @@ class DatabaseManager
          VALUES ($1, $2, $3, $4, $5);',
           [username, crypted_password, email, firstname, lastname])
     rescue PG::Error => error
-      puts error.message
+      #puts error.message
       if error.message[0,69] == 'ERROR:  duplicate key value violates unique constraint "account_pkey"'
         return "username already in use"
       end
