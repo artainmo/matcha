@@ -6,6 +6,7 @@ require "jwt"
 require 'pony'
 require 'geocoder'
 require 'net/http'
+require 'ipaddr'
 require 'fileutils'
 require __dir__ + '/database/databaseManager.rb'
 
@@ -590,8 +591,9 @@ helpers do
   def getGeolocationCoordinates(paramGeolocation, requestIp)
     if paramGeolocation
       return geolocationCoordinates(paramGeolocation)
-    elsif requestIp != '127.0.0.1' && requestIp != '::1' && requestIp != 'localhost'
-      #Because we are on localhost we cannot deduct our location from it
+    elsif !privateOrLoopbackIp?(requestIp)
+      #A private/loopback requestIp (e.g. localhost, or a Docker gateway address
+      #like 192.168.65.1) cannot be geolocated: it is not a real public IP.
       return geolocationCoordinates(requestIp)
     else
       #https://ifconfig.me/ip gives our ip address.
@@ -604,10 +606,20 @@ helpers do
     end
   end
 
+  def privateOrLoopbackIp?(ip)
+    return true if ip == 'localhost'
+    addr = IPAddr.new(ip)
+    addr.private? || addr.loopback?
+  rescue IPAddr::Error
+    true
+  end
+
   def geolocationCoordinates(ipOrAddress) #Address example: "Hôtel de Ville, 75004 Paris, France"
     geolocation = Geocoder.search(ipOrAddress)
     return false if geolocation.first == nil
-    return geolocation.first.coordinates.join(',')
+    coordinates = geolocation.first.coordinates
+    return false if coordinates.nil? || coordinates.empty?
+    return coordinates.join(',')
   end
   
   # Returns :sent, :logged (EMAILPASS is empty, testing mode) or :failed.
