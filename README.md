@@ -133,11 +133,15 @@ make generate_users AMOUNT=<number>
 make generate_users AMOUNT=<number> MAIL=<your-email-address>
 # ONE OF THE USERS WILL BE NAMED 'test' 
 # ALL USERS HAVE PASSWORD 'pass123'
+make docker-generate_users AMOUNT=<number> MAIL=<your-email-address>
+# If the app runs on docker it is recommanded to use this command instead.
 ```
 
 Clean the database and locally stored images:
 ```
 make db_clean
+make docker-db_clean
+# If the app runs on docker it is recommanded to use this command instead.
 ```
 
 Stop the database container if it runs with docker:
