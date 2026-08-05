@@ -2,10 +2,13 @@ require __dir__ + '/../databaseManager.rb'
 require 'random_name_generator'
 
 #Helper functions
+$geolocationCache = {}
 def geolocationCoordinates(ipOrAddress)
+  return $geolocationCache[ipOrAddress] if $geolocationCache.key?(ipOrAddress)
   geolocation = Geocoder.search(ipOrAddress)
-  return false if geolocation.first == nil
-  return geolocation.first.coordinates.join(',')
+  coordinates = geolocation.first.nil? ? nil : geolocation.first.coordinates.join(',')
+  sleep(1) # stay within Nominatim's 1 request/second rate limit
+  $geolocationCache[ipOrAddress] = coordinates
 end
 
 #Predefine values
@@ -17,7 +20,7 @@ AMOUNT = ARGV[0]
 ARGV[1] ? personal_email = ARGV[1] : personal_email = 'tainmontarthur@gmail.com'
 locations = ['Brussels', 'Gent', 'Antwerpen', 'Paris', 'Dublin']
 tags = ['tennis', 'chess', 'school19', 'music', 'travel']
-password = 'pass123'
+password = ENV.fetch('TEST_PASSWORD', 'pass123')
 genders = ['MALE', 'FEMALE', 'OTHER']
 sexual_orientations = ['MALE', 'FEMALE', 'BI', 'OTHER']
 bios = ['The last time I was someone’s “type” was when I donated blood.', 'Give me your best pickup line.',
@@ -52,4 +55,5 @@ while i < AMOUNT
                   lastname, gender, sexual_orientation, biography, birthday,
                   last_connected, geolocation, tag)
   i += 1 if ret == 'CREATED'
+  puts "User created number: #{i}."
 end

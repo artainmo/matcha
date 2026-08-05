@@ -20,6 +20,9 @@
                 <mat-hint style="color: red">Invalid email</mat-hint>
             }
         </mat-form-field>
+        @if (mailNotSentNotice) {
+            <div style="color: red">{{ mailNotSentNotice }}</div>
+        }
         <br>
         <mat-form-field appearance="fill">
             <mat-label>Gender</mat-label>
@@ -60,6 +63,6 @@
         @if (profile_picture == '') {
             <mat-error>At least one profile picture is required</mat-error>
         }
-        <button (click)="save()" [disabled]="_tags.length == 0 || profile_picture == ''" mat-raised-button>SAVE</button>
+        <button (click)="save()" [disabled]="_tags.length == 0 || profile_picture == ''" mat-raised-button type="button">SAVE</button>
     </form>
 }

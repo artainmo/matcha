@@ -3,12 +3,34 @@
 42 school [subject](https://cdn.intra.42.fr/pdf/pdf/60925/en.subject.pdf).
 
 This project uses ruby Sinatra as backend and AngularJS as frontend to build a dating app.
-## Prerequisites
-**Docker**
 
-#### Environment Variables
-By default the app uses these settings (configure in `.env`):
-```bash
+## Table of contents
+
+- [Use](#Use)
+    - [Run with Docker](#Run-with-Docker)
+        - [Prerequisites](#Prerequisites)
+        - [Run the whole app with Docker](#Run-the-whole-app-with-Docker)
+        - [Only use docker for the database (for local development)](#only-use-docker-for-the-database-for-local-development)
+        - [View Logs](#View-Logs)
+    - [Run without using any Docker](#Run-without-using-any-Docker)
+    - [Database Management](#Database-Management)
+- [Documentation](#Documentation)
+
+## Use
+
+### Run with Docker
+
+#### Prerequisites
+
+- **Docker Desktop** (or Docker Engine + Docker Compose)
+- **Node.js 24.15.0** and **npm 11.11.0** (for frontend build)
+- **Ruby 3.3.5** (for running the backend when docker is only used for the database)
+
+The app uses these settings that you should configure in a `.env` file:
+```
+#We won't give the password publicly, ask it to pvanderl@student.42belgium.be
+EMAILPASS=
+
 # For Docker networking (use 'postgres' as hostname inside Docker)
 PGHOST=postgres
 PGPORT=5432
@@ -22,91 +44,43 @@ POSTGRES_USER=postgres
 POSTGRES_PASSWORD=admin
 ```
 
-You can create a `.env` file from `.env.example` to customize these values. If you change them when running without Docker, make sure to export the same `PG*` variables before launching the Ruby backend so both sides stay aligned.
+#### Run the whole app with Docker
 
-**Note for local (non-Docker) development:** Use `PGHOST=localhost` and `PGPORT=5433` to connect to the PostgreSQL container from your host machine.
-
-
-## Quick Start with Docker (Recommended)
-
-The easiest way to run the entire Matcha application is with Docker:
-
-### Prerequisites
-- **Docker Desktop** (or Docker Engine + Docker Compose)
-- **Node.js 24.15.0** and **npm 11.11.0** (for frontend build)
-- **Ruby 3.3.5** (only needed if running without Docker)
-
-### Run Everything with Docker
-
-Simply run:
-```bash
-make docker-up
-```
-
+Launch the application with: `make docker-up`.<br>
 This will:
 1. Build the Angular frontend
 2. Start the PostgreSQL database container
 3. Start the Ruby Sinatra backend container
 4. Serve the app at **http://localhost:1942**
 
-The database is automatically initialized and persists in a Docker volume.
+Stop the application with: `make docker-down`.
 
-### Stop the Application
+#### Only use docker for the database (for local development) 
 
-```bash
-make docker-down
-```
+For the frontend we use: Angular CLI 22.0.6; Node 24.15.0; and npm 11.11.0. Discrepancies can make the frontend hang. Verify you have the correct versions with: `npx ng version`. You can download the right versions in your terminal with: `brew install node@24`; `npm install -g @angular/cli@22`.
 
----
-
-## Manual Setup (Without Docker)
-
-If you prefer to run the application locally without Docker:
-
-### Frontend Setup
-For the frontend we use: Angular CLI 22.0.6; Node 24.15.0; and npm 11.11.0. Discrepancies can make the frontend hang. Verify you have the correct versions with: `npx ng version`. You can download the right versions in your terminal with: `brew install node@24`; `npm install`.
-
-### Database Setup
-PostgreSQL 16 runs in Docker for consistency. Start it with:
-```bash
-docker compose up -d postgres
-```
-
-The container creates the `matcha` database automatically and stores its data in a persistent Docker volume.
-
-### Backend Setup
-Install Ruby 3.3.5:
-```bash
-brew install ruby@3.3
-```
-
+For the backend, install Ruby 3.3.5 with: `brew install ruby@3.3`.<br>
 Then add these lines to your `~/.zshrc`:
-```bash
+```
 # To launch the matcha ruby project
 export PATH="/opt/homebrew/opt/ruby@3.3/bin:$PATH"
 export PATH="$HOME/.gem/ruby/3.3.0/bin:$PATH"
 ```
 
-### Run the App Locally (Without Docker)
-
-To launch the whole app in one command:
-```bash
-make backend
+You can launch the database via docker with `docker compose up -d postgres`.<br>
+Afterwards you can launch the backend and frontend with `make`.<br>
+Thus to launch the app you need the following commands:
+```
+docker compose up -d postgres
+make
 ```
 
-Or just run the backend server:
-```bash
-make b
+To run test frontend server with hot reload of frontend, do:
+1. Run the server part
+2. then cd frontend && npm install && npm run serve
+
+#### View Logs
 ```
-
-This starts Sinatra on port 1942, which serves both the API and the built frontend.
-
----
-
-## Useful Commands
-
-### View Logs
-```bash
 # Ruby app logs
 docker logs matcha-ruby
 
@@ -117,39 +91,68 @@ docker logs matcha-postgres
 docker logs -f matcha-ruby
 ```
 
+### Run without using any Docker
+
+This project can be run on macos without using docker. In that case you should have no `.env` and remove it if one exists.
+
+For the frontend we use: Angular CLI 22.0.6; Node 24.15.0; and npm 11.11.0. Discrepancies can make the frontend hang. Verify you have the correct versions with: `npx ng version`. You can download the right versions in your terminal with: `brew install node@24`; `npm install -g @angular/cli@22`.
+
+For the database we run a postgres server using 'https://postgresapp.com' on macos. After downloading the postgres app, within the app you can click on 'initialize' to start the server.<br>
+Now access the psql command line by double clicking a default database such as the one named 'template1'. Within the psql command line you can use the following commands to create a matcha database:
+```
+CREATE USER postgres;
+ALTER USER postgres WITH PASSWORD 'admin';
+CREATE DATABASE matcha OWNER postgres;
+```
+Make sure the postgres server runs while launching the app, generating users, or cleaning the database.
+
+For the backend you should `brew install ruby@3.3`, afterwards you can add the following lines to your "~/.zshrc":
+```
+# To launch the matcha ruby project
+export PATH="/opt/homebrew/opt/ruby/bin:$PATH" #This signals the ruby executables to use the ruby version from homebrew and not the macOS' old system Ruby. This by prepending the path with the homebrew version to look at it first.
+export PATH="$HOME/.gem/ruby/3.3.0/bin:$PATH" #Shows where the gem executables are. Gems are ruby dependencies.
+```
+
+Subsequently the email password needs to be given. You can do this with `export EMAILPASS=""` (we won't give the password publicly, ask it to pvanderl@student.42belgium.be).
+
+Finally, to launch the whole app in one command:
+```
+make
+```
+
+To run test frontend server with hot reload of frontend, do:
+1. Run the server part
+2. then cd frontend && npm install && npm run serve
+
 ### Database Management
 
-Stop the database container:
-```bash
-docker compose down
-```
-
-Stop and remove all PostgreSQL data (clean database):
-```bash
-docker compose down -v
-```
-
 Generate test users:
-```bash
+```
 make generate_users AMOUNT=<number>
 # OR SPECIFY YOUR EMAIL ADDRESS
 make generate_users AMOUNT=<number> MAIL=<your-email-address>
 # ONE OF THE USERS WILL BE NAMED 'test' 
 # ALL USERS HAVE PASSWORD 'pass123'
+make docker-generate_users AMOUNT=<number> MAIL=<your-email-address>
+# If the app runs on docker it is recommanded to use this command instead.
 ```
 
 Clean the database and locally stored images:
-```bash
+```
 make db_clean
+make docker-db_clean
+# If the app runs on docker it is recommanded to use this command instead.
 ```
 
-### Frontend Development
+Stop the database container if it runs with docker:
+```
+docker compose down
+```
 
-To run test frontend server with hot reload:
-1. Start the backend: `make docker-up` or `make b`
-2. In a new terminal: `cd frontend && npm install && npm run serve`
-
----
+Stop and remove all PostgreSQL data (clean database) if it runs with docker:
+```
+docker compose down -v
+```
 
 ## Documentation
 ### Backend

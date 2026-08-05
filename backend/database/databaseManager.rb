@@ -22,13 +22,15 @@ Geocoder.configure(http_headers: { 'User-Agent' => 'matcha-app/1.0' })
 class DatabaseManager
   MAX_CONNECTION_RETRIES = 10
   CONNECTION_RETRY_DELAY = 0.5
+  # Host-side port for the postgres container, see docker-compose.yml ("5433:5432")
+  DOCKER_HOST_PGPORT = '5433'
 
   def initialize
     retries = 0
 
     begin
       puts 'Connecting to database...'
-      puts connection_config
+      #puts connection_config
       @conn = PG.connect(connection_config)
     rescue PG::ConnectionBad => error
       if error.message.include?('FATAL:  sorry, too many clients already')
@@ -50,10 +52,38 @@ class DatabaseManager
 
   private
 
+  # .env is only auto-loaded by docker-compose for containers; scripts run
+  # directly on the host (e.g. generateUsers.rb) need it read manually.
+  def load_dotenv
+    env_path = File.join(__dir__, '..', '..', '.env')
+    return unless File.exist?(env_path)
+
+    File.foreach(env_path) do |line|
+      line = line.strip
+      next if line.empty? || line.start_with?('#')
+
+      key, value = line.split('=', 2)
+      ENV[key] ||= value if key && value
+    end
+  end
+
   def connection_config
+    load_dotenv
+
+    host = ENV.fetch('PGHOST', 'localhost')
+    port = ENV.fetch('PGPORT', '5432')
+
+    # PGHOST=postgres only resolves inside the Docker network. When this
+    # process runs on the host instead of inside a container, reach the
+    # database through its published port instead.
+    if host == 'postgres' && !File.exist?('/.dockerenv')
+      host = 'localhost'
+      port = DOCKER_HOST_PGPORT
+    end
+
     {
-      host: ENV.fetch('PGHOST', 'localhost'),
-      port: ENV.fetch('PGPORT'),
+      host: host,
+      port: port,
       dbname: ENV.fetch('PGDATABASE', 'matcha'),
       user: ENV.fetch('PGUSER', 'postgres'),
       password: ENV.fetch('PGPASSWORD', 'admin')
@@ -105,7 +135,7 @@ class DatabaseManager
          VALUES ($1, $2, $3, $4, $5);',
           [username, crypted_password, email, firstname, lastname])
     rescue PG::Error => error
-      puts error.message
+      #puts error.message
       if error.message[0,69] == 'ERROR:  duplicate key value violates unique constraint "account_pkey"'
         return "username already in use"
       end
@@ -156,7 +186,7 @@ class DatabaseManager
   end
 
   def verifyPasswordAccount(username, passwordTry)
-    puts "Verify if #{passwordTry} is the correct password of #{username}..."
+    puts "Verify password attempt for #{username}..."
     ret = findAccount(username)
     return 'Username not found' if ret.cmd_tuples == 0
     return 'Username not verified' if ret[0]['verified'] == 'f'
@@ -201,17 +231,40 @@ class DatabaseManager
     "with sexual orientation #{sexualOrientation}, gender #{gender}, geolocation #{geolocation}, " + \
     "age #{age}, max age difference #{maxAgeDifference}, max distance #{maxDistance}, " + \
     "minimum fame #{minFame}, minimum common tags #{minCommonTags}...."
-    blockedUsernames = getBlockedUsernames(username) + getBlockedByUsernames(username)
-    notCompleteUsernames = getNotCompleteUsernames().join("','")
-    start_sql = "SELECT * FROM account WHERE username NOT IN " + \
-          "('" + username + "','" + blockedUsernames.join("','") + "','" + notCompleteUsernames + "') "
-    sexualOrientation_sql = "AND (sexual_orientation = 'OTHER' OR sexual_orientation = 'BI' OR sexual_orientation = '#{gender}') "
+  
+    # values collects every bind parameter in the order bind.call() is used;
+    # bind.call(v) appends v and returns its placeholder ("$1", "$2", ...),
+    # so start_sql/sexualOrientation_sql/etc never interpolate raw strings
+    # (usernames, gender, sexual_orientation) into the SQL text itself.
+    #
+    # `->(value) { ... }` is Ruby's lambda syntax: it defines a small
+    # anonymous function, stored in the local variable `bind`, that takes one
+    # argument named `value`. `bind.call(v)` runs it with `v` as `value`.
+    # Each time it runs, `values << value` appends `value` onto the end of
+    # the `values` array (this is why the block can be defined once here but
+    # still add to the same `values` array on every later call — a lambda
+    # keeps access to the local variables that were already in scope where it
+    # was created, in this case `values`). The last line of the lambda body,
+    # `"$#{values.length}"`, becomes its return value: since the value was
+    # just appended, `values.length` is its 1-based position in the array
+    # (1st value appended -> length 1 -> "$1", 2nd -> length 2 -> "$2", etc.),
+    # which is exactly the placeholder Postgres expects to find that value's
+    # position in the `values` array passed to exec_params.
+    values = []
+    bind = ->(value) { values << value; "$#{values.length}" }
+
+    excludedUsernames = [username] + getBlockedUsernames(username) +
+                        getBlockedByUsernames(username) + getNotCompleteUsernames()
+    excluded_placeholders = excludedUsernames.map { |u| bind.call(u) }.join(',')
+    start_sql = "SELECT * FROM account WHERE username NOT IN (#{excluded_placeholders}) "
+    sexualOrientation_sql = "AND (sexual_orientation = 'OTHER' OR sexual_orientation = 'BI' " +
+                            "OR sexual_orientation = #{bind.call(gender)}) "
     if sexualOrientation == 'MALE' or sexualOrientation == 'FEMALE'
-      sexualOrientation_sql = "AND gender = '#{sexualOrientation}' " + sexualOrientation_sql
+      sexualOrientation_sql = "AND gender = #{bind.call(sexualOrientation)} " + sexualOrientation_sql
     end
-    location_sql = "AND geolocation<@>'#{geolocation}' <= #{maxDistance.to_s} " #Distance is calculated in miles
-    age_sql = "AND abs(EXTRACT(YEAR FROM AGE(birthday)) - '#{age}') <= #{maxAgeDifference.to_s};"
-    ret = @conn.exec_params(start_sql + sexualOrientation_sql + location_sql + age_sql)
+    location_sql = "AND geolocation<@>'#{geolocation}' <= #{bind.call(maxDistance.to_i)} " #Distance is calculated in miles
+    age_sql = "AND abs(EXTRACT(YEAR FROM AGE(birthday)) - '#{age}') <= #{bind.call(maxAgeDifference.to_i)};"
+    ret = @conn.exec_params(start_sql + sexualOrientation_sql + location_sql + age_sql, values)
     return [] if ret.cmd_tuples == 0
     ret = filterSuggestionsWithTagsAndFame(username, ret, minCommonTags, minFame)
     return ret #Returns double array instead of PG::Result object
@@ -222,12 +275,14 @@ class DatabaseManager
   end
 
   def getAvailableFromTags(tags)
+    return @conn.exec_params("SELECT account_id FROM public.tag WHERE FALSE") if tags.empty?
+    placeholders = (1..tags.length).map { |i| "$#{i}" }.join(',')
     @conn.exec_params("SELECT account_id FROM (
     SELECT account_id, COUNT(tag)
     FROM public.tag
-    where tag IN ('" + tags.join("','") + "')	GROUP BY account_id
+    where tag IN (#{placeholders})	GROUP BY account_id
     ) as res
-    WHERE res.count = $1", [ tags.length])
+    WHERE res.count = $#{tags.length + 1}", tags + [tags.length])
   end
 
 # Queries on token table
@@ -421,7 +476,37 @@ class DatabaseManager
                             ORDER BY time DESC;', [account])
   end
 
+  # %w[opened] is Ruby shorthand for the array of strings ["opened"] (%w[...]
+  # splits the words inside on whitespace and quotes each one automatically).
+  #
+  # Below, $1/$2 are "bind parameters": placeholders sent to Postgres
+  # separately from the SQL text, along with the actual values ([newValue,
+  # id]) to fill them in with. Postgres treats a bind parameter strictly as a
+  # literal value, never as SQL code, which is what normally prevents SQL
+  # injection. But a column name (columnToUpdate) can't be sent as a bind
+  # parameter — SQL only allows identifiers like column names to appear as
+  # literal text in the query — so it has to be interpolated into the string
+  # instead, and interpolated text IS parsed as SQL. Since columnToUpdate
+  # comes straight from the URL (:colomnToUpdate), that would let a caller
+  # inject arbitrary SQL through the column-name slot.
+  #
+  # A whitelist is a fixed list of the only values allowed through a check;
+  # anything not on the list is rejected. Here it's the list of column names
+  # this method is allowed to update. Checking columnToUpdate against it
+  # below closes the injection hole, since only this known-safe literal
+  # ("opened") can ever reach the interpolated SQL.
+  #
+  # "opened" only works as a column reference because it's spelled exactly
+  # like the notification table's real `opened boolean` column (see
+  # designDatabase.sql) — Postgres resolves the interpolated text against
+  # the table's actual columns. It's the only column listed here because
+  # it's the only one the app ever needs to update this way (the frontend
+  # only ever calls PATCH .../notification/:id/opened/true, to mark a
+  # notification as read).
+  NOTIFICATION_UPDATABLE_COLUMNS = %w[opened]
+
   def updateNotification(id, columnToUpdate, newValue)
+    return "Invalid column" unless NOTIFICATION_UPDATABLE_COLUMNS.include?(columnToUpdate)
     puts "Update notification #{id}'s column '#{columnToUpdate}' with '#{newValue}'"
     begin
       ret = @conn.exec_params("UPDATE notification SET #{columnToUpdate} = $1
@@ -462,7 +547,7 @@ class DatabaseManager
 
   def findSimilarTags(tag)
     puts "Find all tags ressembling #{tag}"
-    return @conn.exec("SELECT DISTINCT tag FROM tag WHERE tag LIKE '%#{tag}%'")
+    return @conn.exec_params("SELECT DISTINCT tag FROM tag WHERE tag LIKE '%' || $1 || '%'", [tag])
   end
 
   def numberCommonTags(tags1, tags2)
@@ -633,89 +718,6 @@ private
       }
       return filtered_suggestions
     end
-
-  def countAccounts
-    begin
-      result = @conn.exec('SELECT COUNT(*) FROM account;')
-      return result[0]['count'].to_i
-    rescue PG::Error => error
-      puts "Error counting accounts: #{error.message}"
-      return 0
-    end
-  end
-
-  def geolocationCoordinates(ipOrAddress)
-    geolocation = Geocoder.search(ipOrAddress)
-    return false if geolocation.first == nil
-    return geolocation.first.coordinates.join(',')
-  end
-
-  public
-  def generateUsersIfNeeded
-    generate_users = ENV.fetch('GENERATE_USERS', 'false').downcase == 'true'
-    unless generate_users
-      puts "\033[1;33mUser generation is disabled. Set the environment variable GENERATE_USERS to 'true' to enable it.\033[0m"
-      return
-    end
-
-    target_amount = ENV.fetch('GENERATED_USERS_AMOUNT', '5').to_i
-    current_count = countAccounts
-    amount_to_generate = target_amount - current_count
-    created_users = 0
-
-    if amount_to_generate <= 0
-      puts "\033[1;33mNo users to generate. Target of #{target_amount} already reached.\033[0m"
-      return
-    end
-
-    puts "\033[1;36mGenerating #{amount_to_generate} test users to reach target of #{target_amount}...\033[0m"
-
-    # Predefined values for user generation
-    locations = ['Brussels', 'Gent', 'Antwerpen', 'Paris', 'Dublin']
-    tags = ['tennis', 'chess', 'school19', 'music', 'travel']
-    password = 'pass123'
-    genders = ['MALE', 'FEMALE', 'OTHER']
-    sexual_orientations = ['MALE', 'FEMALE', 'BI', 'OTHER']
-    bios = ['The last time I was someone''s "type" was when I donated blood.', 'Give me your best pickup line.',
-      'Looking for the pepperoni to my pizza, the peanut butter to my jelly, the cheese to my crackers. Oh dang… now I''m hungry.',
-      'They say love happens when you least expect it, and trust me, my expectations could not be lower right now.',
-      'If we match, that means we have to get married, right?']
-
-    # Require RandomNameGenerator for generating names
-    require 'random_name_generator'
-
-    # Generate test user if it doesn't exist
-    if countAccounts == 0
-      test_geolocation = geolocationCoordinates(locations[0])
-      if createFullAccountForTestPurposes('test', password, ENV.fetch('EMAILPASS', 'test@example.com'), 'Rob', 'Howard',
-        genders[0], sexual_orientations[1], bios[0], '1998-03-04', Time.now(), test_geolocation, tags[0]) == 'CREATED'
-        amount_to_generate -= 1
-        created_users += 1
-      end
-    end
-
-    # Generate random users
-    i = 0
-    while i < amount_to_generate
-      username = RandomNameGenerator.new.compose
-      geolocation = geolocationCoordinates(locations[rand(5)])
-      firstname = RandomNameGenerator.new.compose
-      tag = tags[rand(5)]
-      lastname = RandomNameGenerator.new.compose
-      gender = genders[rand(3)]
-      birthday = Time.at(rand * Time.now.to_i).to_s[0, 10]
-      biography = bios[rand(5)]
-      last_connected = Time.now()
-      sexual_orientation = sexual_orientations[rand(4)]
-
-      ret = createFullAccountForTestPurposes(username, password, ENV.fetch('EMAILPASS', 'test@example.com'), firstname,
-        lastname, gender, sexual_orientation, biography, birthday, last_connected, geolocation, tag)
-      if ret == 'CREATED'
-        i += 1
-        created_users += 1
-      end
-    end
-
-    puts "\033[0;36mUser generation complete! Created #{created_users} user(s).\033[0m"
-  end
 end
+ 
+

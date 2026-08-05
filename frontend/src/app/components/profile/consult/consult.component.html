@@ -45,11 +45,6 @@
             <h4>sexual orientation</h4>
             {{ profile.sexual_orientation }}
         </div>
-        @if (profile.custom_geolocation) {
-            <div>
-                <h4>Profile's location has been manually set up</h4>
-            </div>
-        }
         <div>
             <h4>Tags</h4>
             <mat-chip-set aria-label="Tags selection">
@@ -66,7 +61,7 @@
         }
         @if (!isMyProfile && profile.blocked) {
             <div>
-                You blocked this profile
+                Blocked
             </div>
         }
         @if (!isMyProfile && !profile.blocked) {

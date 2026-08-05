@@ -6,6 +6,7 @@ require "jwt"
 require 'pony'
 require 'geocoder'
 require 'net/http'
+require 'ipaddr'
 require 'fileutils'
 require __dir__ + '/database/databaseManager.rb'
 
@@ -20,28 +21,54 @@ PUBLIC_ASSETS_PATH = File.expand_path('../public', __dir__)
 
 db_start = DatabaseManager.new
 db_start.createDatabase
-db_start.generateUsersIfNeeded
 
 =begin
   CONFIGURATION
 =end
 
-username = '' #username will be defined later through cookies if cookies are used. It must be declared as global variable else it would not be accessible throughout the app.
 set :port, 1942
 set :bind, '0.0.0.0'
 frontend = 'http://localhost:1942'
 
 jwt_token = 'Thasé(à~a-é"çwonderful`^$ù^me`s$^rmcesrf)'
 
+EMAIL_LOGGED_MESSAGE = "No email was sent because EMAILPASS is empty: " \
+  "the email was logged in the terminal instead, for testing purposes."
+
 Geocoder.configure(timeout: 10)
 
+unless ENV['EMAILPASS']
+  abort(
+    "\e[33mERROR: EMAILPASS environment variable is not set: account registration " \
+    "and other emails (password reset, etc.) will fail without it. " \
+    "Look at README for launching the app correctly. " \
+    "Else, The possibility exists to set it empty (export EMAILPASS=\"\") for " \
+    "testing purposes (no mail will be sent but the mail will be logged " \
+    "on console). \e[0m "
+  )
+end
+
 before do
+    # @username (an instance variable) is scoped to this single request: Sinatra
+    # dups a fresh app instance per request, so each dup gets its own instance
+    # variables. A plain local variable here would instead be one variable
+    # shared by every request the process ever handles (captured by this
+    # block's closure), which under a multi-threaded server (Puma, present in
+    # the Gemfile) lets one user's request overwrite another's mid-flight.
+    @username = ''
     if cookies[:username]
-	    username = JWT.decode cookies[:username], nil, false
-      username = username[0]
+	    @username = JWT.decode cookies[:username], nil, false
+      @username = @username[0]
       db = DatabaseManager.new
-      db.updateLastSeen(username)
+      db.updateLastSeen(@username)
     end
+end
+
+# Sinatra defaults to Content-Type: text/html. Without this, API responses
+# containing unescaped user input (username, biography, etc.) would be
+# rendered as HTML by a browser on direct navigation, enabling XSS.
+before %r{/rest/.*} do
+  content_type :json
 end
 
 enable :static # Before searching route patterns direct matches with file names
@@ -64,6 +91,9 @@ end
 post '/rest/account/register' do
   db = DatabaseManager.new
   body = JSON.parse request.body.read
+  return 400, "Invalid characters in username, firstname or lastname" if
+    has_forbidden_chars?(body['username']) || has_forbidden_chars?(body['firstname']) ||
+    has_forbidden_chars?(body['lastname'])
   ret = db.createAccount(body['username'], body['password'],
         body['email'], body['firstname'], body['lastname'])
   return 417, ret if ret != 'CREATED'
@@ -71,11 +101,13 @@ post '/rest/account/register' do
     data: body['username']
   }
   token = JWT.encode payload, jwt_token, 'HS256'
-  return 417, "Mail is not valid" unless send_mail(body['email'],
+  mail_status = send_mail(body['email'],
    "Verify Matcha Account",
    "Click on the following link to verify your account: " +
    frontend + "/profile/verify/" +
    token)
+  return 417, "Mail is not valid" if mail_status == :failed
+  return 417, EMAIL_LOGGED_MESSAGE if mail_status == :logged
   return 200
 end
 
@@ -92,29 +124,32 @@ end
 patch '/rest/account/fill' do
   db = DatabaseManager.new
   body = JSON.parse request.body.read
-  ret = db.updateAccount(username, 'gender', body['gender'])
+  return 400, "Invalid characters in biography" if has_forbidden_chars?(body['biography'])
+  ret = db.updateAccount(@username, 'gender', body['gender'])
   return 417, ret if ret != 'UPDATED'
-  ret = db.updateAccount(username, 'sexual_orientation', body['sexual_orientation'])
+  ret = db.updateAccount(@username, 'sexual_orientation', body['sexual_orientation'])
   return 417, ret if ret != 'UPDATED'
-  ret = db.updateAccount(username, 'biography', body['biography'])
+  ret = db.updateAccount(@username, 'biography', body['biography'])
   return 417, ret if ret != 'UPDATED'
-  ret = db.updateAccount(username, 'birthday', body['birthday'])
+  ret = db.updateAccount(@username, 'birthday', body['birthday'])
   return 417, ret if ret != 'UPDATED'
-  ret = db.updateAccount(username, 'last_connected', Time.now())
+  ret = db.updateAccount(@username, 'last_connected', Time.now())
   return 417, ret if ret != 'UPDATED'
-  ret = db.updateAccount(username, 'profile_picture', body['profile_picture'])
+  ret = db.updateAccount(@username, 'profile_picture', body['profile_picture'])
   return 417, ret if ret != 'UPDATED'
   if body['tags']
-    db.deleteTagsOfUser(username)
+    db.deleteTagsOfUser(@username)
     body['tags'].each { |tag|
-      ret = db.createTag(username, tag)
+      ret = db.createTag(@username, tag)
       return 417, ret if ret != 'CREATED' && ret[0,54] != 'ERROR:  duplicate key value violates unique constraint'
     }
   end
   geolocation = getGeolocationCoordinates(body['geolocation'], request.ip)
   puts geolocation
   return 417, "Wrong geolocation" if geolocation == false
-  ret = db.updateAccount(username, 'geolocation', geolocation)
+  ret = db.updateAccount(@username, 'geolocation', geolocation)
+  return 417, ret if ret != 'UPDATED'
+  ret = db.updateAccount(@username, 'custom_geolocation', body['geolocation'] ? true : false)
   return 417, ret if ret != 'UPDATED'
   return 200, ret
 end
@@ -122,60 +157,65 @@ end
 patch '/rest/account' do
   db = DatabaseManager.new
   body = JSON.parse request.body.read
+  return 400, "Invalid characters in firstname, lastname or biography" if
+    has_forbidden_chars?(body['firstname']) || has_forbidden_chars?(body['lastname']) ||
+    has_forbidden_chars?(body['biography'])
   if body['email']
-    return 417, "Mail is not valid" if !send_mail(body['email'], "New Matcha Email Address",
-    		  "This is the new email address you setup on your Matcha account #{username}.")
-    ret = db.updateAccount(username, 'email', body['email'])
+    mail_status = send_mail(body['email'], "New Matcha Email Address",
+    		  "This is the new email address you setup on your Matcha account #{@username}.")
+    return 417, "Mail is not valid" if mail_status == :failed
+    return 417, EMAIL_LOGGED_MESSAGE if mail_status == :logged
+    ret = db.updateAccount(@username, 'email', body['email'])
     return 417 if ret != 'UPDATED'
   end
   if body['gender']
-    ret = db.updateAccount(username, 'gender', body['gender'])
+    ret = db.updateAccount(@username, 'gender', body['gender'])
     return 417 if ret != 'UPDATED'
   end
   if body['sexual_orientation']
-    ret = db.updateAccount(username, 'sexual_orientation', body['sexual_orientation'])
+    ret = db.updateAccount(@username, 'sexual_orientation', body['sexual_orientation'])
     return 417 if ret != 'UPDATED'
   end
   if body['biography']
-    ret = db.updateAccount(username, 'biography', body['biography'])
+    ret = db.updateAccount(@username, 'biography', body['biography'])
     return 417 if ret != 'UPDATED'
   end
   if body['birthday']
-    ret = db.updateAccount(username, 'birthday', body['birthday'])
+    ret = db.updateAccount(@username, 'birthday', body['birthday'])
     return 417 if ret != 'UPDATED'
   end
   if body['profile_picture']
-    ret = db.updateAccount(username, 'profile_picture', body['profile_picture'])
+    ret = db.updateAccount(@username, 'profile_picture', body['profile_picture'])
     return 417 if ret != 'UPDATED'
   end
   if body['firstname']
-    ret = db.updateAccount(username, 'firstname', body['firstname'])
+    ret = db.updateAccount(@username, 'firstname', body['firstname'])
     return 417 if ret != 'UPDATED'
   end
   if body['lastname']
-    ret = db.updateAccount(username, 'lastname', body['lastname'])
+    ret = db.updateAccount(@username, 'lastname', body['lastname'])
     return 417 if ret != 'UPDATED'
   end
   if body['tags']
-    ret = db.deleteTagsOfUser(username)
+    ret = db.deleteTagsOfUser(@username)
     body['tags'].each { |tag|
-      ret = db.createTag(username, tag)
+      ret = db.createTag(@username, tag)
       return 417 if ret != 'CREATED'
     }
   end
   puts "body: #{body['geolocation']}"
   if body['geolocation']
     if body['geolocation'] == ''
-      ret = db.updateAccount(username, 'custom_geolocation', false)
+      ret = db.updateAccount(@username, 'custom_geolocation', false)
       geolocation = getGeolocationCoordinates(nil, request.ip)
       return 417, "Wrong geolocation" if geolocation == false
-      db.updateGeolocation(username, geolocation)
+      db.updateGeolocation(@username, geolocation)
       return 417, ret if ret != 'UPDATED'
     else
-      ret = db.updateAccount(username, 'custom_geolocation', true)
+      ret = db.updateAccount(@username, 'custom_geolocation', true)
       geolocation = geolocationCoordinates(body['geolocation'])
       return 417, "Wrong geolocation" if geolocation == false
-      ret = db.updateAccount(username, 'geolocation', geolocation)
+      ret = db.updateAccount(@username, 'geolocation', geolocation)
       return 417, ret if ret != 'UPDATED'
     end
   end
@@ -187,11 +227,11 @@ get '/rest/account/find/:_username' do |_username|
   accounts = db.findAccount(_username)
   affected_rows = accounts.cmd_tuples
   return 404, "Username not found" if affected_rows == 0
-  if _username != username && _username != '' && username != ''
-    ret = db.createVisit(username, _username)
+  if _username != @username && _username != '' && @username != ''
+    ret = db.createVisit(@username, _username)
     return 417, ret if ret != 'CREATED'
-    db.createNotification(username, _username, "account view",
-                          "account viewed by #{username}", "VIEWED")
+    db.createNotification(@username, _username, "account view",
+                          "account viewed by #{@username}", "VIEWED")
   end
   ret = db.findTagsOfUser(_username)
   tags = []
@@ -202,11 +242,11 @@ get '/rest/account/find/:_username' do |_username|
   likes_back = false
   connected = false
   blocked = false
-  if _username != username
-    liked = db.findLiked(username, _username).cmd_tuples > 0
-    likes_back = db.findLiked(_username, username).cmd_tuples > 0
-    blocked = db.isBlockedBy(username, _username)
-    connected = db.findLiked(_username, username).cmd_tuples > 0 && liked
+  if _username != @username
+    liked = db.findLiked(@username, _username).cmd_tuples > 0
+    likes_back = db.findLiked(_username, @username).cmd_tuples > 0
+    blocked = db.isBlockedBy(@username, _username)
+    connected = db.findLiked(_username, @username).cmd_tuples > 0 && liked
   end
   pictures = db.findPicturesUser(_username).values.map {|a| a[0]}
   return 200, toAccountObject(accounts.values[0], tags, liked, likes_back, connected, pictures, blocked).to_json
@@ -222,14 +262,15 @@ post '/rest/account/fake/:_username' do |_username|
   return 200
 end
 
-get '/rest/account/:_username/password/:passwordTry' do |_username, passwordTry|
+post '/rest/account/login' do
   db = DatabaseManager.new
-  ret = db.verifyPasswordAccount(_username, passwordTry)
+  body = JSON.parse request.body.read
+  ret = db.verifyPasswordAccount(body['username'], body['password'])
   return 404, ret if ret == 'Username not found'
   return 417, ret if ret == 'Username not verified'
   return 400, ret[0].to_s if ret[0] === false
-  cookie_token = JWT.encode _username, nil, 'none'
-  db.updateLastSeen(_username)
+  cookie_token = JWT.encode body['username'], nil, 'none'
+  db.updateLastSeen(body['username'])
   response.set_cookie("username", :value => cookie_token, :domain => false,
 					  :path => '/', :expires => Date.today + 3)
   return 200, {:message => ret[0].to_s, :completed => ret[1] }.to_json
@@ -237,16 +278,16 @@ end
 
 get '/rest/account/more-infos' do
   db = DatabaseManager.new
-  ret = db.findAccount(username)
+  ret = db.findAccount(@username)
   return 417, "Username not found" if ret.cmd_tuples == 0
   # Fame
-  fame_rating = db.getFameRating(username)
+  fame_rating = db.getFameRating(@username)
   # likes
-  ret = db.findLikesTo(username)
+  ret = db.findLikesTo(@username)
   affected_rows = ret.cmd_tuples
   likes = affected_rows == 0 ? [] : ret.values.map {|a| a[0]}
   # Visits
-  ret = db.findVisitsTo(username)
+  ret = db.findVisitsTo(@username)
   affected_rows = ret.cmd_tuples
   visits = affected_rows == 0 ? [] : ret.values.map {|a| a[0]}
   return 200, {
@@ -267,10 +308,10 @@ end
 post '/rest/account/search' do
   db = DatabaseManager.new
   body = JSON.parse request.body.read
-  blockedUsernames = db.getBlockedUsernames(username) + db.getBlockedByUsernames(username)
+  blockedUsernames = db.getBlockedUsernames(@username) + db.getBlockedByUsernames(@username)
   notCompleteUsernames = db.getNotCompleteUsernames().join("','")
   query = 'WHERE username NOT IN ' + \
-        "('" + username + "','" + blockedUsernames.join("','") + "','" + notCompleteUsernames + "')"
+        "('" + @username + "','" + blockedUsernames.join("','") + "','" + notCompleteUsernames + "')"
   variables = []
   today = Date.today
   if body['minAge']
@@ -295,7 +336,7 @@ post '/rest/account/search' do
     query += ' AND username IN ' + "('" + usernames.join("','") + "')"
   end
   search = db.search(query, variables)
-  res = db.getIUserResultsFromArray(username, search)
+  res = db.getIUserResultsFromArray(@username, search)
   if body['minFame'] || body['maxFame']
     res.each {|user|
       if body['minFame'] && user[:fame] < body['minFame'].to_i
@@ -313,7 +354,7 @@ get '/rest/account/suggestions' do
   db = DatabaseManager.new
   geolocation = getGeolocationCoordinates(params[:geolocation], request.ip)
   return 417, "Wrong geolocation" if geolocation == false
-  db.updateGeolocation(username, geolocation)
+  db.updateGeolocation(@username, geolocation)
   maxAgeDifference = params[:age]
   maxDistance = params[:location]
   minFame = params[:fame]
@@ -322,7 +363,7 @@ get '/rest/account/suggestions' do
   maxDistance = 33 if maxDistance == nil
   minFame = -1000 if minFame == nil
   minCommonTags = 0 if minCommonTags == nil
-  ret = db.findAccount(username)
+  ret = db.findAccount(@username)
   return 404, "Username not found" if ret.cmd_tuples == 0
   age = getAgeInYears(ret[0]['birthday'])
   sug = db.findSuggestionsAccount(ret[0]['username'],
@@ -347,22 +388,25 @@ get '/rest/token/resetPassword/:_username' do |_username|
   token = ret[1]
   puts(token)
   #send email with token
-  return 417, "Mail is not valid" if !send_mail(email, "reset matcha password",
+  mail_status = send_mail(email, "reset matcha password",
   		  "Click on the following link to reset password: " +
           frontend + "/profile/password/reset/" +
            token)
+  return 417, "Mail is not valid" if mail_status == :failed
+  return 417, EMAIL_LOGGED_MESSAGE if mail_status == :logged
   return 200
 end
 
-get '/rest/token/:token/resetPassword/:newPassword' do |token, newPassword|
+post '/rest/token/:token/resetPassword' do |token|
   db = DatabaseManager.new
+  body = JSON.parse request.body.read
   ret = db.findToken(token)
   return 417, "Token not found" if ret.cmd_tuples == 0
   if Date.parse(ret[0]['expiry_time']) < Date.today
     db.deleteToken(ret[0]['account_id'])
     return 417, "Token is expired"
   end
-  db.updateAccount(ret[0]['account_id'], "password", newPassword)
+  db.updateAccount(ret[0]['account_id'], "password", body['newPassword'])
   return 200
 end
 
@@ -370,7 +414,7 @@ end
 
 post '/rest/blocked/:blocked' do |blocked|
   db = DatabaseManager.new
-  ret = db.createBlocked(username, blocked)
+  ret = db.createBlocked(@username, blocked)
   return 417, ret if ret != 'CREATED'
   return 200, ret
 end
@@ -379,25 +423,25 @@ end
 
 post '/rest/liked/:liked' do |liked|
   db = DatabaseManager.new
-  ret = db.createLiked(username, liked)
+  ret = db.createLiked(@username, liked)
   return 417, ret if ret != 'CREATED'
-  if (db.findLiked(liked, username)).cmd_tuples === 0
-    db.createNotification(username, liked, "account liked",
-                          "account liked by #{username}", "LIKE")
+  if (db.findLiked(liked, @username)).cmd_tuples === 0
+    db.createNotification(@username, liked, "account liked",
+                          "account liked by #{@username}", "LIKE")
   else
-    db.createNotification(username, liked, "account liked back",
-                          "account liked back by #{username}", "LIKED_BACK")
+    db.createNotification(@username, liked, "account liked back",
+                          "account liked back by #{@username}", "LIKED_BACK")
   end
   return 200, ret
 end
 
 delete '/rest/liked/:liked' do |liked|
   db = DatabaseManager.new
-  ret = db.deleteLiked(username, liked)
+  ret = db.deleteLiked(@username, liked)
   affected_rows = ret.cmd_tuples
-  return 417, "Like of #{username} to #{liked} not found" if affected_rows == 0
-  db.createNotification(username, liked, "account unliked",
-                        "account unliked by #{username}", "UNLIKED")
+  return 417, "Like of #{@username} to #{liked} not found" if affected_rows == 0
+  db.createNotification(@username, liked, "account unliked",
+                        "account unliked by #{@username}", "UNLIKED")
   return 200, ret.cmd_tuples.to_s #Returns the number of removed rows
 end
 
@@ -405,11 +449,11 @@ get '/rest/liked/connections' do
   db = DatabaseManager.new
   connections = []
 
-  blockedBy = db.getBlockedByUsernames(username)
-  ret = db.findLikesTo(username)
+  blockedBy = db.getBlockedByUsernames(@username)
+  ret = db.findLikesTo(@username)
   return 200, [] if ret == nil
   ret.each_row { |row|
-    ret2 = db.findLiked(username, row[0])
+    ret2 = db.findLiked(@username, row[0])
     if !blockedBy.include?(row[0]) && ret2.cmd_tuples != 0
       connections.push(row[0])
     end
@@ -422,20 +466,20 @@ end
 post '/rest/message/:receiver' do |receiver|
   db = DatabaseManager.new
   body = JSON.parse request.body.read
-  if db.isBlockedBy(username, receiver) or !itsMatch(username, receiver)
+  if db.isBlockedBy(@username, receiver) or !itsMatch(@username, receiver)
     return 201, 'CREATED'
   end
-  ret = db.createMessage(username, receiver, body['content'])
+  ret = db.createMessage(@username, receiver, body['content'])
   return 417, ret if ret != 'CREATED'
-  db.createNotification(username, receiver, "message received",
-                        "message received from #{username}", "MESSAGE")
+  db.createNotification(@username, receiver, "message received",
+                        "message received from #{@username}", "MESSAGE")
   return 201, ret
 end
 
 get '/rest/message' do
   db = DatabaseManager.new
   list = []
-  ret = db.findMessagesForUser(username)
+  ret = db.findMessagesForUser(@username)
   list = ret.each.map { |message|
     {
       id: message['id'],
@@ -452,7 +496,7 @@ end
 
 get '/rest/notification' do
   db = DatabaseManager.new
-  ret = db.findNotifications(username)
+  ret = db.findNotifications(@username)
   list = ret.each.map { |notification|
     {
       id: notification['id'],
@@ -486,18 +530,18 @@ end
 
 post '/rest/picture' do
   db = DatabaseManager.new
-  if db.numberPicturesUser(username)[0]['count'].to_i >= 5
+  if db.numberPicturesUser(@username)[0]['count'].to_i >= 5
     return 400, "Maximum number of pictures for user attained"
   end
   if !params[:file] or !params[:file][:filename]
     return 400, "No file in request to be uploaded"
   end
-  FileUtils.mkdir_p("../public/images/#{username}")
-  storage_path = "images/#{username}/#{params[:file][:filename]}"
+  FileUtils.mkdir_p("../public/images/#{@username}")
+  storage_path = "images/#{@username}/#{params[:file][:filename]}"
   if File.exist?("../public/" + storage_path)
     return 400, "Filename already exists"
   end
-  ret = db.createPicture(username, storage_path)
+  ret = db.createPicture(@username, storage_path)
   return 417, ret if ret != 'CREATED'
   File.open("../public/" + storage_path, "wb") do |f|
     f.write(params[:file][:tempfile].read)
@@ -519,7 +563,7 @@ end
 
 get '/rest/picture' do
   db = DatabaseManager.new
-  ret = db.findPicturesUser(username)
+  ret = db.findPicturesUser(@username)
   return 200, ret.values.to_json
   #Returns the storage paths towards locally stored images which start from project root
 end
@@ -529,6 +573,13 @@ end
 =end
 
 helpers do
+  # Rejects '<'/'>' so stored fields can't carry an HTML/script payload that
+  # would execute if ever reflected without escaping.
+  def has_forbidden_chars?(str)
+    return false if str.nil?
+    str.match?(/[<>]/)
+  end
+
   # Function takes timestamp string and returns age in year as integer
   def getAgeInYears(dob) #dob stands for date of birth.
     dob = DateTime.parse(dob).to_date
@@ -540,8 +591,9 @@ helpers do
   def getGeolocationCoordinates(paramGeolocation, requestIp)
     if paramGeolocation
       return geolocationCoordinates(paramGeolocation)
-    elsif requestIp != '127.0.0.1' && requestIp != '::1' && requestIp != 'localhost'
-      #Because we are on localhost we cannot deduct our location from it
+    elsif !privateOrLoopbackIp?(requestIp)
+      #A private/loopback requestIp (e.g. localhost, or a Docker gateway address
+      #like 192.168.65.1) cannot be geolocated: it is not a real public IP.
       return geolocationCoordinates(requestIp)
     else
       #https://ifconfig.me/ip gives our ip address.
@@ -554,15 +606,33 @@ helpers do
     end
   end
 
+  def privateOrLoopbackIp?(ip)
+    return true if ip == 'localhost'
+    addr = IPAddr.new(ip)
+    addr.private? || addr.loopback?
+  rescue IPAddr::Error
+    true
+  end
+
   def geolocationCoordinates(ipOrAddress) #Address example: "Hôtel de Ville, 75004 Paris, France"
     geolocation = Geocoder.search(ipOrAddress)
     return false if geolocation.first == nil
-    return geolocation.first.coordinates.join(',')
+    coordinates = geolocation.first.coordinates
+    return false if coordinates.nil? || coordinates.empty?
+    return coordinates.join(',')
   end
   
+  # Returns :sent, :logged (EMAILPASS is empty, testing mode) or :failed.
   def send_mail(receiver, subject, content)
+    if ENV['EMAILPASS'].empty?
+      puts "\e[36m[send_mail] EMAILPASS is empty: no email sent (testing mode). " \
+        "Logging it below instead:\e[0m"
+      puts "To: #{receiver}"
+      puts "Subject: #{subject}"
+      puts "Content: #{content}"
+      return :logged
+    end
     begin
-      puts "emailpass: #{ENV['EMAILPASS']}"
       Pony.mail(
         :to => receiver,
         :from => 'no-reply@vanderlynden.eu',
@@ -576,11 +646,11 @@ helpers do
         :password => ENV['EMAILPASS'], #Ask the actual password to pvanderl, we won't leave it publicly here
         :authentication => :plain
       })
-      return true
+      return :sent
     rescue StandardError => e
       warn "[send_mail] Failed to send email to #{receiver.inspect} with subject #{subject.inspect}: #{e.class} - #{e.message}"
       warn e.backtrace.join("\n") if e.backtrace
-      return false
+      return :failed
     end
   end
 

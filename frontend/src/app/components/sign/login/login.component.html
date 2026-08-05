@@ -14,7 +14,7 @@
             <mat-error>{{ message$ | async }}</mat-error>
         }
         <button (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide" mat-icon-button
-                matSuffix>
+                matSuffix type="button">
             <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
         </button>
     </mat-form-field>
@@ -22,7 +22,7 @@
         <p>{{ message$ | async }}</p>
     }
     <br>
-    <button (click)="login()" [disabled]="!user || !password" color="primary" mat-raised-button type="submit">Login
+    <button (click)="login()" [disabled]="!user || !password" color="primary" mat-raised-button type="button">Login
     </button>
-    <button mat-button routerLink="/profile/password/request">Reset password!</button>
+    <button mat-button routerLink="/profile/password/request" type="button">Reset password!</button>
 </form>

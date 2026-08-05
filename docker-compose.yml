@@ -32,6 +32,11 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/app
+      # myapp.rb/databaseManager.rb resolve images to '../public' relative to
+      # their own location (i.e. one level above /app) -> mount the repo's
+      # public/ there, so uploaded images persist on the host across
+      # container recreations instead of living only in the container layer.
+      - ./public:/public
     working_dir: /app
 
 volumes:
