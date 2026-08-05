@@ -30,7 +30,7 @@ set :port, 1942
 set :bind, '0.0.0.0'
 frontend = 'http://localhost:1942'
 
-jwt_token = 'Thasé(à~a-é"çwonderful`^$ù^me`s$^rmcesrf)'
+jwt_token = ENV['JWT_SECRET']
 
 EMAIL_LOGGED_MESSAGE = "No email was sent because EMAILPASS is empty: " \
   "the email was logged in the terminal instead, for testing purposes."
@@ -45,6 +45,14 @@ unless ENV['EMAILPASS']
     "Else, The possibility exists to set it empty (export EMAILPASS=\"\") for " \
     "testing purposes (no mail will be sent but the mail will be logged " \
     "on console). \e[0m "
+  )
+end
+
+unless jwt_token
+  abort(
+    "\e[33mERROR: JWT_SECRET environment variable is not set: signing in and " \
+    "verifying auth tokens will fail without it. " \
+    "Look at README for launching the app correctly. \e[0m "
   )
 end
 

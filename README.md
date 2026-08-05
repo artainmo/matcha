@@ -42,6 +42,9 @@ PGPASSWORD=admin
 POSTGRES_DB=matcha
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=admin
+
+# Secret used to sign/verify JWT auth tokens
+JWT_SECRET=Thasé(à~a-é"çwonderful`^$ù^me`s$^rmcesrf)
 ```
 
 #### Run the whole app with Docker
@@ -113,7 +116,11 @@ export PATH="/opt/homebrew/opt/ruby/bin:$PATH" #This signals the ruby executable
 export PATH="$HOME/.gem/ruby/3.3.0/bin:$PATH" #Shows where the gem executables are. Gems are ruby dependencies.
 ```
 
-Subsequently the email password needs to be given. You can do this with `export EMAILPASS=""` (we won't give the password publicly, ask it to pvanderl@student.42belgium.be).
+Subsequently the email password needs to be given. You can do this with `export EMAILPASS=""` (we won't give the password publicly, ask it to pvanderl@student.42belgium.be).<br>
+You also need to set the JWT signing secret:
+```
+export JWT_SECRET='Thasé(à~a-é"çwonderful`^$ù^me`s$^rmcesrf)'
+```
 
 Finally, to launch the whole app in one command:
 ```
@@ -131,10 +138,6 @@ Generate test users:
 make generate_users AMOUNT=<number>
 # OR SPECIFY YOUR EMAIL ADDRESS
 make generate_users AMOUNT=<number> MAIL=<your-email-address>
-# RUN THE SAME USER GENERATION THROUGH DOCKER
-make docker-generate-users AMOUNT=<number>
-# OR SPECIFY YOUR EMAIL ADDRESS
-make docker-generate-users AMOUNT=<number> MAIL=<your-email-address>
 # ONE OF THE USERS WILL BE NAMED 'test' 
 # ALL USERS HAVE PASSWORD 'pass123'
 make docker-generate_users AMOUNT=<number> MAIL=<your-email-address>
