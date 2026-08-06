@@ -458,11 +458,12 @@ get '/rest/liked/connections' do
   connections = []
 
   blockedBy = db.getBlockedByUsernames(@username)
+  blocked = db.getBlockedUsernames(@username)
   ret = db.findLikesTo(@username)
   return 200, [] if ret == nil
   ret.each_row { |row|
     ret2 = db.findLiked(@username, row[0])
-    if !blockedBy.include?(row[0]) && ret2.cmd_tuples != 0
+    if !blockedBy.include?(row[0]) && !blocked.include?(row[0]) && ret2.cmd_tuples != 0
       connections.push(row[0])
     end
   }
@@ -474,7 +475,7 @@ end
 post '/rest/message/:receiver' do |receiver|
   db = DatabaseManager.new
   body = JSON.parse request.body.read
-  if db.isBlockedBy(@username, receiver) or !itsMatch(@username, receiver)
+  if db.isBlockedBy(@username, receiver) or db.isBlockedBy(receiver, @username) or !itsMatch(@username, receiver)
     return 201, 'CREATED'
   end
   ret = db.createMessage(@username, receiver, body['content'])
