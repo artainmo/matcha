@@ -12,3 +12,4 @@ public/images/*
 .idea
 .env
 .env.local
+/e2e/node_modules/
