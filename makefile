@@ -1,9 +1,9 @@
 .PHONY: all frontend backend generate_users db_clean b docker-up docker-down docker-generate_users docker-db_clean
 
-all: frontend backend
+all: frontend copy-frontend backend
 	# We use 'bundle exec' instead of 'ruby' to force the use of the gem versions indicated in the Gemfile; this will force the use of Sinatra 3.0.0 instead of the latest 4.0.0 which isn't compatible with this project.
 
-docker-up: frontend
+docker-up: docker-frontend copy-frontend
 	docker-compose up
 
 docker-down:
@@ -27,11 +27,17 @@ docker-db_clean:
 docker-generate_users:
 	docker-compose run --rm --name matcha-ruby-generate_users ruby sh -c "bundle install && cd database/tests_and_scripts && bundle exec ruby generateUsers.rb $(AMOUNT) $(MAIL)"
 
-frontend:
-	cd frontend && npm install && npm run build
+docker-frontend:
+	cd frontend; docker build -o ./dist --target export-stage .
+
+copy-frontend:
 	rm -rf backend/public/frontend
 	mkdir -p backend/public/frontend
-	cp -R dist/frontend/. backend/public/frontend/
+	cp -R frontend/dist/frontend/. backend/public/frontend/
+	rm -rf frontend/dist
+
+frontend:
+	cd frontend && npm install && npm run build
 
 backend:
 	cd backend && ./setup.sh && bundle exec ruby myapp.rb
