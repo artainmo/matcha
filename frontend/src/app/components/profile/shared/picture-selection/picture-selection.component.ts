@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	EventEmitter,
+	input,
+	Input,
+	InputSignal,
+	OnInit,
+	Output
+} from '@angular/core';
 import { PictureService } from './picture.service';
 import { AccountService } from "../../../../services/account.service";
 import { MatList, MatListItem } from '@angular/material/list';
@@ -21,6 +30,8 @@ export class PictureSelectionComponent implements OnInit {
 	preset_favorite: string | undefined;
 
 	@Output() favorite: EventEmitter<string> = new EventEmitter<string>();
+
+	isOnEditPage: InputSignal<boolean> = input(false);
 
 	_files: string[] = [];
 	_favorite: string = '';

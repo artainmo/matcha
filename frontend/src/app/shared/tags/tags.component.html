@@ -16,7 +16,7 @@
                    [matAutocomplete]="auto"
                    [matChipInputAddOnBlur]="addOnBlur"
                    [matChipInputFor]="chipGrid"
-                   [matChipInputSeparatorKeyCodes]="alreadyInList ? separatorKeysCodes : []"
+                   [matChipInputSeparatorKeyCodes]="!alreadyInList ? separatorKeysCodes : []"
                    placeholder="New tag...">
             @if (control.getRawValue().length > 0) {
                 <button (click)="add(null)" [disabled]="alreadyInList" aria-label="Add"

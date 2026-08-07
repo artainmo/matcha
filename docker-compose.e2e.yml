@@ -1,0 +1,43 @@
+services:
+  # E2E runs use the "testing mode" already built into the backend: when
+  # EMAILPASS is empty, send_mail() (backend/myapp.rb) logs the full
+  # verification/reset link to stdout instead of sending a real email. The
+  # e2e/cypress.config.ts "readMailLink" task reads that link straight out of
+  # `docker compose logs ruby`, so Cypress never needs real SMTP access.
+  ruby:
+    environment:
+      - EMAILPASS=
+
+  # Cypress itself is opt-in via the "docker-cypress" profile so this same
+  # override file supports two run modes (see e2e/README.md):
+  #   - `docker compose ... up` (no --profile flag) starts only postgres+ruby,
+  #     for corrector machines with a local Node.js >=24 to run Cypress
+  #     natively against http://localhost:1942.
+  #   - `docker compose ... --profile docker-cypress up` additionally starts
+  #     this container, which bundles Cypress + a virtual display + noVNC so
+  #     Cypress UI mode can be watched/driven from any browser at
+  #     http://localhost:7900, with no local Node.js needed at all.
+  cypress:
+    profiles: ["docker-cypress"]
+    build:
+      context: ./e2e
+    container_name: matcha-cypress
+    depends_on:
+      ruby:
+        condition: service_started
+    environment:
+      - CYPRESS_baseUrl=http://ruby:1942
+      - E2E_COMPOSE_CMD=docker compose -p matcha-e2e -f /repo/docker-compose.yml -f /repo/docker-compose.e2e.yml
+    ports:
+      - "7900:7900"
+    volumes:
+      - ./e2e:/e2e
+      # The mail-log and DB-count Cypress tasks shell out to `docker compose`,
+      # which needs the compose files, the .env file they reference via
+      # `env_file: .env` (docker-compose.yml), and the Docker socket to
+      # control sibling containers from inside this one.
+      - ./docker-compose.yml:/repo/docker-compose.yml:ro
+      - ./docker-compose.e2e.yml:/repo/docker-compose.e2e.yml:ro
+      - ./.env:/repo/.env:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /e2e

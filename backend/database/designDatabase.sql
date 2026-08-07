@@ -12,7 +12,7 @@ CREATE TABLE account (
 		or (sexual_orientation = 'OTHER')),
 	biography varchar(1000),
 	birthday date,
-	last_connected timestamp,
+	last_connected timestamptz,
 	-- cannot put ref to picture as it's a table created later --  REFERENCES picture(storage_path),
 	profile_picture varchar(250),
 	geolocation point,
@@ -26,7 +26,7 @@ CREATE TABLE account (
 CREATE TABLE token (
 	hashed_token varchar(50) PRIMARY KEY,
 	account_id varchar(20) UNIQUE REFERENCES account(username),
-	expiry_time timestamp NOT NULL
+	expiry_time timestamptz NOT NULL
 );
 
 CREATE TABLE tag (
@@ -40,7 +40,7 @@ CREATE TABLE visit (
 	visited_id varchar(20) REFERENCES account(username)
 				CHECK (visited_id != visiter_id) NOT NULL,
 	PRIMARY KEY (visiter_id, visited_id),
-	time timestamp NOT NULL
+	time timestamptz NOT NULL
 );
 
 CREATE TABLE blocked (
@@ -53,7 +53,7 @@ CREATE TABLE liked (
 	liker_id varchar(20) REFERENCES account(username),
 	liked_id varchar(20) REFERENCES account(username) CHECK (liked_id != liker_id),
 	PRIMARY KEY (liker_id, liked_id),
-	time timestamp NOT NULL
+	time timestamptz NOT NULL
 );
 
 CREATE TABLE message (
@@ -62,13 +62,13 @@ CREATE TABLE message (
 	receiver_id varchar(20) REFERENCES account(username)
 				CHECK (receiver_id != sender_id) NOT NULL,
 	content varchar(100),
-	time timestamp NOT NULL
+	time timestamptz NOT NULL
 );
 
 CREATE TABLE notification (
 	id UUID PRIMARY KEY,
 	account_id varchar(20) REFERENCES account(username) NOT NULL,
-	time timestamp NOT NULL,
+	time timestamptz NOT NULL,
 	title varchar(20) NOT NULL,
 	content varchar(50) NOT NULL,
 	notif_type varchar(12) CHECK ((notif_type = 'LIKE') or (notif_type = 'LIKED_BACK')

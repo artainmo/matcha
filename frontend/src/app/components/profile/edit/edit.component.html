@@ -57,6 +57,7 @@
         </mat-form-field>
         <app-tags [tags]="_tags"></app-tags>
         <app-picture-selection
+                [isOnEditPage]="true"
                 (favorite)="profile_picture = $event"
                 [preset_favorite]="profile_picture"></app-picture-selection>
         <br>

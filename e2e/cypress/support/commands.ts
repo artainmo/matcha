@@ -1,0 +1,285 @@
+/// <reference types="cypress" />
+
+export interface TestUser {
+	username: string;
+	password: string;
+	email: string;
+	firstname: string;
+	lastname: string;
+}
+
+export interface CompleteProfileOptions {
+	gender?: 'FEMALE' | 'MALE' | 'OTHER';
+	preferences?: 'FEMALE' | 'MALE' | 'BI' | 'OTHER';
+	biography?: string;
+	birthday?: string; // dd/mm/yyyy, as typed into the Material datepicker input
+	tags?: string[];
+	acceptGeolocation?: boolean;
+	geolocation?: string; // required when acceptGeolocation is false
+	picture?: string; // fixture file name
+}
+
+// Every generated user gets a unique suffix so specs never collide with each
+// other or with previous runs against the same (possibly reused) database.
+export function uniqueUser(prefix = 'e2e'): TestUser {
+	const suffix = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
+	return {
+		username: `${prefix}${suffix}`.slice(0, 20),
+		password: 'Str0ng!Pass',
+		email: `${prefix}${suffix}@matcha-e2e.test`,
+		firstname: 'Cy',
+		lastname: 'Press'
+	};
+}
+
+Cypress.Commands.add('apiRegisterUser', (user: TestUser) => {
+	return cy
+		.request({
+			method: 'POST',
+			url: '/rest/account/register',
+			body: user,
+			failOnStatusCode: false
+		})
+		.then((response) => {
+			// In e2e mode EMAILPASS is empty, so the backend returns 417 with
+			// EMAIL_LOGGED_MESSAGE instead of 200 (see backend/myapp.rb) - the
+			// account is still created and the verify link is logged to stdout.
+			expect([200, 417]).to.include(response.status);
+			return cy
+				.task('readMailLink', {
+					toEmail: user.email,
+					urlPattern: '(?<=Click on the following link to verify your account: )\\S+'
+				})
+				.then((link) => {
+					expect(link, 'verification link logged by the backend').to.be.a('string');
+					const token = (link as string).split('/profile/verify/')[1];
+					return cy
+						.request({
+							method: 'POST',
+							url: '/rest/account/verify',
+							body: token,
+							headers: { 'Content-Type': 'text/plain' }
+						})
+						.then(() => cy.wrap(user, { log: false }));
+				});
+		});
+});
+
+Cypress.Commands.add('apiRequestPasswordResetLink', (user: TestUser) => {
+	return cy
+		.request({
+			method: 'GET',
+			url: `/rest/token/resetPassword/${encodeURIComponent(user.username)}`,
+			failOnStatusCode: false
+		})
+		.then((response) => {
+			expect([200, 417]).to.include(response.status);
+			return cy
+				.task('readMailLink', {
+					toEmail: user.email,
+					urlPattern: '(?<=Click on the following link to reset password: )\\S+'
+				})
+				.then((link) => {
+					expect(link, 'password reset link logged by the backend').to.be.a('string');
+					return cy.wrap((link as string).split('/profile/password/reset/')[1], { log: false });
+				});
+		});
+});
+
+Cypress.Commands.add('uiLogin', (username: string, password: string) => {
+	cy.visit('/sign/in');
+	// {force: true} works around the Material floating-label sometimes
+	// overlapping the input hitbox (harmless CSS quirk, most visible at
+	// narrow/mobile viewports) - see other `{force: true}` usages above.
+	cy.contains('mat-label', 'Enter your user')
+		.parents('mat-form-field')
+		.find('input')
+		.type(username, { force: true });
+	cy.contains('mat-label', 'Enter your password')
+		.parents('mat-form-field')
+		.find('input')
+		.type(password, { force: true });
+	cy.get('.auth-actions').contains('button', 'Login').click();
+});
+
+Cypress.Commands.add('uiLogout', () => {
+	cy.contains('button', 'Logout').click();
+	cy.location('pathname', { timeout: 10000 }).should('include', '/sign/in');
+});
+
+Cypress.Commands.add('openOwnProfile', () => {
+	// The app's auth state is in-memory only (see AccountService.isLoggedIn),
+	// never rehydrated from the cookie on load, so navigation while
+	// "logged in" must always happen via in-app routerLink/clicks, never
+	// cy.visit()/cy.reload() (those silently bounce back to /sign/in).
+	cy.contains('button', 'My profile').click();
+});
+
+Cypress.Commands.add('openDiscover', () => {
+	cy.contains('button', 'Discover').click();
+});
+
+Cypress.Commands.add('openChat', () => {
+	cy.contains('button', 'Chat').click();
+});
+
+Cypress.Commands.add('openNotifications', () => {
+	cy.contains('button', 'Notifications').click();
+});
+
+Cypress.Commands.add('openSearch', () => {
+	// The search icon-button is only rendered from the Discover page (see
+	// app.component.html: `@if (route === '/discover')`), so route through
+	// it first regardless of where we're currently navigating from.
+	cy.openDiscover();
+	cy.location('pathname', { timeout: 10000 }).should('include', '/discover');
+	cy.get('button').find('mat-icon').contains('search').parent().click();
+});
+
+Cypress.Commands.add('uiCompleteProfile', (options: CompleteProfileOptions = {}) => {
+	const opts: Required<Omit<CompleteProfileOptions, 'geolocation'>> & { geolocation?: string } = {
+		gender: options.gender ?? 'OTHER',
+		preferences: options.preferences ?? 'BI',
+		biography: options.biography ?? 'E2E test bio, generated by Cypress.',
+		birthday: options.birthday ?? '01/01/1995',
+		tags: options.tags ?? ['bio', 'NoMakeup'],
+		acceptGeolocation: options.acceptGeolocation ?? true,
+		picture: options.picture ?? 'profile1.png',
+		geolocation: options.geolocation
+	};
+
+	cy.location('pathname', { timeout: 10000 }).should('include', '/profile/complete');
+
+	cy.get('mat-select[formcontrolname="gender"]').click();
+	cy.get('mat-option').contains(
+		opts.gender === 'FEMALE' ? 'Female' : opts.gender === 'MALE' ? 'Male' : 'Other'
+	).click();
+
+	cy.get('input[formcontrolname="birthday"]').type(opts.birthday);
+
+	cy.get('mat-select[formcontrolname="preferences"]').click();
+	cy.get('mat-option').contains(
+		opts.preferences === 'FEMALE'
+			? 'Female'
+			: opts.preferences === 'MALE'
+				? 'Male'
+				: opts.preferences === 'BI'
+					? 'Bi'
+					: 'Other'
+	).click();
+
+	cy.get('input[formcontrolname="biography"]').type(opts.biography);
+
+	if (!opts.acceptGeolocation) {
+		cy.contains('mat-radio-button', 'No, let me enter it manually').click();
+		cy.get('input[formcontrolname="geolocation"]').type(opts.geolocation ?? 'Brussels', { force: true });
+	} else {
+		cy.contains('mat-radio-button', 'Yes, use my IP address').click();
+	}
+
+	opts.tags.forEach((tag) => {
+		cy.get('input[placeholder="New tag..."]').type(`${tag}{enter}`);
+	});
+
+	cy.get('input[type="file"]').selectFile(`cypress/fixtures/${opts.picture}`, { force: true });
+	// The uploaded picture appears as the first (and only, at this point)
+	// mat-list-item; its first button toggles it as the favorite/profile
+	// picture (see picture-selection.component.ts setFavorite()).
+	cy.get('mat-list-item', { timeout: 10000 }).first().find('button').first().click();
+
+	cy.contains('button', 'Register !').should('not.be.disabled').click();
+	cy.location('pathname', { timeout: 15000 }).should('include', '/discover');
+});
+
+Cypress.Commands.add(
+	'createFullUser',
+	(overrides: Partial<TestUser> = {}, profileOptions: CompleteProfileOptions = {}) => {
+		const user = { ...uniqueUser(), ...overrides };
+		return cy.apiRegisterUser(user).then(() => {
+			cy.uiLogin(user.username, user.password);
+			cy.uiCompleteProfile(profileOptions);
+			return cy.wrap(user, { log: false });
+		});
+	}
+);
+
+// --- Multi-user helpers -----------------------------------------------
+//
+// Several correction points (notifications, chat, connections,
+// report/block) require two distinct logged-in identities interacting at
+// once. Cypress only drives a single browser tab/session, and the app's
+// auth cookie is a simple `username=<unsigned JWT>` value (see
+// backend/myapp.rb before-block), so instead of juggling multiple browser
+// contexts we:
+//   1. Fully set up "user B" (register+verify+login+complete-profile) via
+//      the UI/API *before* user A ever logs in, then capture B's session
+//      cookie value via a raw `cy.request` login (which never touches the
+//      browser's cookie jar).
+//   2. Log in as user A via the UI as normal - this is the identity the
+//      test actually watches/drives in the browser.
+//   3. Whenever the test needs B to act (like/message/report/etc), use
+//      `cy.requestAsCookie(bCookieValue, options)` below, which briefly
+//      clears the `username` cookie, fires the request with B's cookie set
+//      explicitly via a header (Cypress otherwise *appends* to, rather than
+//      replaces, an existing jar cookie of the same name, which the backend
+//      then fails to parse), then restores A's cookie immediately after.
+//      Because notifications/chat poll every 10s
+//      (see notifications.service.ts / message.service.ts), A's live
+//      (not reloaded) UI picks up B's actions automatically.
+Cypress.Commands.add('apiLoginCookie', (username: string, password: string) => {
+	return cy
+		.request({ method: 'POST', url: '/rest/account/login', body: { username, password } })
+		.then((response) => {
+			const setCookie = response.headers['set-cookie'] as unknown as string[] | string;
+			const cookieHeader = Array.isArray(setCookie) ? setCookie[0] : (setCookie as string);
+			const cookieValue = cookieHeader.split(';')[0].split('=').slice(1).join('=');
+			return cy.wrap(cookieValue, { log: false });
+		});
+});
+
+Cypress.Commands.add(
+	'requestAsCookie',
+	(cookieValue: string, options: Partial<Cypress.RequestOptions> & { url: string }) => {
+		return cy.getCookie('username').then((savedCookie) => {
+			cy.clearCookie('username');
+			return cy
+				.request({
+					failOnStatusCode: true,
+					...options,
+					headers: { ...(options.headers ?? {}), Cookie: `username=${cookieValue}` }
+				})
+				.then((response) => {
+					return (savedCookie ? cy.setCookie('username', savedCookie.value) : cy.wrap(null)).then(() =>
+						cy.wrap(response, { log: false })
+					);
+				});
+		});
+	}
+);
+
+declare global {
+	// eslint-disable-next-line @typescript-eslint/no-namespace
+	namespace Cypress {
+		interface Chainable {
+			apiRegisterUser(user: TestUser): Chainable<TestUser>;
+			apiRequestPasswordResetLink(user: TestUser): Chainable<string>;
+			uiLogin(username: string, password: string): Chainable<void>;
+			uiLogout(): Chainable<void>;
+			uiCompleteProfile(options?: CompleteProfileOptions): Chainable<void>;
+			openOwnProfile(): Chainable<void>;
+			openDiscover(): Chainable<void>;
+			openChat(): Chainable<void>;
+			openNotifications(): Chainable<void>;
+			openSearch(): Chainable<void>;
+			createFullUser(
+				overrides?: Partial<TestUser>,
+				profileOptions?: CompleteProfileOptions
+			): Chainable<TestUser>;
+			apiLoginCookie(username: string, password: string): Chainable<string>;
+			requestAsCookie(
+				cookieValue: string,
+				options: Partial<Cypress.RequestOptions> & { url: string }
+			): Chainable<Cypress.Response<any>>;
+		}
+	}
+}
