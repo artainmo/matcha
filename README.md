@@ -14,7 +14,6 @@ This project uses ruby Sinatra as backend and AngularJS as frontend to build a d
         - [View Logs](#View-Logs)
     - [Run without using any Docker](#Run-without-using-any-Docker)
     - [Database Management](#Database-Management)
-- [End-to-End Tests (Cypress)](#end-to-end-tests-cypress)
 - [Documentation](#Documentation)
 
 ## Use
@@ -161,15 +160,6 @@ Stop and remove all PostgreSQL data (clean database) if it runs with docker:
 ```
 docker compose down -v
 ```
-
-## End-to-End Tests (Cypress)
-
-The `e2e/` folder has a full Cypress E2E suite covering every point of the
-correction sheet. It can run either **fully dockerized** (no local Node.js
-needed - Cypress UI mode is watchable/drivable from any browser via a
-bundled noVNC page) or, if you have Node.js >=24 installed, natively on the
-host for faster iteration. See **[e2e/README.md](e2e/README.md)** for setup
-and run instructions for both modes.
 
 ## Documentation
 ### Backend
