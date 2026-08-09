@@ -1,6 +1,6 @@
 # Welcome to Matcha!
 
-42 school [subject](https://cdn.intra.42.fr/pdf/pdf/60925/en.subject.pdf).
+42 school [subject](https://cdn.intra.42.fr/pdf/pdf/217413/en.subject.pdf).
 
 This project uses ruby Sinatra as backend and AngularJS as frontend to build a dating app.
 
@@ -28,7 +28,7 @@ This project uses ruby Sinatra as backend and AngularJS as frontend to build a d
 
 The app uses these settings that you should configure in a `.env` file:
 ```
-#We won't give the password publicly, ask it to pvanderl@student.42belgium.be
+#We won't give the password publicly, ask it to pvanderl@student.42belgium.be. But the app can be tested without.
 EMAILPASS=
 
 # For Docker networking (use 'postgres' as hostname inside Docker)
@@ -116,7 +116,7 @@ export PATH="/opt/homebrew/opt/ruby/bin:$PATH" #This signals the ruby executable
 export PATH="$HOME/.gem/ruby/3.3.0/bin:$PATH" #Shows where the gem executables are. Gems are ruby dependencies.
 ```
 
-Subsequently the email password needs to be given. You can do this with `export EMAILPASS=""` (we won't give the password publicly, ask it to pvanderl@student.42belgium.be).<br>
+Subsequently the email password needs to be given. You can do this with `export EMAILPASS=""` (we won't give the password publicly, ask it to pvanderl@student.42belgium.be, but the app can work without it for testing purposes).<br>
 You also need to set the JWT signing secret:
 ```
 export JWT_SECRET='Thasé(à~a-é"çwonderful`^$ù^me`s$^rmcesrf)'
@@ -141,14 +141,13 @@ make generate_users AMOUNT=<number> MAIL=<your-email-address>
 # ONE OF THE USERS WILL BE NAMED 'test' 
 # ALL USERS HAVE PASSWORD 'pass123'
 make docker-generate_users AMOUNT=<number> MAIL=<your-email-address>
-# If the app runs on docker it is recommanded to use this command instead.
+# If the app runs on docker it is recommended to use this command instead.
 ```
 
 Clean the database and locally stored images:
 ```
 make db_clean
-make docker-db_clean
-# If the app runs on docker it is recommanded to use this command instead.
+make docker-db_clean # If the app runs on docker it is recommended to use this command instead.
 ```
 
 Stop the database container if it runs with docker:
