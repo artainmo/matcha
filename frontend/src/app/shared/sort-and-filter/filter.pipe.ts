@@ -18,8 +18,8 @@ export class FilterPipe implements PipeTransform {
 				const matchesMax = filterArg.ageMax === null || item.age <= filterArg.ageMax;
 				return matchesMin && matchesMax;
 			})
-			.filter((item: IUserResult) => filterArg.fame.length === 0 || filterArg.fame.includes(item.fame))
-			.filter((item: IUserResult) => filterArg.commonTags.length === 0 || filterArg.commonTags.includes(item.numberOfTags))
-			.filter((item: IUserResult) => filterArg.distance.length === 0 || filterArg.distance.includes(item.distance));
+			.filter((item: IUserResult) => filterArg.fame === null || filterArg.fame === item.fame)
+			.filter((item: IUserResult) => filterArg.commonTags.length === 0 || filterArg.commonTags.every((tag: string) => item.tags.includes(tag)))
+			.filter((item: IUserResult) => filterArg.distance === null || filterArg.distance === item.distance);
 	}
 }

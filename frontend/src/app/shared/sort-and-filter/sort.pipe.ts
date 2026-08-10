@@ -6,7 +6,6 @@ export class SortPipe implements PipeTransform {
 
 	transform(value: IUserResult[], sortArg: string | null): IUserResult[] {
 		switch (sortArg) {
-			case 'Default':
 			case 'Relevant':
 				return value.sort(
 					(a: IUserResult, b: IUserResult) => a.order - b.order
@@ -17,15 +16,15 @@ export class SortPipe implements PipeTransform {
 				);
 			case 'Location':
 				return value.sort(
-					(a: IUserResult, b: IUserResult) => -(a.distance - b.distance)
+					(a: IUserResult, b: IUserResult) => a.distance - b.distance
 				);
 			case 'Fame':
 				return value.sort(
-					(a: IUserResult, b: IUserResult) => a.fame - b.fame
+					(a: IUserResult, b: IUserResult) => b.fame - a.fame
 				);
 			case 'Tags':
 				return value.sort(
-					(a: IUserResult, b: IUserResult) => a.numberOfTags - b.numberOfTags
+					(a: IUserResult, b: IUserResult) => b.tags.length - a.tags.length
 				);
 		}
 		return value;

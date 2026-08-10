@@ -550,14 +550,22 @@ class DatabaseManager
     return @conn.exec_params("SELECT DISTINCT tag FROM tag WHERE tag LIKE '%' || $1 || '%'", [tag])
   end
 
-  def numberCommonTags(tags1, tags2)
-    num = 0
+  def commonTags(tags1, tags2)
+    user_tags = {}
     tags1.each_row { |row|
-      tags2.each_row { |row2|
-        num += 1 if (row[1] = row2[1])
-      }
+      user_tags[row[1]] = true
     }
-    return num
+
+    common_tags = []
+    already_added = {}
+    tags2.each_row { |row|
+      tag = row[1]
+      next unless user_tags[tag]
+      next if already_added[tag]
+      common_tags.push(tag)
+      already_added[tag] = true
+    }
+    return common_tags
   end
 
   # Queries on picture table
@@ -675,13 +683,14 @@ class DatabaseManager
         distance = -1;
       end
       fame = getFameRating(user['username']).to_i
+      user_common_tags = commonTags(currentUserTags, findTagsOfUser(user['username']))
       {
         'username': user['username'],
         'firstname': user['firstname'],
         'lastname': user['lastname'],
         'birthday': user['birthday'],
         'order': index,
-        'numberOfTags': numberCommonTags(currentUserTags, findTagsOfUser(user['username'])), #number of common tags
+        'tags': user_common_tags,
         'fame': fame,
         'distance': distance, #distance between the logged in user and the other user
         'fake_account': user['fake_account']
@@ -700,13 +709,13 @@ private
       filtered_suggestions = []
 
       result.each { |val|
-        next if minCommonTags.to_i > val[:numberOfTags] or minFame.to_i > val[:fame]
+        next if minCommonTags.to_i > val[:tags].length or minFame.to_i > val[:fame]
         if filtered_suggestions.empty?
           filtered_suggestions.push(val)
         else
           filtered_suggestions.each_with_index { |fil_sug, index|
-            if fil_sug[:numberOfTags] < val[:numberOfTags] or
-              (fil_sug[:numberOfTags] == val[:numberOfTags] and fil_sug[:fame] < val[:fame])
+            if fil_sug[:tags].length < val[:tags].length or
+              (fil_sug[:tags].length == val[:tags].length and fil_sug[:fame] < val[:fame])
                 filtered_suggestions.insert(index, val)
                 break
             elsif index + 1 == filtered_suggestions.length
@@ -720,4 +729,3 @@ private
     end
 end
  
-

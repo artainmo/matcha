@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { SortAndFilterService } from "./sort-and-filter.service";
-import { IFilter } from "./filter.interface";
+import { IAvailableFilters, IFilter } from "./filter.interface";
 import { Observable, tap } from 'rxjs';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatSelect } from '@angular/material/select';
@@ -14,13 +14,14 @@ import {
 	MatExpansionPanelTitle
 } from '@angular/material/expansion';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
 
 @Component({
 	selector: 'app-sort-and-filter',
 	templateUrl: './sort-and-filter.component.html',
 	styleUrls: ['./sort-and-filter.component.css'],
 	changeDetection: ChangeDetectionStrategy.Eager,
-	imports: [MatFormField, MatLabel, MatSelect, FormsModule, ReactiveFormsModule, MatOption, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatCheckbox, AsyncPipe]
+	imports: [MatFormField, MatLabel, MatSelect, FormsModule, ReactiveFormsModule, MatOption, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatCheckbox, MatRadioButton, MatRadioGroup, AsyncPipe]
 })
 export class SortAndFilterComponent implements OnInit {
 
@@ -32,14 +33,20 @@ export class SortAndFilterComponent implements OnInit {
 	_appliedFilter: IFilter = {
 		ageMin: null,
 		ageMax: null,
-		distance: [],
-		fame: [],
+		distance: null,
+		fame: null,
 		commonTags: []
 	};
-	availableFilters$: Observable<IFilter> = this.sortAndFilterService.availableFiltersBS.asObservable()
-		.pipe(tap((val: IFilter) => {
-			this._appliedFilter = JSON.parse(JSON.stringify(val));
-			this.appliedFilters.emit(val);
+	availableFilters$: Observable<IAvailableFilters> = this.sortAndFilterService.availableFiltersBS.asObservable()
+		.pipe(tap((val: IAvailableFilters) => {
+			this._appliedFilter = {
+				ageMin: val.ageMin,
+				ageMax: val.ageMax,
+				fame: null,
+				distance: null,
+				commonTags: []
+			};
+			this.appliedFilters.emit(this._appliedFilter);
 		}));
 
 	constructor(
@@ -52,26 +59,25 @@ export class SortAndFilterComponent implements OnInit {
 		this.sortBy.valueChanges.subscribe((val: string) => this.sortAndFilterService.sortBS.next(val));
 	}
 
-	updateFameList(filter: number) {
-		const index = this._appliedFilter.fame.indexOf(filter);
-		if (!this._appliedFilter.fame.includes(filter))
-			this._appliedFilter.fame.push(filter);
-		else
-			this._appliedFilter.fame.splice(index, 1);
-		this.appliedFilters.emit(this._appliedFilter);
-	}
-
-	updateDistanceList(filter: number) {
-		const index = this._appliedFilter.distance.indexOf(filter);
-		if (index === -1) {
-			this._appliedFilter.distance.push(filter);
+	toggleFameSelection(filter: number) {
+		if (this._appliedFilter.fame === filter) {
+			this._appliedFilter.fame = null;
 		} else {
-			this._appliedFilter.distance.splice(index, 1);
+			this._appliedFilter.fame = filter;
 		}
 		this.appliedFilters.emit(this._appliedFilter);
 	}
 
-	updateCommonTagsList(filter: number) {
+	toggleDistanceSelection(filter: number) {
+		if (this._appliedFilter.distance === filter) {
+			this._appliedFilter.distance = null;
+		} else {
+			this._appliedFilter.distance = filter;
+		}
+		this.appliedFilters.emit(this._appliedFilter);
+	}
+
+	updateCommonTagsList(filter: string) {
 		const index = this._appliedFilter.commonTags.indexOf(filter);
 		if (!this._appliedFilter.commonTags.includes(filter))
 			this._appliedFilter.commonTags.push(filter);

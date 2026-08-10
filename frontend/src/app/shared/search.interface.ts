@@ -2,7 +2,7 @@ export interface IUserResult {
 	username: string;
 	firstname: string;
 	lastname: string;
-	numberOfTags: number;
+	tags: string[];
 	fame: number;
 	distance: number;
 	order: number;

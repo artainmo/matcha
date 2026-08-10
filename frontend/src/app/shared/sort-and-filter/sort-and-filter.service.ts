@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { IUserResult } from "../search.interface";
-import { IFilter } from "./filter.interface";
+import { IAvailableFilters } from "./filter.interface";
 
 @Injectable({
 	providedIn: 'root'
 })
 export class SortAndFilterService {
 	sortBS: BehaviorSubject<string> = new BehaviorSubject<string>('');
-	availableFiltersBS: BehaviorSubject<IFilter> = new BehaviorSubject<IFilter>({
+	availableFiltersBS: BehaviorSubject<IAvailableFilters> = new BehaviorSubject<IAvailableFilters>({
 		ageMin: null,
 		ageMax: null,
 		distance: [],
@@ -20,7 +20,7 @@ export class SortAndFilterService {
 	}
 
 	initFilters(res: IUserResult[]) {
-		const availableFilters: IFilter = {
+		const availableFilters: IAvailableFilters = {
 			ageMin: null,
 			ageMax: null,
 			distance: [],
@@ -32,8 +32,10 @@ export class SortAndFilterService {
 				availableFilters.distance.push(item.distance);
 			if (!(availableFilters.fame.includes(item.fame)))
 				availableFilters.fame.push(item.fame);
-			if (!(availableFilters.commonTags.includes(item.numberOfTags)))
-				availableFilters.commonTags.push(item.numberOfTags);
+			for (const tag of item.tags) {
+				if (!(availableFilters.commonTags.includes(tag)))
+					availableFilters.commonTags.push(tag);
+			}
 		}
 		this.availableFiltersBS.next(availableFilters);
 	}
