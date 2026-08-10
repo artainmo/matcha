@@ -346,13 +346,9 @@ post '/rest/account/search' do
   search = db.search(query, variables)
   res = db.getIUserResultsFromArray(@username, search)
   if body['minFame'] || body['maxFame']
-    res.each {|user|
-      if body['minFame'] && user[:fame] < body['minFame'].to_i
-        res.delete(user)
-      end
-      if body['maxFame'] && user[:fame] > body['maxFame'].to_i
-        res.delete(user)
-      end
+	res = res.select {|user|
+      (!body['minFame'] || user[:fame] >= body['minFame'].to_i) &&
+        (!body['maxFame'] || user[:fame] <= body['maxFame'].to_i)
     }
   end
   return 200, res.to_json
