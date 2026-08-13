@@ -1,31 +1,35 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
-import { ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatChipGrid, MatChipInput, MatChipInputEvent, MatChipRemove, MatChipRow } from '@angular/material/chips';
-import { map, Observable, Subscription } from 'rxjs';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	Input,
+	model,
+	ModelSignal,
+	OnInit,
+	signal,
+	WritableSignal
+} from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatChipInputEvent, MatChipsModule } from '@angular/material/chips';
+import { Observable } from 'rxjs';
 import { TagsService } from './tags.service';
-import { MatError, MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { AsyncPipe } from '@angular/common';
-import { MatIcon } from '@angular/material/icon';
-import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { MatIconButton } from '@angular/material/button';
-import { MatOption } from '@angular/material/core';
 
 @Component({
 	selector: 'app-tags',
 	templateUrl: './tags.component.html',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	imports: [FormsModule, MatFormField, MatLabel, MatChipGrid, MatChipRow, MatChipRemove, MatIcon, MatChipInput, MatAutocompleteTrigger, ReactiveFormsModule, MatIconButton, MatSuffix, MatAutocomplete, MatOption, MatError, AsyncPipe]
+	imports: [AsyncPipe, MatFormFieldModule, MatAutocompleteModule, MatChipsModule, MatIconModule, FormsModule]
 })
-export class TagsComponent implements OnInit, OnDestroy {
-	@ViewChild('tags') inputTag!: ElementRef;
+export class TagsComponent implements OnInit {
 
-	addOnBlur = true;
 	readonly separatorKeysCodes = [ENTER, COMMA, SPACE] as const;
-	control: FormControl = new FormControl<string>('')
 	availableTags: Observable<string[]> = this.tagsService.availableTags$;
-	alreadyInList: boolean = false;
-	private subscription!: Subscription;
+	readonly __tags: WritableSignal<string[]> = signal([]);
+	currentTag: ModelSignal<string> = model('');
 
 	constructor(
 		private readonly tagsService: TagsService
@@ -44,41 +48,38 @@ export class TagsComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit(): void {
-		this.subscription = this.control.valueChanges.pipe(
-			map(value => {
-				this.alreadyInList = this._tags.indexOf(value) > -1;
-				!!value ? this.tagsService.searchTags(value) : this.tagsService.resetSearch();
-			}),
-		).subscribe();
+		this.currentTag.subscribe(value => {
+			!!value ? this.tagsService.searchTags(value) : this.tagsService.resetSearch();
+		});
 	}
 
-	ngOnDestroy() {
-		this.subscription.unsubscribe();
-	}
+	add(event: MatChipInputEvent): void {
+		const value = (event.value || '').trim();
 
-	add(event: MatChipInputEvent | null): void {
-		const value = (event ? (event.value || '').trim() : this.control.getRawValue()).replace(/[# ]/gi, '');
-
-		if (this._tags.indexOf(value) > -1) {
-			event ? event.chipInput!.clear() : this.control.setValue('');
-			return;
-		}
+		// Add our fruit
 		if (value) {
-			this._tags.push(value);
+			this.__tags.update(fruits => [...fruits, value]);
 		}
 
-		if (event)
-			event.chipInput!.clear()
-		this.inputTag.nativeElement.value = ' ';
-		this.control.setValue('');
-		this.tagsService.resetSearch();
+		// Clear the input value
+		this.currentTag.set('');
+	}
+
+	selected(event: MatAutocompleteSelectedEvent): void {
+		this.__tags.update(tags => [...tags, event.option.viewValue]);
+		this.currentTag.set('');
+		event.option.deselect();
 	}
 
 	remove(tag: string) {
-		const index = this._tags.indexOf(tag);
+		this.__tags.update(tags => {
+			const index = tags.indexOf(tag);
+			if (index < 0) {
+				return tags;
+			}
 
-		if (index >= 0) {
-			this._tags.splice(index, 1);
-		}
+			tags.splice(index, 1);
+			return [...tags];
+		});
 	}
 }

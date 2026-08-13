@@ -1,44 +1,35 @@
 <form class="example-form">
-    <mat-form-field appearance="fill" class="example-chip-list">
+    <mat-form-field appearance="fill">
         <mat-label>Tags</mat-label>
-        <mat-chip-grid #chipGrid aria-label="Tag selection">
-            @for (tag of _tags; track tag) {
+        <mat-chip-grid #chipGrid>
+            @for (tag of __tags(); track $index) {
                 <mat-chip-row (removed)="remove(tag)">
                     #{{ tag }}
-                    <button matChipRemove type="button">
+                    <button matChipRemove>
                         <mat-icon>cancel</mat-icon>
                     </button>
                 </mat-chip-row>
             }
-            <input #tags
-                   (matChipInputTokenEnd)="add($event)"
-                   [formControl]="control"
-                   [matAutocomplete]="auto"
-                   [matChipInputAddOnBlur]="addOnBlur"
-                   [matChipInputFor]="chipGrid"
-                   [matChipInputSeparatorKeyCodes]="!alreadyInList ? separatorKeysCodes : []"
-                   placeholder="New tag...">
-            @if (control.getRawValue().length > 0) {
-                <button (click)="add(null)" [disabled]="alreadyInList" aria-label="Add"
-                        mat-icon-button
-                        matSuffix
-                        type="button">
-                    <mat-icon>add</mat-icon>
-                </button>
-            }
-            <mat-autocomplete #auto="matAutocomplete">
-                @for (option of availableTags | async; track option) {
-                    <mat-option [value]="option">
-                        {{ option }}
-                    </mat-option>
-                }
-            </mat-autocomplete>
         </mat-chip-grid>
-        @if (_tags.length < 1) {
+        <input
+                name="currentTag"
+                placeholder="New tag..."
+                #tagInput
+                [matChipInputFor]="chipGrid"
+                [matAutocomplete]="auto"
+                [(ngModel)]="currentTag"
+                [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                (matChipInputTokenEnd)="add($event)"
+        />
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event); tagInput.value = ''">
+            @for (option of availableTags | async; track option) {
+                <mat-option [value]="option">
+                    {{ option }}
+                </mat-option>
+            }
+        </mat-autocomplete>
+        @if (__tags().length < 1) {
             <mat-error>At least one tag is required</mat-error>
-        }
-        @if (alreadyInList) {
-            <mat-error>Element already in list</mat-error>
         }
     </mat-form-field>
 </form>
