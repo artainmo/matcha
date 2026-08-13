@@ -5,7 +5,7 @@ import {
 	Input,
 	model,
 	ModelSignal,
-	OnInit,
+	OnInit, output, Output,
 	signal,
 	WritableSignal
 } from '@angular/core';
@@ -28,21 +28,12 @@ export class TagsComponent implements OnInit {
 
 	readonly separatorKeysCodes = [ENTER, COMMA, SPACE] as const;
 	availableTags: Observable<string[]> = this.tagsService.availableTags$;
-	readonly _tags: WritableSignal<string[]> = signal([]);
+	tags: ModelSignal<string[]> = model<string[]>([]);
 	currentTag: ModelSignal<string> = model('');
 
 	constructor(
 		private readonly tagsService: TagsService
 	) {
-	}
-
-	@Input()
-	get tags(): string[] {
-		return this._tags();
-	}
-
-	set tags(ts: string[]) {
-		this._tags.set(ts);
 	}
 
 	ngOnInit(): void {
@@ -56,7 +47,7 @@ export class TagsComponent implements OnInit {
 
 		// Add our fruit
 		if (value) {
-			this._tags.update(fruits => [...fruits, value]);
+			this.tags.update(fruits => [...fruits, value]);
 		}
 
 		// Clear the input value
@@ -64,13 +55,13 @@ export class TagsComponent implements OnInit {
 	}
 
 	selected(event: MatAutocompleteSelectedEvent): void {
-		this._tags.update(tags => [...tags, event.option.viewValue]);
+		this.tags.update(tags => [...tags, event.option.viewValue]);
 		this.currentTag.set('');
 		event.option.deselect();
 	}
 
 	remove(tag: string) {
-		this._tags.update(tags => {
+		this.tags.update(tags => {
 			const index = tags.indexOf(tag);
 			if (index < 0) {
 				return tags;

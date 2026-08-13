@@ -55,7 +55,7 @@
                 <mat-hint style="color: red">Invalid location</mat-hint>
             }
         </mat-form-field>
-        <app-tags [tags]="_tags"></app-tags>
+        <app-tags [(tags)]="_tags"></app-tags>
         <app-picture-selection
                 [isOnEditPage]="true"
                 (favorite)="profile_picture = $event"

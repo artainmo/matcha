@@ -2,7 +2,7 @@
     <mat-form-field appearance="fill">
         <mat-label>Tags</mat-label>
         <mat-chip-grid #chipGrid>
-            @for (tag of _tags(); track $index) {
+            @for (tag of tags(); track $index) {
                 <mat-chip-row (removed)="remove(tag)">
                     #{{ tag }}
                     <button matChipRemove>
@@ -28,7 +28,7 @@
                 </mat-option>
             }
         </mat-autocomplete>
-        @if (_tags().length < 1) {
+        @if (tags().length < 1) {
             <mat-error>At least one tag is required</mat-error>
         }
     </mat-form-field>
