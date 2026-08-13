@@ -32,7 +32,7 @@ export class RegisterComponent {
 
 	form: FormGroup = new FormGroup({
 		email: new FormControl('', [Validators.required, Validators.email]),
-		username: new FormControl('', [Validators.required, Validators.minLength(6)]),
+		username: new FormControl('', [Validators.required, Validators.minLength(1)]),
 		firstname: new FormControl('', [Validators.required, Validators.minLength(1)]),
 		lastname: new FormControl('', [Validators.required, Validators.minLength(1)]),
 		password: new FormControl('', [Validators.required, Validators.pattern(/^.*(?=.{6,})(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[\ \!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\]\^\_\`\{\|]).*$/)]),

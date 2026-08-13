@@ -53,6 +53,9 @@
     <app-picture-selection
             (favorite)="favorite = $event"></app-picture-selection>
     <br>
+    @if (favorite == '') {
+        <p style="color: red">At least one picture must be liked.</p>
+    }
     <button (click)="submit()" [disabled]="form.invalid || _tags.length < 1 || favorite == '' || (form.controls['acceptGeolocation'].value === false && !form.controls['geolocation'].value)" mat-raised-button type="button">
         Register !
     </button>
@@ -69,4 +72,4 @@
         </h3>
     </div>
 }
-{{ error }}
+{{ errorMessage }}

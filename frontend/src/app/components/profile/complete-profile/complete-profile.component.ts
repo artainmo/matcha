@@ -26,6 +26,7 @@ export class CompleteProfileComponent {
 	loading: boolean = false;
 	success: boolean = false;
 	error: number | null = null;
+	errorMessage: string = '';
 	locationErrorValue: string = '';
 
 	form: FormGroup = new FormGroup({
@@ -66,6 +67,7 @@ export class CompleteProfileComponent {
 				this.notificationsService.subscribe();
 			}, (response: HttpErrorResponse) => {
 				this.error = response.status;
+				this.errorMessage = typeof response.error === 'string' ? response.error : '';
 				if (response.error === 'Wrong geolocation') {
 					this.locationErrorValue = this.form.controls['geolocation'].value;
 					this.form.controls['geolocation'].setErrors({

@@ -132,7 +132,7 @@ end
 patch '/rest/account/fill' do
   db = DatabaseManager.new
   body = JSON.parse request.body.read
-  return 400, "Invalid characters in biography" if has_forbidden_chars?(body['biography'])
+  return 400, "We don't accept the '<' and '>' characters that could form an HTML injection." if has_forbidden_chars?(body['biography'])
   ret = db.updateAccount(@username, 'gender', body['gender'])
   return 417, ret if ret != 'UPDATED'
   ret = db.updateAccount(@username, 'sexual_orientation', body['sexual_orientation'])
