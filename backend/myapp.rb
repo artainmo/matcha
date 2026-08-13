@@ -253,13 +253,19 @@ get '/rest/account/find/:_username' do |_username|
   likes_back = false
   connected = false
   blocked = false
+  profile_picture_liked = false
   if _username != @username
     liked = db.findLiked(@username, _username).cmd_tuples > 0
     likes_back = db.findLiked(_username, @username).cmd_tuples > 0
     connected = db.findLiked(_username, @username).cmd_tuples > 0 && liked
+    profile_picture = accounts[0]['profile_picture']
+    if profile_picture && profile_picture != ''
+      profile_picture_liked = db.findPictureLike(@username, profile_picture).cmd_tuples > 0
+    end
   end
   pictures = db.findPicturesUser(_username).values.map {|a| a[0]}
-  return 200, toAccountObject(accounts.values[0], tags, liked, likes_back, connected, pictures, blocked).to_json
+  return 200, toAccountObject(accounts.values[0], tags, liked, likes_back, connected, pictures, blocked,
+                              profile_picture_liked).to_json
 end
 
 post '/rest/account/fake/:_username' do |_username|
@@ -581,6 +587,41 @@ get '/rest/picture' do
   #Returns the storage paths towards locally stored images which start from project root
 end
 
+# PICTURE_LIKE TABLE ROUTES
+
+post '/rest/picture_like' do
+  db = DatabaseManager.new
+  body = JSON.parse request.body.read
+  storage_path = body['storage_path']
+  return 400, "No given file storage path" unless storage_path
+  picture = db.findPicture(storage_path)
+  return 404, "Picture not found" if picture.cmd_tuples == 0
+  owner = picture[0]['account_id']
+  if db.isBlockedBy(@username, owner) or db.isBlockedBy(owner, @username)
+    return 200, 'CREATED'
+  end
+  ret = db.createPictureLike(@username, storage_path)
+  return 417, ret if ret != 'CREATED'
+  return 200, ret
+end
+
+delete '/rest/picture_like' do
+  db = DatabaseManager.new
+  body = JSON.parse request.body.read
+  storage_path = body['storage_path']
+  return 400, "No given file storage path" unless storage_path
+  picture = db.findPicture(storage_path)
+  return 404, "Picture not found" if picture.cmd_tuples == 0
+  owner = picture[0]['account_id']
+  if db.isBlockedBy(@username, owner) or db.isBlockedBy(owner, @username)
+    return 200, '0'
+  end
+  ret = db.deletePictureLike(@username, storage_path)
+  affected_rows = ret.cmd_tuples
+  return 417, "Like of #{@username} to picture #{storage_path} not found" if affected_rows == 0
+  return 200, ret.cmd_tuples.to_s #Returns the number of removed rows
+end
+
 =begin
   HELPER METHODS
 =end
@@ -675,7 +716,8 @@ helpers do
     likes_back = false,
     connected = false,
     pictures = [],
-    blocked = false
+    blocked = false,
+    profile_picture_liked = false
   )
   geolocation = Geocoder.search(line[11].delete("()").split(','))
   if geolocation.first == nil
@@ -703,7 +745,8 @@ helpers do
       'likes_back': likes_back,
       'connected': connected,
       'blocked': blocked,
-      'pictures': pictures
+      'pictures': pictures,
+      'profile_picture_liked': profile_picture_liked
     }
   end
 

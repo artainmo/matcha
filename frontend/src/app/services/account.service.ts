@@ -12,6 +12,7 @@ import {
 	URL_FAKE,
 	URL_LIKE,
 	URL_LOGIN,
+	URL_PICTURE_LIKE,
 	URL_REGISTER,
 	URL_REQUEST_PASSWORD,
 	URL_RESET_PASSWORD,
@@ -167,6 +168,26 @@ export class AccountService {
 
 	dislikeProfile(otherUsername: string) {
 		return this.http.delete(URL_LIKE + otherUsername).pipe(
+			catchError((error: HttpErrorResponse) => {
+				if (error.status >= 200 && error.status < 300) {
+					return of(error.message);
+				}
+				return throwError(error);
+			}));
+	}
+
+	likePicture(storagePath: string) {
+		return this.http.post(URL_PICTURE_LIKE, { storage_path: storagePath }).pipe(
+			catchError((error: HttpErrorResponse) => {
+				if (error.status >= 200 && error.status < 300) {
+					return of(error.message);
+				}
+				return throwError(error);
+			}));
+	}
+
+	dislikePicture(storagePath: string) {
+		return this.http.delete(URL_PICTURE_LIKE, { body: { storage_path: storagePath } }).pipe(
 			catchError((error: HttpErrorResponse) => {
 				if (error.status >= 200 && error.status < 300) {
 					return of(error.message);

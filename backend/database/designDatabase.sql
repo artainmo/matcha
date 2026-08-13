@@ -82,4 +82,14 @@ CREATE TABLE picture (
 	account_id varchar(20) REFERENCES account(username) NOT NULL
 );
 
+-- Records who liked which picture (e.g. another user's profile picture).
+-- ON DELETE CASCADE so removing a picture (see DELETE /rest/picture) also
+-- drops its likes instead of failing on the foreign key.
+CREATE TABLE picture_like (
+	liker_id varchar(20) REFERENCES account(username),
+	storage_path varchar(250) REFERENCES picture(storage_path) ON DELETE CASCADE,
+	PRIMARY KEY (liker_id, storage_path),
+	time timestamptz NOT NULL
+);
+
 CREATE EXTENSION IF NOT EXISTS earthdistance CASCADE;

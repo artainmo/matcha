@@ -110,7 +110,7 @@ class DatabaseManager
   end
 
   def all_tables_exist?
-    required_tables = %w[account liked blocked visit tag token message notification picture]
+    required_tables = %w[account liked blocked visit tag token message notification picture picture_like]
 
     required_tables.all? do |table|
       result = @conn.exec_params('SELECT to_regclass($1) AS regclass;', ["public.#{table}"])
@@ -595,26 +595,60 @@ class DatabaseManager
                                 [account])
     end
 
+    def findPicture(storage_path)
+      puts "Find picture #{storage_path}..."
+      return @conn.exec_params('SELECT * FROM picture WHERE storage_path = $1;',
+                                [storage_path])
+    end
+
     def numberPicturesUser(account)
       puts "Find number of pictures of #{account}"
       return @conn.exec_params('SELECT COUNT(storage_path) FROM picture
                                 WHERE account_id = $1;', [account])
     end
 
+  # Queries on picture_like table
+
+    def createPictureLike(liker, storage_path)
+      puts "Create like of picture #{storage_path} by #{liker}..."
+      begin
+        @conn.exec_params('INSERT INTO picture_like (liker_id, storage_path, time)
+          VALUES ($1, $2, $3);', [liker, storage_path, Time.now()])
+      rescue PG::Error => error
+        puts error.message
+        return error.message
+      else
+        return 'CREATED'
+      end
+    end
+
+    def deletePictureLike(liker, storage_path)
+      puts "Delete like of picture #{storage_path} by #{liker}..."
+      return @conn.exec_params('DELETE FROM picture_like WHERE liker_id = $1
+                               AND storage_path = $2;', [liker, storage_path])
+    end
+
+    def findPictureLike(liker, storage_path)
+      puts "Find like of picture #{storage_path} by #{liker}..."
+      return @conn.exec_params('SELECT * FROM picture_like WHERE liker_id = $1
+                              AND storage_path = $2;', [liker, storage_path])
+    end
+
   # Other useful functions
 
   def deleteDatabase
     puts 'Deleting the database...'
-    tables = 'picture, notification, message, token, tag, visit, blocked, liked, account'
+    tables = 'picture_like, picture, notification, message, token, tag, visit, blocked, liked, account'
+    # IF EXISTS makes this tolerant of any subset of these tables being
+    # missing (e.g. right after a new table was added to the schema but the
+    # database hasn't been recreated yet): it drops whichever of them exist
+    # and skips the rest, instead of erroring out on the first missing one
+    # and leaving every table after it (and its data) untouched.
     begin
-      @conn.exec("DROP TABLE #{tables}")
+      @conn.exec("DROP TABLE IF EXISTS #{tables}")
     rescue PG::Error => error
-      if error.message[0..-2] == 'ERROR:  table "picture" does not exist'
-        puts "The database is already clean"
-      else
-        puts error.message
-        return error.message
-      end
+      puts error.message
+      return error.message
     else
         puts "Database is empty now"
     end

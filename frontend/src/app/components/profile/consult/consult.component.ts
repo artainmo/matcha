@@ -2,9 +2,10 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { AccountService } from "../../../services/account.service";
 import { IProfile } from "../../../models/user.model";
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 import { MatChip, MatChipSet } from '@angular/material/chips';
 import { MoreProfileInfosComponent } from './more-profile-infos/more-profile-infos.component';
 import { FameRatingComponent } from './fame-rating/fame-rating.component';
@@ -15,7 +16,7 @@ import { IsOnlinePipe } from './pipes/is-online.pipe';
 	templateUrl: './consult.component.html',
 	styleUrls: ['./consult.component.css'],
 	changeDetection: ChangeDetectionStrategy.Eager,
-	imports: [MatProgressSpinner, MatButton, RouterLink, MatChipSet, MatChip, MoreProfileInfosComponent, FameRatingComponent, DatePipe, IsOnlinePipe]
+	imports: [MatProgressSpinner, MatButton, MatIconButton, MatIcon, NgClass, RouterLink, MatChipSet, MatChip, MoreProfileInfosComponent, FameRatingComponent, DatePipe, IsOnlinePipe]
 })
 export class ConsultComponent implements OnInit {
 
@@ -23,6 +24,7 @@ export class ConsultComponent implements OnInit {
 	profile!: IProfile;
 	loading = true;
 	disableLikeAccount = false;
+	disableLikePicture = false;
 	private username: string = '';
 
 	constructor(
@@ -57,6 +59,30 @@ export class ConsultComponent implements OnInit {
 				this.loadInfos();
 			}, () => {
 				this.disableLikeAccount = false;
+			}
+		);
+	}
+
+	likePicture() {
+		this.disableLikePicture = true;
+		this.accountService.likePicture(this.profile.profile_picture).subscribe(
+			() => {
+				this.disableLikePicture = false;
+				this.loadInfos();
+			}, () => {
+				this.disableLikePicture = false;
+			}
+		);
+	}
+
+	dislikePicture() {
+		this.disableLikePicture = true;
+		this.accountService.dislikePicture(this.profile.profile_picture).subscribe(
+			() => {
+				this.disableLikePicture = false;
+				this.loadInfos();
+			}, () => {
+				this.disableLikePicture = false;
 			}
 		);
 	}

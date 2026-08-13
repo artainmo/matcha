@@ -34,6 +34,13 @@
         <div>
             <h4>Profile picture</h4>
             <img [alt]="profile.profile_picture" [src]="profile.profile_picture" class="profile-picture">
+            @if (!isMyProfile && !profile.blocked && profile.profile_picture) {
+                <button (click)="profile.profile_picture_liked ? dislikePicture() : likePicture()"
+                        [disabled]="disableLikePicture" aria-label="Like profile picture" mat-icon-button>
+                    <mat-icon [ngClass]="{'red-icon': profile.profile_picture_liked, 'grey-icon': !profile.profile_picture_liked}">favorite
+                    </mat-icon>
+                </button>
+            }
         </div>
         <div>
             <h4>{{ profile.custom_geolocation ? 'Custom location' : 'Calculated geolocation' }}</h4>

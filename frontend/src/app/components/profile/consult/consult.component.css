@@ -28,6 +28,14 @@
     color: #b91c1c;
 }
 
+.grey-icon {
+    color: grey;
+}
+
+.red-icon {
+    color: red;
+}
+
 @media (max-width: 900px) {
     .picture-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));

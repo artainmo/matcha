@@ -20,4 +20,5 @@ export interface IProfile {
 	blocked?: boolean;
 	pictures?: string[];
 	custom_geolocation?: boolean;
+	profile_picture_liked?: boolean;
 }

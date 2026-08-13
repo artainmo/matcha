@@ -20,3 +20,4 @@ export const URL_MESSAGES = environment.server + '/message';
 export const URL_NOTIFICATIONS = environment.server + '/notification';
 export const URL_TAGS_SEARCH = (search: string) => environment.server + '/tag/' + search + '/similar';
 export const URL_PICTURES = environment.server + '/picture';
+export const URL_PICTURE_LIKE = environment.server + '/picture_like';
