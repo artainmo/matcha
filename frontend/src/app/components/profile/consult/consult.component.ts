@@ -97,6 +97,10 @@ export class ConsultComponent implements OnInit {
 					this.profile.pictures?.splice(index, 1);
 				}
 				this.loading = false;
+			},
+			() => {
+				this.loading = false;
+				this.router.navigate(['/discover']).then();
 			}
 		);
 		this.isMyProfile =

@@ -235,7 +235,10 @@ get '/rest/account/find/:_username' do |_username|
   accounts = db.findAccount(_username)
   affected_rows = accounts.cmd_tuples
   return 404, "Username not found" if affected_rows == 0
-  if _username != @username && _username != '' && @username != ''
+  is_other_user = _username != @username && _username != '' && @username != ''
+  is_blocked = is_other_user && (db.isBlockedBy(@username, _username) || db.isBlockedBy(_username, @username))
+  return 403, "You cannot view this profile" if is_blocked
+  if is_other_user
     ret = db.createVisit(@username, _username)
     return 417, ret if ret != 'CREATED'
     db.createNotification(@username, _username, "account view",
@@ -253,7 +256,6 @@ get '/rest/account/find/:_username' do |_username|
   if _username != @username
     liked = db.findLiked(@username, _username).cmd_tuples > 0
     likes_back = db.findLiked(_username, @username).cmd_tuples > 0
-    blocked = db.isBlockedBy(@username, _username)
     connected = db.findLiked(_username, @username).cmd_tuples > 0 && liked
   end
   pictures = db.findPicturesUser(_username).values.map {|a| a[0]}
@@ -427,6 +429,9 @@ end
 
 post '/rest/liked/:liked' do |liked|
   db = DatabaseManager.new
+  if db.isBlockedBy(@username, liked) or db.isBlockedBy(liked, @username)
+    return 200, 'CREATED'
+  end
   ret = db.createLiked(@username, liked)
   return 417, ret if ret != 'CREATED'
   if (db.findLiked(liked, @username)).cmd_tuples === 0
@@ -441,6 +446,9 @@ end
 
 delete '/rest/liked/:liked' do |liked|
   db = DatabaseManager.new
+  if db.isBlockedBy(@username, liked) or db.isBlockedBy(liked, @username)
+    return 200, '0'
+  end
   ret = db.deleteLiked(@username, liked)
   affected_rows = ret.cmd_tuples
   return 417, "Like of #{@username} to #{liked} not found" if affected_rows == 0
